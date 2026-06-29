@@ -1,0 +1,56 @@
+<th:block th:fragment="findUsernameForm">
+
+    <div class="auth-modal-title-area">
+        <h2>아이디 찾기</h2>
+    </div>
+
+    <form th:action="@{/auth/find-username}" method="POST" id="findUsernameForm">
+
+        <div class="login-input-group">
+            <label for="findUsernameName">이름</label>
+            <input type="text" id="findUsernameName" name="name" required>
+        </div>
+
+        <div class="login-input-group">
+            <label>전화번호</label>
+
+            <div class="find-phone-row">
+                <input type="text" id="findUsernamePhone1" maxlength="3" required>
+                <span>-</span>
+                <input type="text" id="findUsernamePhone2" maxlength="4" required>
+                <span>-</span>
+                <input type="text" id="findUsernamePhone3" maxlength="4" required>
+            </div>
+
+            <input type="hidden" id="findUsernamePhone" name="phone">
+        </div>
+
+        <div class="login-input-group">
+            <label for="findUsernameEmail">이메일</label>
+            <input type="email" id="findUsernameEmail" name="email" required>
+        </div>
+
+        <button type="submit" class="modal-login-btn">아이디 찾기</button>
+    </form>
+
+    <div id="findUsernameResult" class="auth-result-msg"></div>
+
+    <p class="auth-bottom-link">
+        <button type="button" onclick="showLoginForm()">로그인으로 돌아가기</button>
+    </p>
+
+    <script>
+        const findUsernameForm = document.getElementById("findUsernameForm");
+
+        if (findUsernameForm) {
+            findUsernameForm.addEventListener("submit", function () {
+                const phone1 = document.getElementById("findUsernamePhone1").value;
+                const phone2 = document.getElementById("findUsernamePhone2").value;
+                const phone3 = document.getElementById("findUsernamePhone3").value;
+
+                document.getElementById("findUsernamePhone").value = phone1 + "-" + phone2 + "-" + phone3;
+            });
+        }
+    </script>
+
+</th:block>

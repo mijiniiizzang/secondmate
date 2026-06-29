@@ -1,0 +1,132 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background-color: #ffffff;
+    color: #30343b;
+    font-family: Arial, sans-serif;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+button,
+input,
+select {
+    font-family: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+/* 헤더 */
+.site-header {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background-color: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid #ece6df;
+}
+
+.header-container {
+    width: min(1180px, calc(100% - 40px));
+    height: 64px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.header-empty {
+    width: 1px;
+}
+
+.header-section {
+    display: flex;
+    align-items: center;
+}
+
+.guest-menu {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.join-link {
+    padding: 9px 14px;
+    border-radius: 999px;
+    color: #68717b;
+    font-size: 14px;
+    font-weight: 700;
+    transition: 0.2s;
+}
+
+.join-link:hover {
+    background-color: #f3ede7;
+    color: #4a515b;
+}
+
+.login-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 82px;
+    height: 38px;
+    padding: 0 16px;
+    border-radius: 999px;
+    background-color: #697789;
+    color: white;
+    font-size: 14px;
+    font-weight: 700;
+    transition: 0.2s;
+}
+
+.login-link:hover {
+    background-color: #566576;
+}
+
+.user-menu form {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 0;
+}
+
+.welcome-text {
+    color: #596371;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.logout-btn {
+    height: 38px;
+    padding: 0 15px;
+    border: none;
+    border-radius: 999px;
+    background-color: #c58d76;
+    color: white;
+    font-size: 14px;
+    font-weight: 700;
+    transition: 0.2s;
+}
+
+.logout-btn:hover {
+    background-color: #b77962;
+}
+
+@media (max-width: 800px) {
+    .header-container {
+        width: calc(100% - 30px);
+        height: 58px;
+    }
+
+    .welcome-text {
+        display: none;
+    }
+}

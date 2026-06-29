@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <th:block th:replace="~{common/head :: commonHead}"></th:block>
+    <title>홈</title>
+</head>
+
+<body class="home-page">
+    <div th:replace="~{common/header :: header}"></div>
+
+    <main class="home-container">
+
+        <section class="hero-section">
+            <div class="hero-content">
+                <h1>
+                    필요한 건 찾고,<br>
+                    안 쓰는 건 나누세요.
+                </h1>
+
+                <p class="hero-description">
+                    내 주변의 믿을 수 있는 중고거래를 시작해보세요.
+                </p>
+            </div>
+
+
+            <form th:action="@{/product/list}" id="searchProduct" class="hero-search">
+                <select id="category" name="category">
+                    <option value="">전체 카테고리</option>
+                    <option value="ELECTRONICS">전자제품</option>
+                    <option value="FASHION">의류</option>
+                    <option value="BEAUTY">미용/화장품</option>
+                    <option value="BOOK">도서</option>
+                    <option value="SPORTS">스포츠용품</option>
+                    <option value="FURNITURE">가구</option>
+                    <option value="HOBBY">취미</option>
+                    <option value="FOOD">음식</option>
+                    <option value="TICKET">티켓</option>
+                    <option value="ETC">기타</option>
+                </select>
+
+                <input type="text" id="keyword" name="keyword" placeholder="찾고 싶은 상품을 검색하세요">
+                <button type="submit">검색</button>
+            </form>
+
+        </section>
+
+        <section class="category-section">
+            <div class="section-title">
+                <h2>카테고리</h2>
+                <p>원하는 상품을 빠르게 찾아보세요.</p>
+            </div>
+
+            <div class="category-grid">
+                <button type="button" onclick="goCategory('ELECTRONICS')">
+                    <span class="category-icon">💻</span>
+                    <span>전자제품</span>
+                </button>
+
+                <button type="button" onclick="goCategory('FASHION')">
+                    <span class="category-icon">👕</span>
+                    <span>의류</span>
+                </button>
+
+                <button type="button" onclick="goCategory('BEAUTY')">
+                    <span class="category-icon">💄</span>
+                    <span>미용/화장품</span>
+                </button>
+
+                <button type="button" onclick="goCategory('BOOK')">
+                    <span class="category-icon">📚</span>
+                    <span>도서</span>
+                </button>
+
+                <button type="button" onclick="goCategory('SPORTS')">
+                    <span class="category-icon">🏀</span>
+                    <span>스포츠용품</span>
+                </button>
+
+                <button type="button" onclick="goCategory('FURNITURE')">
+                    <span class="category-icon">🪑</span>
+                    <span>가구</span>
+                </button>
+
+                <button type="button" onclick="goCategory('HOBBY')">
+                    <span class="category-icon">🎸</span>
+                    <span>취미</span>
+                </button>
+
+                <button type="button" onclick="goCategory('FOOD')">
+                    <span class="category-icon">🍎</span>
+                    <span>음식</span>
+                </button>
+
+                <button type="button" onclick="goCategory('TICKET')">
+                    <span class="category-icon">🎫</span>
+                    <span>티켓</span>
+                </button>
+
+                <button type="button" onclick="goCategory('ETC')">
+                    <span class="category-icon">📦</span>
+                    <span>기타</span>
+                </button>
+            </div>
+        </section>
+
+        <section class="quick-menu-section">
+            <button type="button" class="quick-menu-card popular-card"
+                onclick="location.href='/product/list?sort=likes'">
+                <div>
+                    <span class="menu-label">POPULAR</span>
+                    <h2>인기 상품</h2>
+                    <p>많은 사람들이 찜한 상품을 확인해보세요.</p>
+                </div>
+
+                <span class="menu-arrow">→</span>
+            </button>
+
+            <button type="button" class="quick-menu-card nearby-card"
+                onclick="location.href='/product/list?region=mine'">
+                <div>
+                    <span class="menu-label">NEARBY</span>
+                    <h2>내 주변 상품</h2>
+                    <p>가까운 지역에서 거래할 수 있는 상품입니다.</p>
+                </div>
+
+                <span class="menu-arrow">→</span>
+            </button>
+        </section>
+    </main>
+
+    <script>
+        function goCategory(category) {
+            location.href = "/product/list?category=" + category;
+        }
+
+        const searchProduct = document.getElementById("searchProduct");
+        const keyword = document.getElementById("keyword");
+
+        searchProduct.addEventListener("submit", function(event) {
+            if (!keyword.value.trim()) {
+                event.preventDefault();
+                alert("검색어를 입력해주세요.");
+            }
+        })
+    </script>
+</body>
+
+</html>

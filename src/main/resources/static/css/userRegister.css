@@ -1,0 +1,197 @@
+* {
+    box-sizing: border-box;
+}
+
+body.register-page {
+    margin: 0;
+    background-color: #f6faf8;
+    font-family: Arial, sans-serif;
+    color: #24342d;
+}
+
+.register-wrap {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 70px 20px;
+}
+
+.register-card {
+    width: 100%;
+    max-width: 680px;
+    background: white;
+    border: 1px solid #dfe9e4;
+    border-radius: 18px;
+    padding: 42px;
+    box-shadow: 0 10px 30px rgba(50, 80, 65, 0.08);
+}
+
+.register-title-area {
+    margin-bottom: 32px;
+}
+
+.register-title-area h1 {
+    margin: 0 0 10px;
+    font-size: 30px;
+    font-weight: 700;
+}
+
+.register-title-area p {
+    margin: 0;
+    font-size: 14px;
+    color: #728078;
+}
+
+.form-group {
+    margin-bottom: 22px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 9px;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    height: 46px;
+    padding: 0 13px;
+    border: 1px solid #cedbd4;
+    border-radius: 9px;
+    background-color: white;
+    font-size: 14px;
+    outline: none;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    border-color: #5c9c7c;
+    box-shadow: 0 0 0 3px rgba(92, 156, 124, 0.12);
+}
+
+.input-button-row {
+    display: flex;
+    gap: 8px;
+}
+
+.input-button-row input {
+    flex: 1;
+}
+
+.check-btn {
+    flex-shrink: 0;
+    height: 46px;
+    padding: 0 14px;
+    border: 1px solid #5c9c7c;
+    border-radius: 9px;
+    background-color: white;
+    color: #397257;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.check-btn:hover {
+    background-color: #edf7f1;
+}
+
+.form-msg {
+    display: block;
+    min-height: 18px;
+    margin-top: 6px;
+    font-size: 12px;
+}
+
+.phone-row {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.phone-row input {
+    min-width: 0;
+    text-align: center;
+}
+
+.phone-row input:nth-of-type(1) {
+    width: 28%;
+}
+
+.phone-row input:nth-of-type(2),
+.phone-row input:nth-of-type(3) {
+    width: 36%;
+}
+
+.phone-row span {
+    color: #7c8982;
+}
+
+.region-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.region-row select {
+    width: 50%;
+}
+
+/* 거래 위치 지도 */
+#map {
+    width: 100% !important;
+    height: 320px !important;
+    overflow: hidden;
+    border: 1px solid #cedbd4;
+    border-radius: 10px;
+    background-color: #f6faf8;
+}
+
+.register-btn {
+    width: 100%;
+    height: 52px;
+    margin-top: 8px;
+    border: none;
+    border-radius: 10px;
+    background-color: #397257;
+    color: white;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.register-btn:hover {
+    background-color: #2f634a;
+}
+
+@media (max-width: 540px) {
+    .register-wrap {
+        padding: 30px 14px;
+    }
+
+    .register-card {
+        padding: 30px 22px;
+        border-radius: 14px;
+    }
+
+    .input-button-row {
+        flex-direction: column;
+    }
+
+    .check-btn {
+        width: 100%;
+    }
+
+    .region-row {
+        flex-direction: column;
+    }
+
+    .region-row select {
+        width: 100%;
+    }
+
+    #map {
+        height: 260px !important;
+    }
+}

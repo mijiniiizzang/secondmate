@@ -1,0 +1,41 @@
+<th:block th:fragment="loginForm">
+
+    <div class="auth-modal-title-area">
+        <h2>로그인</h2>
+    </div>
+
+    <form th:action="@{/auth/login}" method="POST">
+
+        <div class="login-input-group">
+            <label for="loginUsername">아이디</label>
+            <input type="text" id="loginUsername" name="username" required>
+        </div>
+
+        <div class="login-input-group">
+            <label for="loginPassword">비밀번호</label>
+            <input type="password" id="loginPassword" name="password" required>
+        </div>
+
+        <button type="submit" class="modal-login-btn">
+            로그인
+        </button>
+    </form>
+
+    <div class="login-find-links">
+        <button type="button" onclick="showFindUsernameForm()">
+            아이디 찾기
+        </button>
+
+        <span>|</span>
+
+        <button type="button" onclick="showFindPasswordForm()">
+            비밀번호 찾기
+        </button>
+    </div>
+
+    <p class="login-register-text">
+        아직 회원이 아니신가요?
+        <a th:href="@{/user/register}">회원가입</a>
+    </p>
+
+</th:block>

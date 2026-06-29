@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <th:block th:replace="~{common/head :: commonHead}"></th:block>
+    <title>상품 상세</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <div th:replace="~{common/header :: header}"></div>
+    <h1 th:text="${product.title}"></h1>
+    <p><strong>상품명:</strong><span th:text="${product.name}"></span></p>
+    <p><strong>작성자:</strong><span th:text="${product.writer}"></span></p>
+    <p><strong>가격:</strong><span th:text="${product.price}"></span></p>
+    <p><strong>거래상태:</strong><span th:text="${product.tradeStatus}"></span></p>
+    <!-- 글 작성자만 거래 상태 변경 가능 -->
+    <div th:if="${isOwner}">
+        <select id="tradeStatus" name="tradeStatus">
+            <option value="">-</option>
+            <option value="ON_SALE">판매중</option>
+            <option value="RESERVED">예약중</option>
+            <option value="SOLD">판매완료</option>
+        </select>
+        <button type="button" id="changeStatus">거래상태 변경</button>
+    </div>
+    <p><strong>카테고리:</strong><span th:text="${product.category}"></span></p>
+    <p><strong>거래 희망 지역:</strong><span th:text="${product.city + ' ' + product.gu}"></span></p>
+    <p><strong>등록일:</strong><span th:text="${product.regDate}"></span></p>
+    <p><strong>내용:</strong></p>
+    <p th:text="${product.content}"></p>
+    <!--첨부파일-->
+
+
+    <!-- 글 작성자만 수정/삭제 가능 -->
+    <div th:if="${isOwner}">
+        <form th:action="@{/product/edit(productId=${product.productId})}">
+            <button type="submit">수정</button>
+        </form>
+        <form th:action="@{/product/delete(productId=${product.productId})}" method="POST">
+            <button type="submit">삭제</button>
+        </form>
+    </div>
+
+    <a th:href="@{/product/list}">목록</a>
+    <!-- 찜 버튼 -->
+    <div>
+        <button type="button" id="wishlist-btn" th:data-logged-in="${#authorization.expression('isAuthenticated()')}">
+            <span id="heart-icon" th:text="${isWished} ? '♥' : '♡'">♡</span>
+        </button>
+        <span>
+            <span id="wishlist-count" th:text="${wishlistCount}">0</span>
+        </span>
+    </div>
+    <br>
+    <div id="comment-section">
+        <h3>댓글</h3>
+
+        <!-- 댓글 입력란 -->
+        <!-- 로그인 하지 않으면 댓글 입력 안됨 -->
+        <div sec:authorize="isAuthenticated()">
+            <h4>댓글 작성</h4>
+            <p>작성자 : <span th:text="${#authentication.principal.nickname}"></span></p>
+            <br>
+            <textarea id="comment-content" rows="3" cols="50"></textarea>
+            <br>
+            <button id="comment-submit">등록</button>
+        </div>
+        <div sec:authorize="isAnonymous()">
+            <p>댓글은 로그인 후 작성할 수 있습니다.</p>
+        </div>
+        
+
+        <!-- 댓글 목록 -->
+        <ul id="comment-list"></ul>
+    </div>
+    <div th:replace="~{common/footer :: footer}"></div>
+
+    <script th:inline="javascript">
+        const currentUser = /*[[${#authentication != null ? #authentication.principal.nickname : ''}]]*/'';
+        // 게시글의 productId 저장
+        const productId = /*[[${product.productId}]]*/0;
+
+        // 댓글 등록
+        $('#comment-submit').click(function() {
+            const content = $('#comment-content').val().trim();
+
+            // 데이터 전송 전 입력 데이터 검증
+            if(!content) {
+                alert('내용을 입력해주세요');
+                return;
+            }
+
+            $.ajax({
+                type: 'POST',
+                url: '/api/comments',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    content: content,
+                    productId: productId
+                }),
+                success: function() {
+                    alert('댓글 등록 완료');
+                    // $('#comment-writer').val('');
+                    $('#comment-content').val('');
+                    loadComments();
+                },
+                error: function() {
+                    alert('댓글 등록 실패');
+                }
+            });
+        });
+
+        // 댓글 목록 불러오기
+        function loadComments() {
+            $.get(`/api/comments/product/${productId}`, function(comments) {
+                $('#comment-list').empty();
+
+                if(comments.length === 0) {
+                    $('#comment-list').append('<li>등록된 댓글이 없습니다.</li>');
+                } else {
+                    comments.forEach(comment => {
+                        let buttons = '';
+
+                        // 로그인했고, 현재 로그인 한 사람이 댓글 작성자일 때만 버튼 활성화
+                        if(currentUser && currentUser === comment.writer) {
+                            buttons = `
+                                <button onclick="editComment(${comment.commentId})">수정</button>
+                                <button onclick="deleteComment(${comment.commentId})">삭제</button>
+                                <button id="save-${comment.commentId}" onclick="saveEdit(${comment.commentId})" style="display:none">저장</button>    
+                            `;
+                        }
+
+                        $('#comment-list').append(
+                            `<li>
+                                <string>${comment.writer}</string>: 
+                                <input id="comment-${comment.commentId}" value="${comment.content}" readonly>
+                                ${buttons}                                
+                            </li>`
+                        );
+                    });
+                }
+            })
+        }
+
+        // 댓글 수정
+        function editComment(commentId, content) {
+            $(`#comment-${commentId}`).prop('readonly', false);
+            $(`#save-${commentId}`).show();
+        }
+
+        function saveEdit(commentId) {
+            const content = $('#comment-${commentId}').val().trim();
+            $.ajax({
+                type: 'PUT',
+                url: `/api/comments/${commentId}`,
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    content: content
+                }),
+                success: function() {
+                    alert('댓글 수정 완료');
+                    loadComments();
+                },
+                error: function() {
+                    alert('댓글 수정 실패');
+                }
+            });
+        }
+
+        // 댓글 삭제
+        function deleteComment(commentId) {
+            if(!confirm('댓글을 삭제하시겠습니까?')) return;
+
+            $.ajax({
+                type: 'DELETE',
+                url: `/api/comments/${commentId}`,
+                success: function() {
+                    alert('댓글 삭제 완료');
+                    loadComments();
+                },
+                error: function() {
+                    alert('댓글 삭제 실패');
+                }
+            });
+        }
+
+        // 페이지 로딩 시 댓글 목록 가져오기
+        $(document).ready(function() {
+            loadComments();
+        });
+
+        // 찜 버튼
+        $('#wishlist-btn').click(function() {
+            const loggedIn = $(this).data('logged-in') === true;
+
+            if(!loggedIn) {
+                alert("로그인 후 이용할 수 있습니다.");
+                openLoginModal();
+                return;
+            }
+
+            $.ajax({
+                type: 'POST',
+                url: `/wishlist/toggle/${productId}`,
+                success: function(result) {
+                    if(result.wished) {
+                        $('#heart-icon').text('♥');
+                    } else {
+                        $('#heart-icon').text('♡');
+                    }
+
+                    $('#wishlist-count').text(result.wishlistCount);
+                },
+                error: function(xhr) {
+                    alert('찜 처리에 실패했습니다.');
+                }
+            });
+        });
+
+        // 거래 상태 수정
+        $('#changeStatus').click(function() {
+            const tradeStatus = $('#tradeStatus').val();
+
+            if(!tradeStatus) {
+                alert('변경할 거래 상태를 선택해주세요.');
+                return;
+            }
+            if(!confirm('상태를 변경하시겠습니까?')) return;
+
+            $.ajax({
+                type: 'POST',
+                url: `/product/status?productId=${productId}`,
+                data: {
+                    tradeStatus: tradeStatus
+                },
+                success: function() {
+                    alert('거래 상태가 변경되었습니다.');
+                    location.reload();
+                },
+                error: function() {
+                    alert('거래 상태 변경에 실패했습니다.');
+                }
+            });
+        });
+    </script>
+    
+
+</body>
+</html>

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<th:block th:fragment="header">
+
+    <header class="site-header">
+        <div class="header-container">
+
+            <a class="nav-link" th:href="@{/home}">메인</a>
+
+            <div class="header-section">
+
+                <!-- 비로그인 -->
+                <div class="guest-menu" sec:authorize="isAnonymous()">
+                    <a class="join-link" th:href="@{/user/register}">회원가입</a>
+
+                    <button type="button"
+                            class="login-link"
+                            onclick="openLoginModal()">
+                        로그인
+                    </button>
+                </div>
+
+                <!-- 로그인 -->
+                <div class="user-menu" sec:authorize="isAuthenticated()">
+                    <form th:action="@{/auth/logout}" method="POST">
+                        <span class="welcome-text"
+                              th:text="${#authentication.principal.nickname} + '님, 반갑습니다!'">
+                        </span>
+
+                        <button type="submit" class="logout-btn">
+                            로그아웃
+                        </button>
+                    </form>
+                    <a th:href="@{/product/register}">글쓰기</a>
+                </div>
+
+            </div>
+        </div>
+    </header>
+
+    <!-- 로그인 / 아이디 찾기 / 비밀번호 찾기 모달 -->
+    <div id="loginModal" class="login-modal">
+        <div class="login-modal-box">
+
+            <button type="button"
+                    class="modal-close-btn"
+                    onclick="closeLoginModal()">
+                ×
+            </button>
+
+            <!-- 로그인 -->
+            <div id="loginView" class="auth-view active">
+                <div th:replace="~{auth/login :: loginForm}"></div>
+            </div>
+
+            <!-- 아이디 찾기 -->
+            <div id="findUsernameView" class="auth-view">
+                <div th:replace="~{auth/find-username :: findUsernameForm}"></div>
+            </div>
+
+            <!-- 비밀번호 찾기 -->
+            <div id="findPasswordView" class="auth-view">
+                <div th:replace="~{auth/find-password :: findPasswordForm}"></div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function openLoginModal() {
+            document.getElementById("loginModal").classList.add("show");
+            document.body.style.overflow = "hidden";
+
+            showLoginForm();
+        }
+
+        function closeLoginModal() {
+            document.getElementById("loginModal").classList.remove("show");
+            document.body.style.overflow = "";
+        }
+
+        function showLoginForm() {
+            document.getElementById("loginView").classList.add("active");
+            document.getElementById("findUsernameView").classList.remove("active");
+            document.getElementById("findPasswordView").classList.remove("active");
+        }
+
+        function showFindUsernameForm() {
+            document.getElementById("loginView").classList.remove("active");
+            document.getElementById("findUsernameView").classList.add("active");
+            document.getElementById("findPasswordView").classList.remove("active");
+        }
+
+        function showFindPasswordForm() {
+            document.getElementById("loginView").classList.remove("active");
+            document.getElementById("findUsernameView").classList.remove("active");
+            document.getElementById("findPasswordView").classList.add("active");
+        }
+
+        document.getElementById("loginModal").addEventListener("click", function(event) {
+            if (event.target === this) {
+                closeLoginModal();
+            }
+        });
+    </script>
+
+</th:block>
+
+</html>
