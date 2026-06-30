@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <th:block th:replace="~{common/head :: commonHead}"></th:block>
+    <title>마이페이지</title>
+</head>
+
+<body>
+    <div th:replace="~{common/header :: header}"></div>
+
+    <main class="mypage-container">
+        <aside class="mypage-sidebar">
+            <h2>마이페이지</h2>
+            <ul class="mypage-menu">
+                <li>
+                    <a th:href="@{/mypage}" class="active">마이페이지 홈</a>
+                </li>
+                <li>
+                    <a th:href="@{/mypage/profile}">내 회원정보</a>
+                </li>
+                <li>
+                    <a th:href="@{/mypage/products}">내가 쓴 글</a>
+                </li>
+                <li>
+                    <a th:href="@{/mypage/wishlists}">찜 내역</a>
+                </li>
+                <li>
+                    <a th:href="@{/mypage/reports}">신고 내역</a>
+                </li>
+                <li>
+                    <a th:href="@{/mypage/chats}">내 채팅방</a>
+                </li>
+            </ul>
+        </aside>
+
+        <section class="mypage-content">
+            <h1>
+                <span th:text="${user.nickname}">닉네임</span>님, 안녕하세요.
+            </h1>
+
+            <p class="mypage-intro">
+                내 정보와 활동 내역을 확인할 수 있습니다.
+            </p>
+
+            <div class="mypage-summary-list">
+
+                <a th:href="@{/mypage/profile}" class="mypage-summary-card">
+                    <h3>내 회원정보</h3>
+                    <p>회원정보 수정 및 비밀번호 변경</p>
+                </a>
+
+                <a th:href="@{/mypage/products}" class="mypage-summary-card">
+                    <h3>내가 쓴 글</h3>
+                    <p>내가 등록한 상품을 확인합니다.</p>
+                </a>
+
+                <a th:href="@{/mypage/wishlists}" class="mypage-summary-card">
+                    <h3>찜 내역</h3>
+                    <p>찜한 상품을 확인합니다.</p>
+                </a>
+
+                <a th:href="@{/mypage/reports}" class="mypage-summary-card">
+                    <h3>신고 내역</h3>
+                    <p>신고 처리 결과를 확인합니다.</p>
+                </a>
+
+                <a th:href="@{/mypage/chats}" class="mypage-summary-card">
+                    <h3>내 채팅방</h3>
+                    <p>거래 채팅 목록을 확인합니다.</p>
+                </a>
+
+            </div>
+        </section>
+
+    </main>
+
+    <div th:replace="~{common/footer :: footer}"></div>
+</body>
+
+</html>

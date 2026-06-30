@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
 <head>
     <th:block th:replace="~{common/head :: commonHead}"></th:block>
     <title>상품 상세</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
+
 <body>
     <div th:replace="~{common/header :: header}"></div>
     <h1 th:text="${product.title}"></h1>
@@ -40,6 +41,9 @@
             <button type="submit">삭제</button>
         </form>
     </div>
+    <div sec:authorize="isAuthenticated()" th:if="${!isOwner}">
+        <button type="button" onclick="openProductReport()">신고</button>
+    </div>
 
     <a th:href="@{/product/list}">목록</a>
     <!-- 찜 버튼 -->
@@ -68,9 +72,10 @@
         <div sec:authorize="isAnonymous()">
             <p>댓글은 로그인 후 작성할 수 있습니다.</p>
         </div>
-        
+
 
         <!-- 댓글 목록 -->
+        <p>댓글 갯수 : <span id="comment-count" th:text="${product.commentCount}">0</span></p>
         <ul id="comment-list"></ul>
     </div>
     <div th:replace="~{common/footer :: footer}"></div>
@@ -81,11 +86,11 @@
         const productId = /*[[${product.productId}]]*/0;
 
         // 댓글 등록
-        $('#comment-submit').click(function() {
+        $('#comment-submit').click(function () {
             const content = $('#comment-content').val().trim();
 
             // 데이터 전송 전 입력 데이터 검증
-            if(!content) {
+            if (!content) {
                 alert('내용을 입력해주세요');
                 return;
             }
@@ -98,13 +103,13 @@
                     content: content,
                     productId: productId
                 }),
-                success: function() {
+                success: function () {
                     alert('댓글 등록 완료');
                     // $('#comment-writer').val('');
                     $('#comment-content').val('');
                     loadComments();
                 },
-                error: function() {
+                error: function () {
                     alert('댓글 등록 실패');
                 }
             });
@@ -112,38 +117,50 @@
 
         // 댓글 목록 불러오기
         function loadComments() {
-            $.get(`/api/comments/product/${productId}`, function(comments) {
+            $.get(`/api/comments/product/${productId}`, function (comments) {
                 $('#comment-list').empty();
 
-                if(comments.length === 0) {
-                    $('#comment-list').append('<li>등록된 댓글이 없습니다.</li>');
-                } else {
-                    comments.forEach(comment => {
-                        let buttons = '';
+                // 댓글 갯수 갱신
+                $('#comment-count').text(comments.length);
 
-                        // 로그인했고, 현재 로그인 한 사람이 댓글 작성자일 때만 버튼 활성화
-                        if(currentUser && currentUser === comment.writer) {
-                            buttons = `
+                if (comments.length === 0) {
+                    $('#comment-list').append('<li>등록된 댓글이 없습니다.</li>');
+                    return;
+                }
+                comments.forEach(comment => {
+                    let buttons = '';
+
+                    // 로그인했고, 현재 로그인 한 사람이 댓글 작성자일 때만 버튼 활성화
+                    if (currentUser && currentUser === comment.writer) {
+                        buttons += `
                                 <button onclick="editComment(${comment.commentId})">수정</button>
-                                <button onclick="deleteComment(${comment.commentId})">삭제</button>
+                                <button onclick="deleteComment(${comment.commentId})">삭제</button>                                
                                 <button id="save-${comment.commentId}" onclick="saveEdit(${comment.commentId})" style="display:none">저장</button>    
                             `;
-                        }
+                    }
 
-                        $('#comment-list').append(
-                            `<li>
+                    if (currentUser && currentUser !== comment.writer) {
+                        buttons += `
+                                <button onclick='openCommentReport(${comment.commentId}, ${JSON.stringify(comment.writer)}, ${JSON.stringify(comment.content)})'>
+                                    신고
+                                </button>
+                        `;
+                    }
+
+                    $('#comment-list').append(
+                        `<li>
                                 <string>${comment.writer}</string>: 
                                 <input id="comment-${comment.commentId}" value="${comment.content}" readonly>
                                 ${buttons}                                
                             </li>`
-                        );
-                    });
-                }
+                    );
+                });
+
             })
         }
 
         // 댓글 수정
-        function editComment(commentId, content) {
+        function editComment(commentId) {
             $(`#comment-${commentId}`).prop('readonly', false);
             $(`#save-${commentId}`).show();
         }
@@ -157,11 +174,11 @@
                 data: JSON.stringify({
                     content: content
                 }),
-                success: function() {
+                success: function () {
                     alert('댓글 수정 완료');
                     loadComments();
                 },
-                error: function() {
+                error: function () {
                     alert('댓글 수정 실패');
                 }
             });
@@ -169,31 +186,31 @@
 
         // 댓글 삭제
         function deleteComment(commentId) {
-            if(!confirm('댓글을 삭제하시겠습니까?')) return;
+            if (!confirm('댓글을 삭제하시겠습니까?')) return;
 
             $.ajax({
                 type: 'DELETE',
                 url: `/api/comments/${commentId}`,
-                success: function() {
+                success: function () {
                     alert('댓글 삭제 완료');
                     loadComments();
                 },
-                error: function() {
+                error: function () {
                     alert('댓글 삭제 실패');
                 }
             });
         }
 
         // 페이지 로딩 시 댓글 목록 가져오기
-        $(document).ready(function() {
+        $(document).ready(function () {
             loadComments();
         });
 
         // 찜 버튼
-        $('#wishlist-btn').click(function() {
+        $('#wishlist-btn').click(function () {
             const loggedIn = $(this).data('logged-in') === true;
 
-            if(!loggedIn) {
+            if (!loggedIn) {
                 alert("로그인 후 이용할 수 있습니다.");
                 openLoginModal();
                 return;
@@ -202,8 +219,8 @@
             $.ajax({
                 type: 'POST',
                 url: `/wishlist/toggle/${productId}`,
-                success: function(result) {
-                    if(result.wished) {
+                success: function (result) {
+                    if (result.wished) {
                         $('#heart-icon').text('♥');
                     } else {
                         $('#heart-icon').text('♡');
@@ -211,21 +228,21 @@
 
                     $('#wishlist-count').text(result.wishlistCount);
                 },
-                error: function(xhr) {
+                error: function (xhr) {
                     alert('찜 처리에 실패했습니다.');
                 }
             });
         });
 
         // 거래 상태 수정
-        $('#changeStatus').click(function() {
+        $('#changeStatus').click(function () {
             const tradeStatus = $('#tradeStatus').val();
 
-            if(!tradeStatus) {
+            if (!tradeStatus) {
                 alert('변경할 거래 상태를 선택해주세요.');
                 return;
             }
-            if(!confirm('상태를 변경하시겠습니까?')) return;
+            if (!confirm('상태를 변경하시겠습니까?')) return;
 
             $.ajax({
                 type: 'POST',
@@ -233,17 +250,48 @@
                 data: {
                     tradeStatus: tradeStatus
                 },
-                success: function() {
+                success: function () {
                     alert('거래 상태가 변경되었습니다.');
                     location.reload();
                 },
-                error: function() {
+                error: function () {
                     alert('거래 상태 변경에 실패했습니다.');
                 }
             });
         });
-    </script>
-    
 
+        // 상품 신고 모달 활성화
+        function openProductReport() {
+            document.getElementById("productReportModal").style.display = "flex";
+        }
+
+        function closeProductReport() {
+            document.getElementById("productReportModal").style.display = "none";
+        }
+
+        // 댓글 신고 모달 활성화
+        function openCommentReport(commentId, writer, content) {
+            document.getElementById("commentReportForm").action = 
+                "/report/comment/" + commentId;
+
+            document.getElementById("reportProductId").value = productId;
+            document.getElementById("reportCommentWriter").textContent = writer;
+            document.getElementById("reportCommentContent").textContent = content;
+
+            document.getElementById("commentReportModal").style.display = "flex";
+        }
+
+        function closeCommentReport() {
+            document.getElementById("commentReportModal").style.display = "none";
+        }
+    </script>
+
+    <div class="report-modal-wrapper" id="productReportModal">
+        <th:block th:replace="~{report/product-report :: productReport}"></th:block>
+    </div>
+    <div class="report-modal-wrapper" id="commentReportModal">
+        <th:block th:replace="~{report/comment-report :: commentReport}"></th:block>
+    </div>
 </body>
+
 </html>

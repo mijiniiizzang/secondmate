@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <th:block th:replace="~{common/head :: commonHead}"></th:block>
+    <title>내 회원정보</title>
+</head>
+
+<body>
+    <div th:replace="~{common/header :: header}"></div>
+
+    <main class="mypage-container">
+
+        <aside class="mypage-sidebar">
+            <h2>마이페이지</h2>
+
+            <ul class="mypage-menu">
+                <li>
+                    <a th:href="@{/mypage}">마이페이지 홈</a>
+                </li>
+                <li>
+                    <a th:href="@{/mypage/profile}" class="active">내 회원정보</a>
+                </li>
+                <li>
+                    <a th:href="@{/mypage/products}">내가 쓴 글</a>
+                </li>
+                <li>
+                    <a th:href="@{/mypage/wishlists}">찜 내역</a>
+                </li>
+                <li>
+                    <a th:href="@{/mypage/reports}">신고 내역</a>
+                </li>
+                <li>
+                    <a th:href="@{/mypage/chats}">내 채팅방</a>
+                </li>
+            </ul>
+        </aside>
+
+        <section class="mypage-content">
+            <h1>내 회원정보</h1>
+            <p class="mypage-intro">회원정보를 수정할 수 있습니다.</p>
+
+            <form class="mypage-form"
+                  th:action="@{/mypage/profile}"
+                  method="POST">
+
+                <div class="mypage-form-row">
+                    <label>아이디</label>
+                    <input type="text"
+                           th:value="${user.username}"
+                           readonly>
+                </div>
+
+                <div class="mypage-form-row">
+                    <label>이름</label>
+                    <input type="text"
+                           name="name"
+                           th:value="${user.name}"
+                           required>
+                </div>
+
+                <div class="mypage-form-row">
+                    <label>닉네임</label>
+                    <input type="text"
+                           name="nickname"
+                           th:value="${user.nickname}"
+                           required>
+                </div>
+
+                <div class="mypage-form-row">
+                    <label>전화번호</label>
+                    <input type="text"
+                           name="phone"
+                           th:value="${user.phone}"
+                           required>
+                </div>
+
+                <div class="mypage-form-row">
+                    <label>이메일</label>
+                    <input type="email"
+                           name="email"
+                           th:value="${user.email}"
+                           required>
+                </div>
+
+                <div class="mypage-form-row">
+                    <label>주소</label>
+                    <input type="text"
+                           name="address"
+                           th:value="${user.address}"
+                           required>
+                </div>
+
+                <input type="hidden"
+                       name="latitude"
+                       th:value="${user.latitude}">
+
+                <input type="hidden"
+                       name="longitude"
+                       th:value="${user.longitude}">
+
+                <button type="submit" class="mypage-submit-btn">
+                    회원정보 수정
+                </button>
+            </form>
+
+            <div class="mypage-divider"></div>
+
+            <h2 class="mypage-section-title">비밀번호 변경</h2>
+
+            <form class="mypage-form"
+                  th:action="@{/mypage/password}"
+                  method="POST">
+
+                <div class="mypage-form-row">
+                    <label>현재 비밀번호</label>
+                    <input type="password"
+                           name="oldPassword"
+                           required>
+                </div>
+
+                <div class="mypage-form-row">
+                    <label>새 비밀번호</label>
+                    <input type="password"
+                           name="newPassword"
+                           required>
+                </div>
+
+                <button type="submit" class="mypage-submit-btn">
+                    비밀번호 변경
+                </button>
+            </form>
+
+            <div class="mypage-divider"></div>
+
+            <div class="mypage-delete-area">
+                <h2 class="mypage-section-title">회원 탈퇴</h2>
+                <p>탈퇴하면 계정을 복구할 수 없습니다.</p>
+
+                <form th:action="@{/mypage/delete}" method="POST"
+                      onsubmit="return confirm('정말 회원 탈퇴하시겠습니까?');">
+                    <button type="submit" class="mypage-delete-btn">
+                        회원 탈퇴
+                    </button>
+                </form>
+            </div>
+        </section>
+
+    </main>
+
+    <div th:replace="~{common/footer :: footer}"></div>
+</body>
+
+</html>

@@ -5,7 +5,8 @@ import lombok.Getter;
 @Getter
 public enum ReportStatus {
     PENDING(1, "처리중"),
-    COMPLETED(2, "처리 완료");
+    ACCEPTED(2, "처리 완료"),
+    REJECTED(3, "반려");
 
     private final int id;
     private final String statusName;

@@ -32,9 +32,8 @@ public class CommentRestController {
         if(accountDetails == null) {
             return ResponseEntity.status(401).build();
         }
-
-        //로그인한 사용자 닉네임 보내기
-        commentDTO.setWriter(accountDetails.getNickname());
+        
+        commentDTO.setUserId(accountDetails.getUserId());
         int result = commentService.saveComment(commentDTO);
         return ResponseEntity.ok(result);
     }

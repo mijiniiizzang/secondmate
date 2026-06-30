@@ -5,7 +5,8 @@ import lombok.Getter;
 @Getter
 public enum TargetType {
     PRODUCT(1, "상품"),
-    COMMENT(2, "댓글");
+    COMMENT(2, "댓글"),
+    USER(3, "사용자");
 
     private final int id;
     private final String typeName;

@@ -1,0 +1,80 @@
+<th:block th:fragment="reportModal">
+
+    <!-- 계정 정지 안내 -->
+    <div class="report-modal suspended-report-modal"
+         id="suspendedModal"
+         th:if="${param.suspended}">
+
+        <div class="report-modal-box">
+
+            <button type="button"
+                    class="report-modal-close"
+                    onclick="closeReportModal('suspendedModal')">
+                ×
+            </button>
+
+            <h2>계정 이용 제한 안내</h2>
+
+            <p class="report-modal-message">
+                <strong th:text="${param.count[0]}"></strong>번 신고 누적으로
+                계정 이용이 일시적으로 제한되었습니다.
+            </p>
+
+            <p class="report-modal-description">
+                정지 해제 예정일 :
+                <strong th:text="${param.until[0]}"></strong>
+            </p>
+
+            <p class="report-modal-description">
+                자세한 내용은 마이페이지에서 확인해주세요.
+            </p>
+
+            <button type="button"
+                    class="report-modal-confirm-btn"
+                    onclick="closeReportModal('suspendedModal')">
+                확인
+            </button>
+
+        </div>
+    </div>
+
+    <!-- 로그인 후 신고 처리 알림 -->
+    <div class="report-modal"
+         id="acceptedReportModal"
+         th:if="${acceptedReportCount != null and acceptedReportCount > 0}">
+
+        <div class="report-modal-box">
+
+            <button type="button"
+                    class="report-modal-close"
+                    onclick="closeReportModal('acceptedReportModal')">
+                ×
+            </button>
+
+            <h2>신고 처리 안내</h2>
+
+            <p class="report-modal-message">
+                <strong th:text="${#authentication.principal.nickname}"></strong>님 관련 신고
+                <strong th:text="${acceptedReportCount}"></strong>건이 처리되었습니다.
+            </p>
+
+            <p class="report-modal-description">
+                자세한 내용은 마이페이지에서 확인해주세요.
+            </p>
+
+            <button type="button"
+                    class="report-modal-confirm-btn"
+                    onclick="closeReportModal('acceptedReportModal')">
+                확인
+            </button>
+
+        </div>
+    </div>
+
+    <script>
+        function closeReportModal(modalId) {
+            document.getElementById(modalId).style.display = "none";
+        }
+    </script>
+
+</th:block>

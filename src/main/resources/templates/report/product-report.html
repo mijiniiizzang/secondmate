@@ -1,0 +1,21 @@
+<th:block th:fragment="productReport">
+    <link rel="stylesheet" th:href="@{/css/report-form.css}">
+    <!-- 신고 접수 -->
+    <button type="button" class="report-modal-close" onclick="closeProductReport()">x</button>
+    <form class="report-form" th:action="@{/report/product/{productId}(productId=${product.productId})}" method="POST">
+        <h2>상품 신고</h2>
+        <p>신고자 : <span th:text="${#authentication.principal.nickname}"></span></p>
+        <p>상품 : <span th:text="${product.title}"></span></p>
+        <p>신고 유형 : </p>
+        <select name="reportType" required>
+            <option value="">신고 유형을 선택해주세요</option>
+            <option value="PRODUCT_FRAUD">사기 의심</option>
+            <option value="PRODUCT_PROHIBITED_ITEM">판매 금지 물품</option>
+            <option value="PRODUCT_FALSE_INFORMATION">허위 상품 정보</option>
+            <option value="OTHER">기타</option>
+        </select>
+        <p>신고 내용 : </p>
+        <textarea name="reason" rows="5" cols="30" placeholder="신고 사유를 입력해주세요" required></textarea>
+        <button type="submit">신고접수</button>
+    </form>
+</th:block>

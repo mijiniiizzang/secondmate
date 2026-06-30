@@ -63,7 +63,8 @@ public class CommentService {
     // 댓글 삭제 : 댓글 제거 + 상품 테이블 수정
     @Transactional
     public void deleteComment(Long commentId) {
-        Comment comment = commentRepository.findById(commentId).get();
+        Comment comment = commentRepository.findById(commentId)
+                                           .orElseThrow(() -> new IllegalArgumentException("댓글 없음"));
         commentRepository.deleteById(commentId);
         Product product = productRepository.findById(comment.getProduct().getProductId()).get();
         product.setCommentCount(product.getCommentCount() - 1);
@@ -78,6 +79,7 @@ public class CommentService {
                          .content(comment.getContent())
                          .createdAt(comment.getCreatedAt())
                          .productId(comment.getProduct().getProductId())
+                         .userId(comment.getUser().getUserId())
                          .build();
     }
 

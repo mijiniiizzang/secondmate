@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 import org.hibernate.annotations.CreationTimestamp;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -36,7 +37,11 @@ public class Comment {
     @JoinColumn(name="user_id", nullable=false)
     private User user;
 
+    @Column(nullable=false)
     private String content;
+    @Builder.Default
+    @Column(nullable=false)
+    private boolean hidden = false;
     @CreationTimestamp
     private LocalDateTime createdAt;
 }

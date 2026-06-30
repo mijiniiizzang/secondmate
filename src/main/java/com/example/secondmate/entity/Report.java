@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import org.hibernate.annotations.CreationTimestamp;
 
 import com.example.secondmate.common.ReportStatus;
+import com.example.secondmate.common.ReportType;
 import com.example.secondmate.common.TargetType;
 
 import jakarta.persistence.Column;
@@ -38,6 +39,10 @@ public class Report {
     @JoinColumn(name="reporter_id", nullable=false)
     private User reporter;
 
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="reported_user_id", nullable=false)
+    private User reportedUser;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable=false)
     private TargetType targetType;
@@ -48,6 +53,9 @@ public class Report {
     @Enumerated(EnumType.STRING)
     @Column(nullable=false)
     private ReportStatus reportStatus;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable=false)
+    private ReportType reportType;
 
     @CreationTimestamp
     private LocalDateTime regDate;

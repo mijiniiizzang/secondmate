@@ -1,0 +1,142 @@
+.report-modal-wrapper {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+
+    justify-content: center;
+    align-items: center;
+
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.45);
+}
+
+.report-form {
+    position: relative;
+
+    width: 100%;
+    max-width: 430px;
+    padding: 32px;
+
+    border-radius: 18px;
+    background: #ffffff;
+    box-shadow: 0 12px 34px rgba(0, 0, 0, 0.12);
+
+    box-sizing: border-box;
+}
+
+.report-form h2 {
+    margin: 0 0 24px;
+
+    color: #222;
+    font-size: 22px;
+    font-weight: 700;
+    text-align: center;
+}
+
+.report-form p {
+    margin: 14px 0 7px;
+
+    color: #444;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.report-form p span {
+    color: #222;
+    font-weight: 600;
+}
+
+.report-form select,
+.report-form textarea {
+    width: 100%;
+
+    border: 1px solid #dcdcdc;
+    border-radius: 10px;
+    outline: none;
+
+    box-sizing: border-box;
+    font-family: inherit;
+    font-size: 14px;
+    color: #333;
+}
+
+.report-form select {
+    padding: 12px;
+    background: #ffffff;
+    cursor: pointer;
+}
+
+.report-form textarea {
+    min-height: 110px;
+    padding: 12px;
+    resize: vertical;
+    line-height: 1.5;
+}
+
+.report-form select:focus,
+.report-form textarea:focus {
+    border-color: #ff6b35;
+    box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.12);
+}
+
+.report-form select:invalid {
+    color: #aaa;
+}
+
+.report-form textarea::placeholder {
+    color: #aaa;
+}
+
+.report-form button[type="submit"] {
+    width: 100%;
+    margin-top: 24px;
+    padding: 13px 16px;
+
+    border: none;
+    border-radius: 10px;
+    background: #ff6b35;
+    color: #ffffff;
+
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.report-form button[type="submit"]:hover {
+    background: #f15a24;
+}
+
+.report-modal-close {
+    position: absolute;
+    top: 13px;
+    right: 16px;
+
+    width: 34px;
+    height: 34px;
+
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    color: #777;
+
+    font-size: 25px;
+    line-height: 30px;
+    cursor: pointer;
+}
+
+.report-modal-close:hover {
+    background: #f4f4f4;
+    color: #222;
+}
+
+@media (max-width: 480px) {
+    .report-form {
+        padding: 28px 22px;
+        border-radius: 16px;
+    }
+
+    .report-form h2 {
+        font-size: 20px;
+    }
+}

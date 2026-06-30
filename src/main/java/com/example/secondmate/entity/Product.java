@@ -69,6 +69,9 @@ public class Product {
     @Enumerated(EnumType.STRING)
     @Column(nullable=false)
     private TradeStatus tradeStatus;
+    @Builder.Default
+    @Column(nullable=false)
+    private boolean hidden = false;
 
     @CreationTimestamp
     private LocalDateTime regDate;

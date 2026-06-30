@@ -1,5 +1,7 @@
 package com.example.secondmate.entity;
 
+import java.time.LocalDateTime;
+
 import com.example.secondmate.common.UserRole;
 import com.example.secondmate.common.UserStatus;
 
@@ -48,7 +50,13 @@ public class User {
     @Enumerated(EnumType.STRING)
     @Column(nullable=false)
     private UserRole role;
+    
+    // 신고
     @Enumerated(EnumType.STRING)
     @Column(nullable=false)
     private UserStatus status;
+    @Builder.Default
+    @Column(nullable=false)
+    private int suspensionCount = 0;
+    private LocalDateTime suspendedUntil;
 }

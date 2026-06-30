@@ -1,0 +1,20 @@
+<th:block th:fragment="userReport">
+    <link rel="stylesheet" th:href="@{/css/report-form.css}">
+    <!-- 사용자 신고 -->
+    <form class="report-form" th:action="@{/report/user/{reportedUserId}(reportedUserId=${user.userId})}" method="POST">
+        <h2>사용자 신고</h2>
+        <p>신고자 : <span th:text="${#authentication.principal.nickname}"></span></p>
+        <p>신고 대상 : <span th:text="${user.nickname}"></span></p>
+        <p>신고 유형 :</p>
+        <select name="reportType" required>
+            <option value="">신고 유형을 선택해주세요</option>
+            <option value="USER_FRAUD">사기 의심</option>
+            <option value="USER_HARASSMENT">괴롭힘 / 비방</option>
+            <option value="USER_IMPERSONATION">사칭</option>
+            <option value="OTHER">기타</option>
+        </select>
+        <p>신고 내용 : </p>
+        <textarea name="reason" rows="5" cols="30" placeholder="신고 사유를 입력해주세요" required></textarea>
+        <button type="submit">신고접수</button>
+    </form>
+</th:block>
