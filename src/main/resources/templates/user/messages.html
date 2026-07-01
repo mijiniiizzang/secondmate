@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <th:block th:replace="~{common/head :: commonHead}"></th:block>
+    <title>쪽지함</title>
+</head>
+
+<body>
+    <div th:replace="~{common/header :: header}"></div>
+
+    <main>
+        <h1>쪽지함</h1>
+
+        <div>
+            <a th:href="@{/user/messages}">쪽지</a>
+            <a href="#">채팅</a>
+        </div>
+
+        <section>
+            <h2>쪽지</h2>
+
+            <table border="1">
+                <thead>
+                    <tr>
+                        <th>제목</th>
+                        <th>내용</th>
+                        <th>읽음 여부</th>
+                        <th>받은 날짜</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr th:each="notification : ${notifications.content}">
+                        <td th:text="${notification.title}"></td>
+                        <td th:text="${notification.content}"></td>
+                        <td th:text="${notification.read ? '읽음' : '안 읽음'}"></td>
+                        <td th:text="${#temporals.format(notification.createdAt, 'yyyy.MM.dd HH:mm')}"></td>
+                    </tr>
+
+                    <tr th:if="${notifications.empty}">
+                        <td colspan="4">받은 쪽지가 없습니다.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div>
+                <a th:if="${!notifications.first}" th:href="@{/user/messages(page=${notifications.number - 1}, size=${notifications.size})}">
+                    이전
+                </a>
+
+                <span th:each="page : ${#numbers.sequence(0, notifications.totalPages - 1)}">
+                    <a th:if="${page != notifications.number}" th:href="@{/user/messages(page=${page}, size=${notifications.size})}" th:text="${page + 1}"></a>
+
+                    <strong th:if="${page == notifications.number}" th:text="${page + 1}"></strong>
+                </span>
+
+                <a th:if="${!notifications.last}" th:href="@{/user/messages(page=${notifications.number + 1}, size=${notifications.size})}">
+                    다음
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <div th:replace="~{common/footer :: footer}"></div>
+</body>
+
+</html>

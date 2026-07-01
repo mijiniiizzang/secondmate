@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <th:block th:replace="~{common/head :: commonHead}"></th:block>
+    <link rel="stylesheet" th:href="@{/css/admin/reports.css}">
+    <link rel="stylesheet" th:href="@{/css/admin/common.css}">
+    <title>신고 관리</title>
+</head>
+
+<body class="admin-reports-page">
+    <div th:replace="~{common/header :: header}"></div>
+
+    <main class="admin-reports-container">
+        <div th:replace="~{admin/common :: adminSidebar}"></div>
+
+        <section class="admin-reports-content">
+            <div class="admin-page-heading">
+                <div>
+                    <p class="admin-page-label">REPORT MANAGEMENT</p>
+                    <h1>신고 관리</h1>
+                    <p>접수된 신고를 확인하고 처리할 수 있습니다.</p>
+                </div>
+            </div>
+
+            <section class="admin-reports-panel">
+                <div class="admin-reports-panel-header">
+                    <div>
+                        <p class="admin-panel-label">REPORT LIST</p>
+                        <h2>신고 목록</h2>
+                    </div>
+
+                    <span class="report-total-count">
+                        총 <strong th:text="${reports.totalElements}"></strong>건
+                    </span>
+                </div>
+
+                <div class="report-filter-area">
+                    <div class="report-status-tabs">
+                        <a th:href="@{/admin/reports(targetType=${targetType}, keyword=${keyword})}"
+                           th:classappend="${reportStatus == null} ? 'active'">
+                            전체
+                        </a>
+
+                        <a th:href="@{/admin/reports(reportStatus='PENDING', targetType=${targetType}, keyword=${keyword})}"
+                           th:classappend="${reportStatus != null and reportStatus.name() == 'PENDING'} ? 'active'">
+                            처리중
+                        </a>
+
+                        <a th:href="@{/admin/reports(reportStatus='ACCEPTED', targetType=${targetType}, keyword=${keyword})}"
+                           th:classappend="${reportStatus != null and reportStatus.name() == 'ACCEPTED'} ? 'active'">
+                            처리 완료
+                        </a>
+
+                        <a th:href="@{/admin/reports(reportStatus='REJECTED', targetType=${targetType}, keyword=${keyword})}"
+                           th:classappend="${reportStatus != null and reportStatus.name() == 'REJECTED'} ? 'active'">
+                            반려
+                        </a>
+                    </div>
+
+                    <form class="report-search-form" th:action="@{/admin/reports}" method="get">
+                        <input type="hidden" name="reportStatus" th:value="${reportStatus}">
+
+                        <select name="targetType">
+                            <option value="">전체 대상</option>
+                            <option value="PRODUCT" th:selected="${targetType != null and targetType.name() == 'PRODUCT'}">게시글</option>
+                            <option value="COMMENT" th:selected="${targetType != null and targetType.name() == 'COMMENT'}">댓글</option>
+                            <option value="USER" th:selected="${targetType != null and targetType.name() == 'USER'}">회원</option>
+                        </select>
+
+                        <input type="text" name="keyword" th:value="${keyword}" placeholder="신고 내용 검색">
+                        <button type="submit">검색</button>
+                    </form>
+                </div>
+
+                <div class="report-table-wrap">
+                    <table class="report-table">
+                        <thead>
+                            <tr>
+                                <th>신고번호</th>
+                                <th>신고 대상</th>
+                                <th>신고 유형</th>
+                                <th>처리 상태</th>
+                                <th>신고일</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <tr th:each="report : ${reports.content}"
+                                class="report-row"
+                                th:attr="data-report-id=${report.reportId},data-target-type=${report.targetType},data-report-type=${report.reportType},data-reason=${report.reason},data-report-status=${report.reportStatus}"
+                                onclick="openReportDetailModal(this)">
+
+                                <td th:text="${report.reportId}"></td>
+
+                                <td>
+                                    <span class="target-badge product-target"
+                                          th:if="${report.targetType.name() == 'PRODUCT'}">
+                                        게시글
+                                    </span>
+
+                                    <span class="target-badge comment-target"
+                                          th:if="${report.targetType.name() == 'COMMENT'}">
+                                        댓글
+                                    </span>
+
+                                    <span class="target-badge user-target"
+                                          th:if="${report.targetType.name() == 'USER'}">
+                                        회원
+                                    </span>
+                                </td>
+
+                                <td th:text="${report.reportType}"></td>
+
+                                <td>
+                                    <span class="report-status-badge pending-status"
+                                          th:if="${report.reportStatus.name() == 'PENDING'}">
+                                        처리중
+                                    </span>
+
+                                    <span class="report-status-badge accepted-status"
+                                          th:if="${report.reportStatus.name() == 'ACCEPTED'}">
+                                        처리 완료
+                                    </span>
+
+                                    <span class="report-status-badge rejected-status"
+                                          th:if="${report.reportStatus.name() == 'REJECTED'}">
+                                        반려
+                                    </span>
+                                </td>
+
+                                <td th:text="${#temporals.format(report.regDate, 'yyyy.MM.dd HH:mm')}"></td>
+                            </tr>
+
+                            <tr th:if="${reports.empty}">
+                                <td colspan="5" class="empty-report-message">
+                                    신고 내역이 없습니다.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="report-pagination">
+                    <a th:if="${!reports.first}"
+                       th:href="@{/admin/reports(page=${reports.number - 1}, size=${reports.size}, reportStatus=${reportStatus}, targetType=${targetType}, keyword=${keyword})}">
+                        이전
+                    </a>
+
+                    <span th:each="page : ${#numbers.sequence(0, reports.totalPages - 1)}">
+                        <a th:if="${page != reports.number}"
+                           th:href="@{/admin/reports(page=${page}, size=${reports.size}, reportStatus=${reportStatus}, targetType=${targetType}, keyword=${keyword})}"
+                           th:text="${page + 1}">
+                        </a>
+
+                        <strong th:if="${page == reports.number}"
+                                th:text="${page + 1}">
+                        </strong>
+                    </span>
+
+                    <a th:if="${!reports.last}"
+                       th:href="@{/admin/reports(page=${reports.number + 1}, size=${reports.size}, reportStatus=${reportStatus}, targetType=${targetType}, keyword=${keyword})}">
+                        다음
+                    </a>
+                </div>
+            </section>
+        </section>
+    </main>
+
+    <div th:replace="~{admin/report-process-modal :: reportDetailModal}"></div>
+
+    <div th:replace="~{common/footer :: footer}"></div>
+</body>
+
+</html>

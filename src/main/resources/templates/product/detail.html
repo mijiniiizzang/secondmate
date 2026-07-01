@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head>
     <th:block th:replace="~{common/head :: commonHead}"></th:block>
@@ -7,89 +8,213 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 
-<body>
+<body class="product-detail-page">
+
     <div th:replace="~{common/header :: header}"></div>
-    <h1 th:text="${product.title}"></h1>
-    <p><strong>상품명:</strong><span th:text="${product.name}"></span></p>
-    <p><strong>작성자:</strong><span th:text="${product.writer}"></span></p>
-    <p><strong>가격:</strong><span th:text="${product.price}"></span></p>
-    <p><strong>거래상태:</strong><span th:text="${product.tradeStatus}"></span></p>
-    <!-- 글 작성자만 거래 상태 변경 가능 -->
-    <div th:if="${isOwner}">
-        <select id="tradeStatus" name="tradeStatus">
-            <option value="">-</option>
-            <option value="ON_SALE">판매중</option>
-            <option value="RESERVED">예약중</option>
-            <option value="SOLD">판매완료</option>
-        </select>
-        <button type="button" id="changeStatus">거래상태 변경</button>
-    </div>
-    <p><strong>카테고리:</strong><span th:text="${product.category}"></span></p>
-    <p><strong>거래 희망 지역:</strong><span th:text="${product.city + ' ' + product.gu}"></span></p>
-    <p><strong>등록일:</strong><span th:text="${product.regDate}"></span></p>
-    <p><strong>내용:</strong></p>
-    <p th:text="${product.content}"></p>
-    <!--첨부파일-->
 
+    <main class="product-detail-wrap">
 
-    <!-- 글 작성자만 수정/삭제 가능 -->
-    <div th:if="${isOwner}">
-        <form th:action="@{/product/edit(productId=${product.productId})}">
-            <button type="submit">수정</button>
-        </form>
-        <form th:action="@{/product/delete(productId=${product.productId})}" method="POST">
-            <button type="submit">삭제</button>
-        </form>
-    </div>
-    <div sec:authorize="isAuthenticated()" th:if="${!isOwner}">
-        <button type="button" onclick="openProductReport()">신고</button>
-    </div>
+        <section class="product-detail-card">
 
-    <a th:href="@{/product/list}">목록</a>
-    <!-- 찜 버튼 -->
-    <div>
-        <button type="button" id="wishlist-btn" th:data-logged-in="${#authorization.expression('isAuthenticated()')}">
-            <span id="heart-icon" th:text="${isWished} ? '♥' : '♡'">♡</span>
-        </button>
-        <span>
-            <span id="wishlist-count" th:text="${wishlistCount}">0</span>
-        </span>
-    </div>
-    <br>
-    <div id="comment-section">
-        <h3>댓글</h3>
+            <div class="product-top">
 
-        <!-- 댓글 입력란 -->
-        <!-- 로그인 하지 않으면 댓글 입력 안됨 -->
-        <div sec:authorize="isAuthenticated()">
-            <h4>댓글 작성</h4>
-            <p>작성자 : <span th:text="${#authentication.principal.nickname}"></span></p>
-            <br>
-            <textarea id="comment-content" rows="3" cols="50"></textarea>
-            <br>
-            <button id="comment-submit">등록</button>
-        </div>
-        <div sec:authorize="isAnonymous()">
-            <p>댓글은 로그인 후 작성할 수 있습니다.</p>
-        </div>
+                <!-- 상품 이미지 -->
+                <div th:if="${product.imageList != null and !#lists.isEmpty(product.imageList)}"
+                     class="product-image-slider-wrap">
 
+                    <button type="button"
+                            class="image-slide-button image-prev"
+                            onclick="moveProductImages(-1)">
+                        ‹
+                    </button>
 
-        <!-- 댓글 목록 -->
-        <p>댓글 갯수 : <span id="comment-count" th:text="${product.commentCount}">0</span></p>
-        <ul id="comment-list"></ul>
-    </div>
+                    <div class="product-image-area" id="productImageArea">
+                        <div class="product-image-box"
+                             th:each="image : ${product.imageList}">
+
+                            <img th:src="@{'/upload/' + ${image.imageChgName}}"
+                                 th:alt="${product.name}">
+                        </div>
+                    </div>
+
+                    <button type="button"
+                            class="image-slide-button image-next"
+                            onclick="moveProductImages(1)">
+                        ›
+                    </button>
+                </div>
+
+                <div th:if="${product.imageList == null or #lists.isEmpty(product.imageList)}"
+                     class="product-empty-image">
+                    등록된 사진이 없습니다.
+                </div>
+
+                <!-- 상품 정보 -->
+                <div class="product-info-area">
+
+                    <span class="product-category"
+                          th:text="${product.category}">
+                    </span>
+
+                    <h1 class="product-title"
+                        th:text="${product.title}">
+                    </h1>
+
+                    <p class="product-price">
+                        <span th:text="${#numbers.formatInteger(product.price, 3, 'COMMA')}"></span>원
+                    </p>
+
+                    <dl class="product-info-list">
+
+                        <div class="product-info-row">
+                            <dt>상품명</dt>
+                            <dd th:text="${product.name}"></dd>
+                        </div>
+
+                        <div class="product-info-row">
+                            <dt>작성자</dt>
+                            <dd th:text="${product.writer}"></dd>
+                        </div>
+
+                        <div class="product-info-row">
+                            <dt>거래 상태</dt>
+                            <dd>
+                                <span class="product-status"
+                                      th:text="${product.tradeStatus}">
+                                </span>
+
+                                <div th:if="${isOwner}" style="margin-top: 10px;">
+                                    <select id="tradeStatus" name="tradeStatus">
+                                        <option value="">변경</option>
+                                        <option value="ON_SALE">판매중</option>
+                                        <option value="RESERVED">예약중</option>
+                                        <option value="SOLD">판매완료</option>
+                                    </select>
+
+                                    <button type="button" id="changeStatus">
+                                        상태 변경
+                                    </button>
+                                </div>
+                            </dd>
+                        </div>
+
+                        <div class="product-info-row">
+                            <dt>거래 희망 지역</dt>
+                            <dd th:text="${product.city + ' ' + product.gu}"></dd>
+                        </div>
+
+                        <div class="product-info-row">
+                            <dt>등록일</dt>
+                            <dd th:text="${#temporals.format(product.regDate, 'yyyy.MM.dd')}"></dd>
+                        </div>
+
+                    </dl>
+
+                    <div class="product-action-row">
+
+                        <div class="wishlist-area">
+                            <button type="button"
+                                    id="wishlist-btn"
+                                    class="wishlist-button"
+                                    th:data-logged-in="${#authorization.expression('isAuthenticated()')}">
+
+                                <span id="heart-icon"
+                                      th:text="${isWished} ? '♥' : '♡'">
+                                    ♡
+                                </span>
+                            </button>
+
+                            <span class="wishlist-count-text">
+                                찜 <span id="wishlist-count" th:text="${wishlistCount}">0</span>
+                            </span>
+                        </div>
+
+                        <button type="button"
+                                class="product-report-button"
+                                sec:authorize="isAuthenticated()"
+                                th:if="${!isOwner}"
+                                onclick="openProductReport()">
+                            신고
+                        </button>
+
+                        <a class="product-list-button"
+                           th:href="@{/product/list}">
+                            목록
+                        </a>
+
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- 상품 설명 -->
+            <section class="product-content-area">
+                <h2 class="section-title">상품 설명</h2>
+
+                <p class="product-content"
+                   th:text="${product.content}">
+                </p>
+            </section>
+
+            <!-- 작성자 수정 / 삭제 -->
+            <div class="owner-action-row" th:if="${isOwner}">
+
+                <form th:action="@{/product/edit(productId=${product.productId})}">
+                    <button type="submit">수정</button>
+                </form>
+
+                <form th:action="@{/product/delete(productId=${product.productId})}"
+                      method="POST">
+                    <button type="submit">삭제</button>
+                </form>
+
+            </div>
+
+            <!-- 댓글 -->
+            <section id="comment-section" class="comment-section">
+
+                <h2 class="section-title">댓글</h2>
+
+                <div sec:authorize="isAuthenticated()" class="comment-write-box">
+                    <p>
+                        작성자 :
+                        <span th:text="${#authentication.principal.nickname}"></span>
+                    </p>
+
+                    <textarea id="comment-content"
+                              placeholder="댓글을 입력해주세요."></textarea>
+
+                    <button id="comment-submit">등록</button>
+
+                    <div style="clear: both;"></div>
+                </div>
+
+                <div sec:authorize="isAnonymous()" class="comment-write-box">
+                    <p>댓글은 로그인 후 작성할 수 있습니다.</p>
+                </div>
+
+                <p style="margin-top: 24px;">
+                    댓글 <span id="comment-count" th:text="${product.commentCount}">0</span>
+                </p>
+
+                <ul id="comment-list"></ul>
+
+            </section>
+
+        </section>
+    </main>
+
     <div th:replace="~{common/footer :: footer}"></div>
 
     <script th:inline="javascript">
-        const currentUser = /*[[${#authentication != null ? #authentication.principal.nickname : ''}]]*/'';
-        // 게시글의 productId 저장
+        const currentUser =
+            /*[[${#authorization.expression('isAuthenticated()') ? #authentication.principal.nickname : ''}]]*/'';
+
         const productId = /*[[${product.productId}]]*/0;
 
-        // 댓글 등록
         $('#comment-submit').click(function () {
             const content = $('#comment-content').val().trim();
 
-            // 데이터 전송 전 입력 데이터 검증
             if (!content) {
                 alert('내용을 입력해주세요');
                 return;
@@ -105,7 +230,6 @@
                 }),
                 success: function () {
                     alert('댓글 등록 완료');
-                    // $('#comment-writer').val('');
                     $('#comment-content').val('');
                     loadComments();
                 },
@@ -115,58 +239,64 @@
             });
         });
 
-        // 댓글 목록 불러오기
         function loadComments() {
             $.get(`/api/comments/product/${productId}`, function (comments) {
                 $('#comment-list').empty();
-
-                // 댓글 갯수 갱신
                 $('#comment-count').text(comments.length);
 
                 if (comments.length === 0) {
                     $('#comment-list').append('<li>등록된 댓글이 없습니다.</li>');
                     return;
                 }
+
                 comments.forEach(comment => {
                     let buttons = '';
 
-                    // 로그인했고, 현재 로그인 한 사람이 댓글 작성자일 때만 버튼 활성화
                     if (currentUser && currentUser === comment.writer) {
                         buttons += `
-                                <button onclick="editComment(${comment.commentId})">수정</button>
-                                <button onclick="deleteComment(${comment.commentId})">삭제</button>                                
-                                <button id="save-${comment.commentId}" onclick="saveEdit(${comment.commentId})" style="display:none">저장</button>    
-                            `;
+                            <button onclick="editComment(${comment.commentId})">수정</button>
+                            <button onclick="deleteComment(${comment.commentId})">삭제</button>
+                            <button id="save-${comment.commentId}"
+                                    onclick="saveEdit(${comment.commentId})"
+                                    style="display:none">
+                                저장
+                            </button>
+                        `;
                     }
 
                     if (currentUser && currentUser !== comment.writer) {
                         buttons += `
-                                <button onclick='openCommentReport(${comment.commentId}, ${JSON.stringify(comment.writer)}, ${JSON.stringify(comment.content)})'>
-                                    신고
-                                </button>
+                            <button onclick='openCommentReport(
+                                ${comment.commentId},
+                                ${JSON.stringify(comment.writer)},
+                                ${JSON.stringify(comment.content)}
+                            )'>
+                                신고
+                            </button>
                         `;
                     }
 
-                    $('#comment-list').append(
-                        `<li>
-                                <string>${comment.writer}</string>: 
-                                <input id="comment-${comment.commentId}" value="${comment.content}" readonly>
-                                ${buttons}                                
-                            </li>`
-                    );
+                    $('#comment-list').append(`
+                        <li>
+                            <strong>${comment.writer}</strong>
+                            <input id="comment-${comment.commentId}"
+                                   value="${comment.content}"
+                                   readonly>
+                            ${buttons}
+                        </li>
+                    `);
                 });
-
-            })
+            });
         }
 
-        // 댓글 수정
         function editComment(commentId) {
             $(`#comment-${commentId}`).prop('readonly', false);
             $(`#save-${commentId}`).show();
         }
 
         function saveEdit(commentId) {
-            const content = $('#comment-${commentId}').val().trim();
+            const content = $(`#comment-${commentId}`).val().trim();
+
             $.ajax({
                 type: 'PUT',
                 url: `/api/comments/${commentId}`,
@@ -184,7 +314,6 @@
             });
         }
 
-        // 댓글 삭제
         function deleteComment(commentId) {
             if (!confirm('댓글을 삭제하시겠습니까?')) return;
 
@@ -201,17 +330,15 @@
             });
         }
 
-        // 페이지 로딩 시 댓글 목록 가져오기
         $(document).ready(function () {
             loadComments();
         });
 
-        // 찜 버튼
         $('#wishlist-btn').click(function () {
-            const loggedIn = $(this).data('logged-in') === true;
+            const loggedIn = $(this).attr('data-logged-in') === 'true';
 
             if (!loggedIn) {
-                alert("로그인 후 이용할 수 있습니다.");
+                alert('로그인 후 이용할 수 있습니다.');
                 openLoginModal();
                 return;
             }
@@ -220,21 +347,15 @@
                 type: 'POST',
                 url: `/wishlist/toggle/${productId}`,
                 success: function (result) {
-                    if (result.wished) {
-                        $('#heart-icon').text('♥');
-                    } else {
-                        $('#heart-icon').text('♡');
-                    }
-
+                    $('#heart-icon').text(result.wished ? '♥' : '♡');
                     $('#wishlist-count').text(result.wishlistCount);
                 },
-                error: function (xhr) {
+                error: function () {
                     alert('찜 처리에 실패했습니다.');
                 }
             });
         });
 
-        // 거래 상태 수정
         $('#changeStatus').click(function () {
             const tradeStatus = $('#tradeStatus').val();
 
@@ -242,6 +363,7 @@
                 alert('변경할 거래 상태를 선택해주세요.');
                 return;
             }
+
             if (!confirm('상태를 변경하시겠습니까?')) return;
 
             $.ajax({
@@ -260,38 +382,46 @@
             });
         });
 
-        // 상품 신고 모달 활성화
+        function moveProductImages(direction) {
+            const imageArea = document.getElementById('productImageArea');
+
+            imageArea.scrollBy({
+                left: imageArea.clientWidth * direction,
+                behavior: 'smooth'
+            });
+        }
+
         function openProductReport() {
-            document.getElementById("productReportModal").style.display = "flex";
+            document.getElementById('productReportModal').style.display = 'flex';
         }
 
         function closeProductReport() {
-            document.getElementById("productReportModal").style.display = "none";
+            document.getElementById('productReportModal').style.display = 'none';
         }
 
-        // 댓글 신고 모달 활성화
         function openCommentReport(commentId, writer, content) {
-            document.getElementById("commentReportForm").action = 
-                "/report/comment/" + commentId;
+            document.getElementById('commentReportForm').action =
+                '/report/comment/' + commentId;
 
-            document.getElementById("reportProductId").value = productId;
-            document.getElementById("reportCommentWriter").textContent = writer;
-            document.getElementById("reportCommentContent").textContent = content;
+            document.getElementById('reportProductId').value = productId;
+            document.getElementById('reportCommentWriter').textContent = writer;
+            document.getElementById('reportCommentContent').textContent = content;
 
-            document.getElementById("commentReportModal").style.display = "flex";
+            document.getElementById('commentReportModal').style.display = 'flex';
         }
 
         function closeCommentReport() {
-            document.getElementById("commentReportModal").style.display = "none";
+            document.getElementById('commentReportModal').style.display = 'none';
         }
     </script>
 
     <div class="report-modal-wrapper" id="productReportModal">
         <th:block th:replace="~{report/product-report :: productReport}"></th:block>
     </div>
+
     <div class="report-modal-wrapper" id="commentReportModal">
         <th:block th:replace="~{report/comment-report :: commentReport}"></th:block>
     </div>
-</body>
 
+</body>
 </html>

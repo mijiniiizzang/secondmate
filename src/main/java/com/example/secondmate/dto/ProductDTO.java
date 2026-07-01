@@ -28,6 +28,8 @@ public class ProductDTO {
     private Double latitude;
     private Double longitude;
     private TradeStatus tradeStatus;
+    private boolean hidden;
+    private String hiddenReason;
     private LocalDateTime regDate;
     private int commentCount;
     private boolean isWished;

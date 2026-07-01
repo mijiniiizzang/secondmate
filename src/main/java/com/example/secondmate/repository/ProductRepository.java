@@ -1,5 +1,6 @@
 package com.example.secondmate.repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -37,4 +38,26 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
         @Param("maxPrice") Long maxPrice,
         Pageable pageable
     );
+
+    // [관리자]용 검색
+    @Query("""
+            SELECT p FROM Product p
+            WHERE (:tradeStatus IS NULL OR p.tradeStatus = :tradeStatus)
+            AND (:categories IS NULL OR p.category IN :categories)
+            AND (
+                :keyword IS NULL
+                OR p.title LIKE %:keyword%
+                OR p.name LIKE %:keyword%
+                OR p.user.username LIKE %:keyword%
+                OR p.user.nickname LIKE %:keyword%
+            )
+            """)
+    Page<Product> searchAdminProducts(
+        @Param("tradeStatus") TradeStatus tradeStatus,
+        @Param("categories") List<ProductCategory> categories,
+        @Param("keyword") String keyword,
+        Pageable pageable
+    );
+
+    long countByRegDateBetween(LocalDateTime startDate, LocalDateTime endDate);
 }

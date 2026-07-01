@@ -16,7 +16,8 @@ a {
 
 button,
 input,
-select {
+select,
+textarea {
     font-family: inherit;
 }
 
@@ -29,104 +30,168 @@ button {
     position: sticky;
     top: 0;
     z-index: 1000;
-    background-color: rgba(255, 255, 255, 0.9);
+    background-color: rgba(255, 255, 255, 0.92);
     backdrop-filter: blur(10px);
     border-bottom: 1px solid #ece6df;
 }
 
 .header-container {
     width: min(1180px, calc(100% - 40px));
-    height: 64px;
+    min-height: 68px;
     margin: 0 auto;
     display: flex;
     align-items: center;
     justify-content: space-between;
 }
 
-.header-empty {
-    width: 1px;
-}
-
-.header-section {
+.header-left,
+.header-right,
+.main-nav,
+.guest-menu,
+.user-menu {
     display: flex;
     align-items: center;
 }
 
-.guest-menu {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+.header-left {
+    gap: 20px;
 }
 
-.join-link {
-    padding: 9px 14px;
-    border-radius: 999px;
+.header-right {
+    justify-content: flex-end;
+}
+
+.main-nav {
+    gap: 22px;
+}
+
+.main-nav a {
     color: #68717b;
     font-size: 14px;
     font-weight: 700;
     transition: 0.2s;
 }
 
-.join-link:hover {
-    background-color: #f3ede7;
-    color: #4a515b;
+.main-nav a:hover {
+    color: #30343b;
 }
 
-.login-link {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+.guest-menu,
+.user-menu {
+    gap: 12px;
+}
+
+.header-text-link,
+.header-icon-link,
+.header-user-link,
+.header-admin-link {
+    color: #68717b;
+    font-size: 14px;
+    font-weight: 700;
+    transition: 0.2s;
+}
+
+.header-text-link:hover,
+.header-icon-link:hover,
+.header-user-link:hover,
+.header-admin-link:hover {
+    color: #30343b;
+}
+
+.header-login-btn,
+.header-write-btn,
+.header-logout-btn {
+    border: none;
+    font-size: 14px;
+    font-weight: 700;
+    transition: 0.2s;
+}
+
+.header-login-btn {
     min-width: 82px;
     height: 38px;
     padding: 0 16px;
     border-radius: 999px;
     background-color: #697789;
-    color: white;
-    font-size: 14px;
-    font-weight: 700;
-    transition: 0.2s;
+    color: #ffffff;
 }
 
-.login-link:hover {
+.header-login-btn:hover {
     background-color: #566576;
+}
+
+.header-write-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 38px;
+    padding: 0 15px;
+    border-radius: 999px;
+    background-color: #697789;
+    color: #ffffff;
+}
+
+.header-write-btn:hover {
+    background-color: #566576;
+}
+
+.header-user-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.header-user-name {
+    color: #596371;
+    font-size: 14px;
+    font-weight: 700;
 }
 
 .user-menu form {
     display: flex;
     align-items: center;
-    gap: 12px;
     margin: 0;
 }
 
-.welcome-text {
-    color: #596371;
-    font-size: 14px;
-    font-weight: 600;
+.header-logout-btn {
+    padding: 0;
+    background-color: transparent;
+    color: #9aa2ac;
 }
 
-.logout-btn {
-    height: 38px;
-    padding: 0 15px;
-    border: none;
-    border-radius: 999px;
-    background-color: #c58d76;
-    color: white;
-    font-size: 14px;
-    font-weight: 700;
-    transition: 0.2s;
+.header-logout-btn:hover {
+    color: #c58d76;
 }
 
-.logout-btn:hover {
-    background-color: #b77962;
-}
-
+/* 반응형 */
 @media (max-width: 800px) {
     .header-container {
         width: calc(100% - 30px);
-        height: 58px;
+        min-height: 58px;
     }
 
-    .welcome-text {
+    .main-nav,
+    .header-user-name {
         display: none;
+    }
+
+    .guest-menu,
+    .user-menu {
+        gap: 8px;
+    }
+
+    .header-write-btn,
+    .header-login-btn {
+        min-width: auto;
+        height: 34px;
+        padding: 0 12px;
+    }
+
+    .header-text-link,
+    .header-icon-link,
+    .header-user-link,
+    .header-admin-link,
+    .header-logout-btn {
+        font-size: 13px;
     }
 }

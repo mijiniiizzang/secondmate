@@ -3,6 +3,8 @@ package com.example.secondmate.service;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +30,7 @@ public class ReportService {
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
     private final CommentRepository commentRepository;
+    private final NotificationService notificationService;
 
     // 상품 신고
     @Transactional
@@ -39,21 +42,21 @@ public class ReportService {
 
         // 신고자 확인
         User reporter = userRepository.findById(userId)
-                                      .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자"));
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자"));
 
         // 신고 대상 상품 확인
         Product product = productRepository.findById(productId)
-                                           .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품"));
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품"));
 
         Report report = Report.builder()
-                              .reporter(reporter)
-                              .reportedUser(product.getUser())
-                              .targetType(TargetType.PRODUCT)
-                              .targetId(product.getProductId())
-                              .reason(reason)
-                              .reportStatus(ReportStatus.PENDING)
-                              .reportType(reportType)
-                              .build();
+                .reporter(reporter)
+                .reportedUser(product.getUser())
+                .targetType(TargetType.PRODUCT)
+                .targetId(product.getProductId())
+                .reason(reason)
+                .reportStatus(ReportStatus.PENDING)
+                .reportType(reportType)
+                .build();
 
         reportRepository.save(report);
     }
@@ -68,21 +71,21 @@ public class ReportService {
 
         // 신고자 확인
         User reporter = userRepository.findById(userId)
-                                      .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자"));
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자"));
 
         // 신고 대상 댓글 확인
         Comment comment = commentRepository.findById(commentId)
-                                           .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 댓글"));
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 댓글"));
 
         Report report = Report.builder()
-                              .reporter(reporter)
-                              .reportedUser(comment.getUser())
-                              .targetType(TargetType.COMMENT)
-                              .targetId(comment.getCommentId())
-                              .reason(reason)
-                              .reportStatus(ReportStatus.PENDING)
-                              .reportType(reportType)
-                              .build();
+                .reporter(reporter)
+                .reportedUser(comment.getUser())
+                .targetType(TargetType.COMMENT)
+                .targetId(comment.getCommentId())
+                .reason(reason)
+                .reportStatus(ReportStatus.PENDING)
+                .reportType(reportType)
+                .build();
 
         reportRepository.save(report);
     }
@@ -100,20 +103,20 @@ public class ReportService {
         }
 
         User reporter = userRepository.findById(userId)
-                                      .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자"));
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자"));
 
         User reportedUser = userRepository.findById(reportedUserId)
-                                          .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자"));
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자"));
 
         Report report = Report.builder()
-                              .reporter(reporter)
-                              .reportedUser(reportedUser)
-                              .targetType(TargetType.USER)
-                              .targetId(reportedUser.getUserId())
-                              .reason(reason)
-                              .reportStatus(ReportStatus.PENDING)
-                              .reportType(reportType)
-                              .build();
+                .reporter(reporter)
+                .reportedUser(reportedUser)
+                .targetType(TargetType.USER)
+                .targetId(reportedUser.getUserId())
+                .reason(reason)
+                .reportStatus(ReportStatus.PENDING)
+                .reportType(reportType)
+                .build();
 
         reportRepository.save(report);
     }
@@ -132,42 +135,44 @@ public class ReportService {
     @Transactional
     public void changeReportStatus(Long reportId, ReportStatus reportStatus) {
         Report report = reportRepository.findById(reportId)
-                                        .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 신고"));
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 신고"));
 
         // 이미 처리된 신고를 다시 하지 못하게
-        if(report.getReportStatus() != ReportStatus.PENDING) {
+        if (report.getReportStatus() != ReportStatus.PENDING) {
             throw new IllegalArgumentException("이미 처리된 신고");
         }
 
         report.setReportStatus(reportStatus);
+        notificationService.createReportProcessedNotification(report, reportStatus);
 
         // 관리자가 신고를 처리한 경우에만 제재 처리
         if (reportStatus == ReportStatus.ACCEPTED) {
             // 댓글 신고 : 댓글 숨김 처리
             if (report.getTargetType() == TargetType.COMMENT) {
                 Comment comment = commentRepository.findById(report.getTargetId())
-                                                   .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 댓글"));
+                        .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 댓글"));
 
                 comment.setHidden(true);
             }
 
             // 상품 신고 : 수락된 신고 3건 이상일 경우
             if (report.getTargetType() == TargetType.PRODUCT) {
-                long productReportCount = reportRepository.countByTargetTypeAndTargetIdAndReportStatus(TargetType.PRODUCT, report.getTargetId(), ReportStatus.ACCEPTED);
+                long productReportCount = reportRepository.countByTargetTypeAndTargetIdAndReportStatus(
+                        TargetType.PRODUCT, report.getTargetId(), ReportStatus.ACCEPTED);
 
                 if (productReportCount >= 3) {
                     Product product = productRepository.findById(report.getTargetId())
-                                                       .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품"));
+                            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품"));
 
                     product.setHidden(true);
                 }
             }
 
             // 신고 수락 누적 3건 이상이면 계정 정지
-            long userReportCount = 
-                    reportRepository.countByReportedUser_UserIdAndReportStatus(report.getReportedUser().getUserId(), ReportStatus.ACCEPTED);
+            long userReportCount = reportRepository.countByReportedUser_UserIdAndReportStatus(
+                    report.getReportedUser().getUserId(), ReportStatus.ACCEPTED);
 
-            if (userReportCount >= 3) {
+            if (userReportCount >= 3 && report.getReportedUser().getStatus() != UserStatus.SUSPENDED) {
                 suspendUser(report.getReportedUser());
             }
         }
@@ -199,5 +204,22 @@ public class ReportService {
     // 로그인한 사용자가 받은 수락된 신고 횟수
     public long getReportCount(Long userId, ReportStatus reportStatus) {
         return reportRepository.countByReportedUser_UserIdAndReportStatus(userId, reportStatus);
+    }
+
+    // 관리자 신고 목록 조회
+    public Page<Report> getAdminReportList(ReportStatus reportStatus, TargetType targetType,
+            String keyword, Pageable pageable) {
+
+        if (keyword != null && keyword.trim().isEmpty()) {
+            keyword = null;
+        }
+
+        return reportRepository.searchAdminReports(reportStatus, targetType, keyword, pageable);
+    }
+
+    // 신고 상세내역
+    public Report getReport(Long reportId) {
+        return reportRepository.findById(reportId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 신고"));
     }
 }

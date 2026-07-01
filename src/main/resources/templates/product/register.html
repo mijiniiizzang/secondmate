@@ -74,10 +74,13 @@
                         회원 기본 주소 사용
                     </label>
                 </div>
+                <!-- 기본 주소 사용할 때 서버로 전송될 값 -->
+                <input type="hidden" id="defaultCity" name="city" th:value="${savedCity}">
+                <input type="hidden" id="defaultGu" name="gu" th:value="${savedGu}">
 
                 <div id="customLocationArea" style="display: none;">
                     <div class="location-select-row">
-                        <select id="city" name="city" required onchange="changeGu()">
+                        <select id="city" name="city" disabled onchange="changeGu()">
                             <option value="">시/도 선택</option>
                             <option th:selected="${savedCity == '서울특별시'}" value="서울특별시">서울특별시</option>
                             <option th:selected="${savedCity == '부산광역시'}" value="부산광역시">부산광역시</option>
@@ -97,7 +100,7 @@
                             <option th:selected="${savedCity == '경상남도'}" value="경상남도">경상남도</option>
                             <option th:selected="${savedCity == '제주도'}" value="제주도">제주도</option>
                         </select>
-                        <select id="gu" name="gu" required>
+                        <select id="gu" name="gu" disabled>
                             <option value="">구/군 선택</option>
                         </select>
                     </div>
@@ -120,28 +123,71 @@
     <div th:replace="~{common/footer :: footer}"></div>
 
     <script th:inline="javascript">
-        alert("스크립트 실행됨");
-        alert(typeof kakao);
         const savedCity = /*[[${savedCity}]]*/'';
         const savedGu = /*[[${savedGu}]]*/'';
 
         // 회원 기본 주소 사용
         const useDefaultAddr = document.getElementById("useDefaultAddr");
         const customLocationArea = document.getElementById("customLocationArea");
+        const defaultLocationText = document.getElementById("defaultLocationText");
+
+        const citySelect = document.getElementById("city");
+        const guSelect = document.getElementById("gu");
+
+        const defaultCity = document.getElementById("defaultCity");
+        const defaultGu = document.getElementById("defaultGu");
+
+        function useDefaultLocation() {
+            // 기본 주소 문구 보이기
+            defaultLocationText.style.display = "block";
+
+            // 직접 선택 영역 숨기기
+            customLocationArea.style.display = "none";
+
+            // hidden input이 city, gu로 전송되게 유지
+            defaultCity.disabled = false;
+            defaultGu.disabled = false;
+
+            // select는 서버에 전송되지 않게 설정
+            citySelect.disabled = true;
+            guSelect.disabled = true;
+
+            citySelect.removeAttribute("required");
+            guSelect.removeAttribute("required");
+        }
+
+        function useCustomLocation() {
+            // 기본 주소 문구 숨기기
+            defaultLocationText.style.display = "none";
+
+            // 직접 선택 영역 보이기
+            customLocationArea.style.display = "block";
+
+            // hidden 기본 주소는 서버 전송에서 제외
+            defaultCity.disabled = true;
+            defaultGu.disabled = true;
+
+            // 직접 고른 city, gu가 서버로 전송되게 설정
+            citySelect.disabled = false;
+            guSelect.disabled = false;
+
+            citySelect.setAttribute("required", "required");
+            guSelect.setAttribute("required", "required");
+
+            citySelect.value = "";
+            guSelect.innerHTML = '<option value="">구/군 선택</option>';
+        }
 
         useDefaultAddr.addEventListener("change", function () {
             if (this.checked) {
-                document.getElementById("city").value = savedCity;
-                changeGu();
-
-                customLocationArea.style.display = "none";
+                useDefaultLocation();
             } else {
-                document.getElementById("city").value = "";
-                document.getElementById("gu").innerHTML = '<option value="">구/군 선택</option>';
-
-                customLocationArea.style.display = "block";
+                useCustomLocation();
             }
-        })
+        });
+
+        // 처음 화면 열릴 때: 기본 주소 사용 상태
+        useDefaultLocation();
 
         const areaData = {
             "서울특별시": [
@@ -262,9 +308,6 @@
                 })
             }
 
-            if (savedGu) {
-                gu.value = savedGu;
-            }
         }
 
         // 대표사진 + 사진 미리보기
@@ -272,7 +315,6 @@
         let selectedFiles = new DataTransfer();
 
         fileInput.addEventListener("change", function () {
-            selectedFiles = new DataTransfer();
 
             Array.from(fileInput.files).forEach(file => {
                 selectedFiles.items.add(file);

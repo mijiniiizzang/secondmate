@@ -7,33 +7,65 @@
     <header class="site-header">
         <div class="header-container">
 
-            <a class="nav-link" th:href="@{/home}">메인</a>
+            <div class="header-left">
+                <nav class="main-nav">
+                    <a th:href="@{/home}">메인</a>
+                    <a th:href="@{/product/list}">상품 둘러보기</a>
+                </nav>
+            </div>
 
-            <div class="header-section">
+            <div class="header-right">
 
                 <!-- 비로그인 -->
                 <div class="guest-menu" sec:authorize="isAnonymous()">
-                    <a class="join-link" th:href="@{/user/register}">회원가입</a>
+                    <a class="header-text-link" th:href="@{/user/register}">회원가입</a>
 
                     <button type="button"
-                            class="login-link"
+                            class="header-login-btn"
                             onclick="openLoginModal()">
                         로그인
                     </button>
                 </div>
 
-                <!-- 로그인 -->
-                <div class="user-menu" sec:authorize="isAuthenticated()">
-                    <form th:action="@{/auth/logout}" method="POST">
-                        <span class="welcome-text"
-                              th:text="${#authentication.principal.nickname} + '님, 반갑습니다!'">
-                        </span>
+                <!-- 일반 사용자 로그인 -->
+                <div class="user-menu" sec:authorize="hasRole('USER')">
+                    <a class="header-write-btn" th:href="@{/product/register}">
+                        글쓰기
+                    </a>
 
-                        <button type="submit" class="logout-btn">
+                    <a class="header-icon-link" th:href="@{/user/messages}">
+                        쪽지함
+                    </a>
+
+                    <a class="header-user-link" th:href="@{/user/mypage}">
+                        <span class="header-user-name"
+                              th:text="${#authentication.principal.nickname} + '님'">
+                        </span>
+                        <span>마이페이지</span>
+                    </a>
+
+                    <form th:action="@{/auth/logout}" method="POST">
+                        <button type="submit" class="header-logout-btn">
                             로그아웃
                         </button>
                     </form>
-                    <a th:href="@{/product/register}">글쓰기</a>
+                </div>
+
+                <!-- 관리자 로그인 -->
+                <div class="user-menu" sec:authorize="hasRole('ADMIN')">
+                    <a class="header-admin-link" th:href="@{/admin/home}">
+                        관리자 페이지
+                    </a>
+
+                    <span class="header-user-name"
+                          th:text="${#authentication.principal.nickname} + '님'">
+                    </span>
+
+                    <form th:action="@{/auth/logout}" method="POST">
+                        <button type="submit" class="header-logout-btn">
+                            로그아웃
+                        </button>
+                    </form>
                 </div>
 
             </div>
@@ -50,17 +82,14 @@
                 ×
             </button>
 
-            <!-- 로그인 -->
             <div id="loginView" class="auth-view active">
                 <div th:replace="~{auth/login :: loginForm}"></div>
             </div>
 
-            <!-- 아이디 찾기 -->
             <div id="findUsernameView" class="auth-view">
                 <div th:replace="~{auth/find-username :: findUsernameForm}"></div>
             </div>
 
-            <!-- 비밀번호 찾기 -->
             <div id="findPasswordView" class="auth-view">
                 <div th:replace="~{auth/find-password :: findPasswordForm}"></div>
             </div>
@@ -70,6 +99,9 @@
 
     <script>
         function openLoginModal() {
+            document.getElementById("redirectUrl").value =
+                window.location.pathname + window.location.search;
+
             document.getElementById("loginModal").classList.add("show");
             document.body.style.overflow = "hidden";
 

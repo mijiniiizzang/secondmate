@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <th:block th:replace="~{common/head :: commonHead}"></th:block>
+    <link rel="stylesheet" th:href="@{/css/admin/users.css}">
+    <link rel="stylesheet" th:href="@{/css/admin/common.css}">
+    <title>회원 관리</title>
+</head>
+
+<body class="admin-users-page">
+    <div th:replace="~{common/header :: header}"></div>
+
+    <main class="admin-users-container">
+        <div th:replace="~{admin/common :: adminSidebar}"></div>
+
+        <section class="admin-users-content">
+            <div class="admin-page-heading">
+                <div>
+                    <p class="admin-page-label">USER MANAGEMENT</p>
+                    <h1>회원 관리</h1>
+                    <p>회원 정보와 계정 상태를 확인할 수 있습니다.</p>
+                </div>
+            </div>
+
+            <section class="admin-users-panel">
+                <div class="admin-users-panel-header">
+                    <div>
+                        <p class="admin-panel-label">MEMBER LIST</p>
+                        <h2>전체 회원 목록</h2>
+                    </div>
+
+                    <span class="member-total-count">
+                        총 <strong th:text="${users.totalElements}"></strong>명
+                    </span>
+                </div>
+
+                <div class="member-filter-area">
+                    <div class="member-status-tabs">
+                        <a th:href="@{/admin/users(keyword=${keyword})}"
+                           th:classappend="${status == null} ? 'active'">
+                            전체
+                        </a>
+
+                        <a th:href="@{/admin/users(status='ACTIVE', keyword=${keyword})}"
+                           th:classappend="${status != null and status.name() == 'ACTIVE'} ? 'active'">
+                            활성 회원
+                        </a>
+
+                        <a th:href="@{/admin/users(status='SUSPENDED', keyword=${keyword})}"
+                           th:classappend="${status != null and status.name() == 'SUSPENDED'} ? 'active'">
+                            정지 회원
+                        </a>
+                    </div>
+
+                    <form class="member-search-form" th:action="@{/admin/users}" method="GET">
+                        <input type="hidden" name="status" th:value="${status}">
+                        <input type="text" name="keyword" placeholder="아이디, 이름, 닉네임 검색" th:value="${keyword}">
+                        <button type="submit">검색</button>
+                    </form>
+                </div>
+
+                <div class="member-table-wrap">
+                    <table class="member-table">
+                        <thead>
+                            <tr>
+                                <th>회원번호</th>
+                                <th>아이디</th>
+                                <th>이름</th>
+                                <th>닉네임</th>
+                                <th>전화번호</th>
+                                <th>이메일</th>
+                                <th>권한</th>
+                                <th>상태</th>
+                                <th>정지 횟수</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <tr th:each="user : ${users.content}">
+                                <td th:text="${user.userId}"></td>
+                                <td class="username-cell" th:text="${user.username}"></td>
+                                <td th:text="${user.name}"></td>
+                                <td th:text="${user.nickname}"></td>
+                                <td th:text="${user.phone}"></td>
+                                <td class="email-cell" th:text="${user.email}"></td>
+
+                                <td>
+                                    <span class="role-badge"
+                                          th:classappend="${user.role.name() == 'ROLE_ADMIN'} ? 'admin-role' : 'user-role'"
+                                          th:text="${user.role.name() == 'ROLE_ADMIN'} ? '관리자' : '일반회원'">
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <button type="button"
+                                            class="status-badge suspended-status"
+                                            th:if="${user.status.name() == 'SUSPENDED'}"
+                                            th:text="${user.status}"
+                                            th:attr="data-until=${user.suspendedUntil != null ? #temporals.format(user.suspendedUntil, 'yyyy.MM.dd HH:mm') : '-'}"
+                                            onclick="toggleSuspendedUntil(this)">
+                                    </button>
+
+                                    <span class="status-badge active-status"
+                                          th:if="${user.status.name() != 'SUSPENDED'}"
+                                          th:text="${user.status}">
+                                    </span>
+
+                                    <p class="suspended-until" hidden></p>
+                                </td>
+
+                                <td>
+                                    <span class="suspension-count"
+                                          th:classappend="${user.suspensionCount > 0} ? 'has-suspension'"
+                                          th:text="${user.suspensionCount}">
+                                    </span>
+                                </td>
+                            </tr>
+
+                            <tr th:if="${users.empty}">
+                                <td colspan="9" class="empty-member-message">
+                                    등록된 회원이 없습니다.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="member-pagination">
+                    <a th:if="${!users.first}"
+                       th:href="@{/admin/users(page=${users.number - 1}, size=${users.size}, status=${status}, keyword=${keyword})}">
+                        이전
+                    </a>
+
+                    <span th:each="page : ${#numbers.sequence(0, users.totalPages - 1)}">
+                        <a th:if="${page != users.number}"
+                           th:href="@{/admin/users(page=${page}, size=${users.size}, status=${status}, keyword=${keyword})}"
+                           th:text="${page + 1}">
+                        </a>
+
+                        <strong th:if="${page == users.number}"
+                                th:text="${page + 1}">
+                        </strong>
+                    </span>
+
+                    <a th:if="${!users.last}"
+                       th:href="@{/admin/users(page=${users.number + 1}, size=${users.size}, status=${status}, keyword=${keyword})}">
+                        다음
+                    </a>
+                </div>
+            </section>
+        </section>
+    </main>
+
+    <div th:replace="~{common/footer :: footer}"></div>
+
+    <script>
+        function toggleSuspendedUntil(button) {
+            const untilText = button.parentElement.querySelector(".suspended-until");
+
+            if (untilText.hidden) {
+                untilText.textContent = "정지 종료일 : " + button.dataset.until;
+                untilText.hidden = false;
+            } else {
+                untilText.hidden = true;
+            }
+        }
+    </script>
+</body>
+
+</html>

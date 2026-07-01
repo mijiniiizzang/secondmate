@@ -17,6 +17,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())
         .authorizeHttpRequests(auth -> auth
+            .requestMatchers("/admin/**").hasRole("ADMIN")
             .requestMatchers(
                 "/product/edit",
                 "/product/delete",
@@ -29,7 +30,20 @@ public class SecurityConfig {
         
         .formLogin(form -> form.loginPage("/auth/login")
                                .loginProcessingUrl("/auth/login")
-                               .defaultSuccessUrl("/home", true)
+                               .successHandler((request, response, authentication) -> {
+                                    String redirectUrl = request.getParameter("redirectUrl");
+
+                                    // 현재 사이트 내부 주소일 때만 이동
+                                    if (redirectUrl != null 
+                                        && !redirectUrl.isBlank()
+                                        && redirectUrl.startsWith("/")
+                                        && !redirectUrl.startsWith("//")) {
+
+                                        response.sendRedirect(redirectUrl);
+                                        return;
+                                    }
+                                    response.sendRedirect("/home");
+                               })
                                .failureHandler((request, response, exception) -> {
                                 if (exception instanceof DisabledException) {
                                     String[] suspendedInfo = exception.getMessage().split("\\|");
@@ -44,7 +58,7 @@ public class SecurityConfig {
                                .permitAll()
         )
         .logout(logout -> logout.logoutUrl("/auth/logout")
-                                .logoutSuccessUrl("/auth/login?logoutMsg=true")
+                                .logoutSuccessUrl("/home")
                                 .permitAll()
         );
 

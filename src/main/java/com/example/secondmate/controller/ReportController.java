@@ -23,14 +23,14 @@ public class ReportController {
     @PostMapping("/product/{productId}")
     public String reportProduct(@PathVariable Long productId, @RequestParam ReportType reportType, @RequestParam String reason, @AuthenticationPrincipal AccountDetails accountDetails) {
         reportService.reportProduct(accountDetails.getUserId(), productId, reportType, reason);
-        return "redirect:/product/detail/" + productId;
+        return "redirect:/product/detail?productId=" + productId;
     }
 
     // 댓글 신고
     @PostMapping("/comment/{commentId}")
     public String reportComment(@PathVariable Long commentId, @RequestParam Long productId, @RequestParam ReportType reportType, @RequestParam String reason, @AuthenticationPrincipal AccountDetails accountDetails) {
         reportService.reportComment(accountDetails.getUserId(), commentId, reportType, reason);
-        return "redirect:/product/detail/" + productId;
+        return "redirect:/product/detail?productId=" + productId;
     }
 
     // 사용자 신고 접수

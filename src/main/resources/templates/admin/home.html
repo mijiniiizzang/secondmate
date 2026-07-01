@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <link rel="stylesheet" th:href="@{/css/admin/home.css}">
+    <link rel="stylesheet" th:href="@{/css/admin/common.css}">
+    <th:block th:replace="~{common/head :: commonHead}"></th:block>
+    <title>관리자 마이페이지</title>
+</head>
+
+<body class="admin-home-page">
+    <div th:replace="~{common/header :: header}"></div>
+
+    <main class="admin-home-container">
+        <div th:replace="~{admin/common :: adminSidebar}"></div>
+
+        <section class="admin-home-content">
+            <div class="admin-home-title">
+                <div>
+                    <p class="admin-home-label">ADMIN DASHBOARD</p>
+                    <h1>관리자 마이페이지</h1>
+                    <p>회원, 상품, 신고 현황을 한눈에 확인하세요.</p>
+                </div>
+            </div>
+
+            <section class="admin-summary-section">
+                <div class="admin-summary-card">
+                    <div class="admin-card-top">
+                        <span class="admin-card-label">전체 회원</span>
+                        <span class="admin-card-icon">👥</span>
+                    </div>
+
+                    <strong th:text="${totalUserCount}"></strong>
+                    <p>현재 가입된 전체 회원 수</p>
+
+                    <a th:href="@{/admin/users}">회원 관리 보기 →</a>
+                </div>
+
+                <div class="admin-summary-card warning-card">
+                    <div class="admin-card-top">
+                        <span class="admin-card-label">정지 회원</span>
+                        <span class="admin-card-icon">🚫</span>
+                    </div>
+
+                    <strong th:text="${suspendedUserCount}"></strong>
+                    <p>현재 이용 정지 상태 회원 수</p>
+
+                    <a th:href="@{/admin/users(status='SUSPENDED')}">정지 회원 보기 →</a>
+                </div>
+
+                <div class="admin-summary-card">
+                    <div class="admin-card-top">
+                        <span class="admin-card-label">처리 대기 신고</span>
+                        <span class="admin-card-icon">⚠️</span>
+                    </div>
+
+                    <strong th:text="${pendingReportCount}"></strong>
+                    <p>관리자 확인이 필요한 신고 수</p>
+
+                    <a th:href="@{/admin/reports(reportStatus='PENDING')}">신고 처리하기 →</a>
+                </div>
+            </section>
+
+            <section class="admin-dashboard-grid">
+                <article class="admin-panel recent-product-panel">
+                    <div class="admin-panel-header">
+                        <div>
+                            <p class="admin-panel-label">PRODUCT</p>
+                            <h2>최근 등록된 상품</h2>
+                        </div>
+
+                        <a th:href="@{/admin/products}" class="admin-panel-link">전체 보기 →</a>
+                    </div>
+
+                    <div class="today-product-count">
+                        <span>오늘 등록된 상품</span>
+                        <strong th:text="${todayProductCount} + '개'"></strong>
+                    </div>
+
+                    <table class="admin-product-table">
+                        <thead>
+                            <tr>
+                                <th>번호</th>
+                                <th>제목</th>
+                                <th>판매자</th>
+                                <th>등록일</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <tr th:each="product : ${recentProducts}">
+                                <td th:text="${product.productId}"></td>
+
+                                <td class="product-title-cell">
+                                    <a th:href="@{/product/detail(productId=${product.productId})}"
+                                       th:text="${product.title}">
+                                    </a>
+                                </td>
+
+                                <td th:text="${product.user.nickname}"></td>
+                                <td th:text="${#temporals.format(product.regDate, 'MM.dd HH:mm')}"></td>
+                            </tr>
+
+                            <tr th:if="${#lists.isEmpty(recentProducts)}">
+                                <td colspan="4" class="empty-table-message">
+                                    오늘 등록된 상품이 없습니다.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </article>
+
+                <article class="admin-panel report-panel">
+                    <div class="admin-panel-header">
+                        <div>
+                            <p class="admin-panel-label">REPORT</p>
+                            <h2>신고 관리 현황</h2>
+                        </div>
+
+                        <a th:href="@{/admin/reports}" class="admin-panel-link">전체 보기 →</a>
+                    </div>
+
+                    <div class="report-status-list">
+                        <div class="report-status-item">
+                            <span>전체 신고</span>
+                            <strong th:text="${totalReportCount} + '건'"></strong>
+                        </div>
+
+                        <div class="report-status-item pending-report">
+                            <span>처리 대기</span>
+                            <strong th:text="${pendingReportCount} + '건'"></strong>
+                        </div>
+
+                        <div class="report-status-item completed-report">
+                            <span>처리 완료</span>
+                            <strong th:text="${acceptedReportCount} + '건'"></strong>
+                        </div>
+                    </div>
+
+                    <a th:href="@{/admin/reports(reportStatus='PENDING')}" class="report-action-link">
+                        처리 대기 신고 확인하기 →
+                    </a>
+                </article>
+            </section>
+        </section>
+    </main>
+
+    <div th:replace="~{common/footer :: footer}"></div>
+</body>
+
+</html>

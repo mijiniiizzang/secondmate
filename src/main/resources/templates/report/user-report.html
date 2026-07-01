@@ -3,7 +3,7 @@
     <!-- 사용자 신고 -->
     <form class="report-form" th:action="@{/report/user/{reportedUserId}(reportedUserId=${user.userId})}" method="POST">
         <h2>사용자 신고</h2>
-        <p>신고자 : <span th:text="${#authentication.principal.nickname}"></span></p>
+        <p>신고자 : <span th:text="${#authorization.expression('isAuthenticated()') ? #authentication.principal.nickname : ''}"></span></p>
         <p>신고 대상 : <span th:text="${user.nickname}"></span></p>
         <p>신고 유형 :</p>
         <select name="reportType" required>

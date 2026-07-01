@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<th:block th:fragment="reportDetailModal">
+    <div id="reportDetailModal" class="report-modal-backdrop" hidden>
+        <div class="report-modal-box">
+            <form th:action="@{/admin/reports/process}" method="post">
+                <input type="hidden" id="modalReportId" name="reportId">
+                <input type="hidden" id="modalTargetType" name="targetType">
+
+                <div class="report-modal-header">
+                    <div>
+                        <p class="report-modal-label">REPORT DETAIL</p>
+                        <h2>신고 상세</h2>
+                    </div>
+
+                    <button type="button" class="report-modal-close" onclick="closeReportDetailModal()">×</button>
+                </div>
+
+                <div class="report-detail-list">
+                    <div class="report-detail-item">
+                        <span>신고 대상</span>
+                        <strong id="modalTargetTypeText"></strong>
+                    </div>
+
+                    <div class="report-detail-item">
+                        <span>신고 유형</span>
+                        <strong id="modalReportType"></strong>
+                    </div>
+
+                    <div class="report-detail-item report-reason-item">
+                        <span>신고 내용</span>
+                        <p id="modalReason"></p>
+                    </div>
+
+                    <div class="report-detail-item">
+                        <span>처리 상태</span>
+                        <strong id="modalReportStatus"></strong>
+                    </div>
+                </div>
+
+                <div id="reportProcessArea" class="report-process-area">
+                    <div class="report-form-group">
+                        <label for="action">처리 선택</label>
+
+                        <select id="action" name="action" onchange="changeReportAction()" required>
+                            <option value="">선택</option>
+                            <option value="ACCEPT">수락</option>
+                            <option value="HIDE" id="hideActionOption">수락 후 숨김</option>
+                            <option value="DELETE" id="deleteActionOption">수락 후 삭제</option>
+                            <option value="REJECT">반려</option>
+                        </select>
+                    </div>
+
+                    <div id="reasonArea" hidden>
+                        <div class="report-form-group">
+                            <label for="processReason">처리 사유</label>
+
+                            <select id="processReason" name="processReason">
+                                <option value="">처리 사유 선택</option>
+
+                                <option th:each="reason : ${T(com.example.secondmate.common.ProcessReason).values()}"
+                                        th:value="${reason}"
+                                        th:text="${reason.reasonName}">
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="report-form-group">
+                            <label for="detailReason">상세 사유</label>
+                            <textarea id="detailReason" name="detailReason" placeholder="상세 사유를 입력하세요."></textarea>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="report-process-btn">처리하기</button>
+                </div>
+
+                <button type="button" class="report-modal-cancel-btn" onclick="closeReportDetailModal()">닫기</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function openReportDetailModal(row) {
+            const targetType = row.dataset.targetType;
+            const isPending = row.dataset.reportStatus === "PENDING";
+            const modal = document.getElementById("reportDetailModal");
+
+            document.getElementById("modalReportId").value = row.dataset.reportId;
+            document.getElementById("modalTargetType").value = targetType;
+            document.getElementById("modalReportType").textContent = row.dataset.reportType;
+            document.getElementById("modalReason").textContent = row.dataset.reason;
+            document.getElementById("modalReportStatus").textContent = row.dataset.reportStatus;
+
+            if (targetType === "PRODUCT") {
+                document.getElementById("modalTargetTypeText").textContent = "게시글";
+            } else if (targetType === "COMMENT") {
+                document.getElementById("modalTargetTypeText").textContent = "댓글";
+            } else {
+                document.getElementById("modalTargetTypeText").textContent = "회원";
+            }
+
+            const isUserReport = targetType === "USER";
+
+            document.getElementById("hideActionOption").hidden = isUserReport;
+            document.getElementById("deleteActionOption").hidden = isUserReport;
+
+            document.getElementById("action").value = "";
+            document.getElementById("processReason").value = "";
+            document.getElementById("detailReason").value = "";
+            document.getElementById("reasonArea").hidden = true;
+            document.getElementById("processReason").required = false;
+            document.getElementById("detailReason").required = false;
+            document.getElementById("reportProcessArea").hidden = !isPending;
+
+            modal.hidden = false;
+            document.body.style.overflow = "hidden";
+        }
+
+        function closeReportDetailModal() {
+            document.getElementById("reportDetailModal").hidden = true;
+            document.body.style.overflow = "";
+        }
+
+        function changeReportAction() {
+            const action = document.getElementById("action").value;
+            const needsReason = action === "HIDE" || action === "DELETE";
+
+            document.getElementById("reasonArea").hidden = !needsReason;
+            document.getElementById("processReason").required = needsReason;
+            document.getElementById("detailReason").required = needsReason;
+        }
+
+        document.getElementById("reportDetailModal").addEventListener("click", function(event) {
+            if (event.target === this) {
+                closeReportDetailModal();
+            }
+        });
+    </script>
+</th:block>
+
+</html>

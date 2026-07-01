@@ -3,31 +3,93 @@
     position: fixed;
     inset: 0;
     z-index: 9999;
-
     justify-content: center;
     align-items: center;
-
     padding: 20px;
     background: rgba(0, 0, 0, 0.45);
 }
 
-.report-form {
-    position: relative;
+/* 홈에서 뜨는 신고 처리 알림 모달 */
+.report-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.45);
+}
 
+.report-modal-box {
+    position: relative;
     width: 100%;
     max-width: 430px;
     padding: 32px;
-
     border-radius: 18px;
     background: #ffffff;
     box-shadow: 0 12px 34px rgba(0, 0, 0, 0.12);
+    box-sizing: border-box;
+}
 
+.report-modal-box h2 {
+    margin: 0 0 24px;
+    color: #222;
+    font-size: 22px;
+    font-weight: 700;
+    text-align: center;
+}
+
+.report-modal-message {
+    margin: 14px 0 7px;
+    color: #444;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.report-modal-message strong {
+    color: #222;
+    font-weight: 700;
+}
+
+.report-modal-description {
+    margin: 12px 0 0;
+    color: #777;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.report-modal-confirm-btn {
+    width: 100%;
+    margin-top: 24px;
+    padding: 13px 16px;
+    border: none;
+    border-radius: 10px;
+    background: #697789;
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.report-modal-confirm-btn:hover {
+    background: #566576;
+}
+
+/* 상품 / 댓글 신고 작성 모달 */
+.report-form {
+    position: relative;
+    width: 100%;
+    max-width: 430px;
+    padding: 32px;
+    border-radius: 18px;
+    background: #ffffff;
+    box-shadow: 0 12px 34px rgba(0, 0, 0, 0.12);
     box-sizing: border-box;
 }
 
 .report-form h2 {
     margin: 0 0 24px;
-
     color: #222;
     font-size: 22px;
     font-weight: 700;
@@ -36,7 +98,6 @@
 
 .report-form p {
     margin: 14px 0 7px;
-
     color: #444;
     font-size: 14px;
     line-height: 1.5;
@@ -50,11 +111,9 @@
 .report-form select,
 .report-form textarea {
     width: 100%;
-
     border: 1px solid #dcdcdc;
     border-radius: 10px;
     outline: none;
-
     box-sizing: border-box;
     font-family: inherit;
     font-size: 14px;
@@ -92,12 +151,10 @@
     width: 100%;
     margin-top: 24px;
     padding: 13px 16px;
-
     border: none;
     border-radius: 10px;
     background: #ff6b35;
     color: #ffffff;
-
     font-size: 15px;
     font-weight: 700;
     cursor: pointer;
@@ -111,15 +168,12 @@
     position: absolute;
     top: 13px;
     right: 16px;
-
     width: 34px;
     height: 34px;
-
     border: none;
     border-radius: 50%;
     background: transparent;
     color: #777;
-
     font-size: 25px;
     line-height: 30px;
     cursor: pointer;
@@ -131,12 +185,14 @@
 }
 
 @media (max-width: 480px) {
-    .report-form {
+    .report-form,
+    .report-modal-box {
         padding: 28px 22px;
         border-radius: 16px;
     }
 
-    .report-form h2 {
+    .report-form h2,
+    .report-modal-box h2 {
         font-size: 20px;
     }
 }

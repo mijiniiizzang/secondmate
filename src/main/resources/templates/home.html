@@ -3,6 +3,7 @@
 
 <head>
     <th:block th:replace="~{common/head :: commonHead}"></th:block>
+    <link rel="stylesheet" th:href="@{/css/report-form.css}">
     <title>홈</title>
 </head>
 
@@ -143,6 +144,9 @@
                 alert("검색어를 입력해주세요.");
             }
         })
+    </script>
+    <script th:if="${param.logout}">
+        alert("정상적으로 로그아웃되었습니다.");
     </script>
     <th:block th:replace="~{report/report-modal :: reportModal}"></th:block>
 </body>

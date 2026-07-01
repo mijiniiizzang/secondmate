@@ -72,6 +72,8 @@ public class Product {
     @Builder.Default
     @Column(nullable=false)
     private boolean hidden = false;
+    @Column(length=500)
+    private String hiddenReason;
 
     @CreationTimestamp
     private LocalDateTime regDate;

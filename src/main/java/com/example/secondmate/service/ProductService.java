@@ -168,6 +168,8 @@ public class ProductService {
                          .latitude(product.getLatitude())
                          .longitude(product.getLongitude())
                          .tradeStatus(product.getTradeStatus())
+                         .hidden(product.isHidden())
+                         .hiddenReason(product.getHiddenReason())
                          .regDate(product.getRegDate())
                          .imageList(imageDTOs)
                          .build();

@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <th:block th:replace="~{common/head :: commonHead}"></th:block>
+    <link rel="stylesheet" th:href="@{/css/admin/products.css}">
+    <link rel="stylesheet" th:href="@{/css/admin/common.css}">
+    <title>상품 관리</title>
+</head>
+
+<body class="admin-products-page">
+    <div th:replace="~{common/header :: header}"></div>
+
+    <main class="admin-products-container">
+        <div th:replace="~{admin/common :: adminSidebar}"></div>
+
+        <section class="admin-products-content">
+            <div class="admin-page-heading">
+                <div>
+                    <p class="admin-page-label">PRODUCT MANAGEMENT</p>
+                    <h1>상품 관리</h1>
+                    <p>등록된 상품과 게시글 상태를 관리할 수 있습니다.</p>
+                </div>
+            </div>
+
+            <section class="admin-products-panel">
+                <div class="admin-products-panel-header">
+                    <div>
+                        <p class="admin-panel-label">PRODUCT LIST</p>
+                        <h2>전체 상품 목록</h2>
+                    </div>
+
+                    <span class="product-total-count">
+                        총 <strong th:text="${products.totalElements}"></strong>건
+                    </span>
+                </div>
+
+                <div class="product-status-tabs">
+                    <a th:href="@{/admin/products(categories=${categories}, keyword=${keyword})}"
+                       th:classappend="${tradeStatus == null} ? 'active'">
+                        전체
+                    </a>
+
+                    <a th:href="@{/admin/products(tradeStatus='ON_SALE', categories=${categories}, keyword=${keyword})}"
+                       th:classappend="${tradeStatus != null and tradeStatus.name() == 'ON_SALE'} ? 'active'">
+                        판매중
+                    </a>
+
+                    <a th:href="@{/admin/products(tradeStatus='RESERVED', categories=${categories}, keyword=${keyword})}"
+                       th:classappend="${tradeStatus != null and tradeStatus.name() == 'RESERVED'} ? 'active'">
+                        예약중
+                    </a>
+
+                    <a th:href="@{/admin/products(tradeStatus='SOLD', categories=${categories}, keyword=${keyword})}"
+                       th:classappend="${tradeStatus != null and tradeStatus.name() == 'SOLD'} ? 'active'">
+                        판매완료
+                    </a>
+                </div>
+
+                <form class="product-filter-form" th:action="@{/admin/products}" method="get">
+                    <input type="hidden" name="tradeStatus" th:value="${tradeStatus}">
+
+                    <div class="category-filter-list">
+                        <label class="category-button">
+                            <input type="checkbox" name="categories" value="ELECTRONICS"
+                                th:checked="${categories != null and categories.contains(T(com.example.secondmate.common.ProductCategory).ELECTRONICS)}"
+                                onchange="this.form.submit()">
+                            <span>전자제품</span>
+                        </label>
+
+                        <label class="category-button">
+                            <input type="checkbox" name="categories" value="FASHION"
+                                th:checked="${categories != null and categories.contains(T(com.example.secondmate.common.ProductCategory).FASHION)}"
+                                onchange="this.form.submit()">
+                            <span>의류</span>
+                        </label>
+
+                        <label class="category-button">
+                            <input type="checkbox" name="categories" value="BEAUTY"
+                                th:checked="${categories != null and categories.contains(T(com.example.secondmate.common.ProductCategory).BEAUTY)}"
+                                onchange="this.form.submit()">
+                            <span>미용/화장품</span>
+                        </label>
+
+                        <label class="category-button">
+                            <input type="checkbox" name="categories" value="BOOK"
+                                th:checked="${categories != null and categories.contains(T(com.example.secondmate.common.ProductCategory).BOOK)}"
+                                onchange="this.form.submit()">
+                            <span>도서</span>
+                        </label>
+
+                        <label class="category-button">
+                            <input type="checkbox" name="categories" value="SPORTS"
+                                th:checked="${categories != null and categories.contains(T(com.example.secondmate.common.ProductCategory).SPORTS)}"
+                                onchange="this.form.submit()">
+                            <span>스포츠용품</span>
+                        </label>
+
+                        <label class="category-button">
+                            <input type="checkbox" name="categories" value="FURNITURE"
+                                th:checked="${categories != null and categories.contains(T(com.example.secondmate.common.ProductCategory).FURNITURE)}"
+                                onchange="this.form.submit()">
+                            <span>가구</span>
+                        </label>
+
+                        <label class="category-button">
+                            <input type="checkbox" name="categories" value="HOBBY"
+                                th:checked="${categories != null and categories.contains(T(com.example.secondmate.common.ProductCategory).HOBBY)}"
+                                onchange="this.form.submit()">
+                            <span>취미</span>
+                        </label>
+
+                        <label class="category-button">
+                            <input type="checkbox" name="categories" value="FOOD"
+                                th:checked="${categories != null and categories.contains(T(com.example.secondmate.common.ProductCategory).FOOD)}"
+                                onchange="this.form.submit()">
+                            <span>음식</span>
+                        </label>
+
+                        <label class="category-button">
+                            <input type="checkbox" name="categories" value="TICKET"
+                                th:checked="${categories != null and categories.contains(T(com.example.secondmate.common.ProductCategory).TICKET)}"
+                                onchange="this.form.submit()">
+                            <span>티켓</span>
+                        </label>
+
+                        <label class="category-button">
+                            <input type="checkbox" name="categories" value="ETC"
+                                th:checked="${categories != null and categories.contains(T(com.example.secondmate.common.ProductCategory).ETC)}"
+                                onchange="this.form.submit()">
+                            <span>기타</span>
+                        </label>
+                    </div>
+
+                    <div class="product-search-form">
+                        <input type="text" name="keyword" placeholder="제목, 상품명, 판매자 검색" th:value="${keyword}">
+                        <button type="submit">검색</button>
+                    </div>
+                </form>
+
+                <div class="product-table-wrap">
+                    <table class="product-table">
+                        <thead>
+                            <tr>
+                                <th>상품번호</th>
+                                <th>제목</th>
+                                <th>상품명</th>
+                                <th>판매자</th>
+                                <th>카테고리</th>
+                                <th>가격</th>
+                                <th>거래 상태</th>
+                                <th>게시글 상태</th>
+                                <th>등록일</th>
+                                <th>관리</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <tr th:each="product : ${products.content}">
+                                <td th:text="${product.productId}"></td>
+
+                                <td class="product-title-cell">
+                                    <a th:href="@{/product/detail(productId=${product.productId})}"
+                                       th:text="${product.title}">
+                                    </a>
+                                </td>
+
+                                <td class="product-name-cell" th:text="${product.name}"></td>
+                                <td th:text="${product.user.nickname}"></td>
+
+                                <td>
+                                    <span class="product-category-badge" th:text="${product.category}"></span>
+                                </td>
+
+                                <td class="product-price-cell"
+                                    th:text="${#numbers.formatInteger(product.price, 3, 'COMMA')} + '원'">
+                                </td>
+
+                                <td>
+                                    <span class="trade-status-badge on-sale-status"
+                                          th:if="${product.tradeStatus.name() == 'ON_SALE'}">
+                                        판매중
+                                    </span>
+
+                                    <span class="trade-status-badge reserved-status"
+                                          th:if="${product.tradeStatus.name() == 'RESERVED'}">
+                                        예약중
+                                    </span>
+
+                                    <span class="trade-status-badge sold-status"
+                                          th:if="${product.tradeStatus.name() == 'SOLD'}">
+                                        판매완료
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span class="post-status-badge hidden-status"
+                                          th:if="${product.hidden}"
+                                          th:title="${product.hiddenReason != null ? product.hiddenReason : '숨김 사유 없음'}">
+                                        숨김
+                                    </span>
+
+                                    <span class="post-status-badge public-status"
+                                          th:if="${!product.hidden}">
+                                        공개
+                                    </span>
+                                </td>
+
+                                <td th:text="${#temporals.format(product.regDate, 'yyyy.MM.dd HH:mm')}"></td>
+
+                                <td class="product-manage-cell">
+                                    <form th:if="${!product.hidden}" th:action="@{/admin/products/hide}" method="post">
+                                        <input type="hidden" name="productId" th:value="${product.productId}">
+                                        <input type="text" name="hiddenReason" placeholder="숨김 사유" required>
+                                        <button type="submit" class="hide-btn">숨김</button>
+                                    </form>
+
+                                    <form th:if="${product.hidden}" th:action="@{/admin/products/show}" method="post">
+                                        <input type="hidden" name="productId" th:value="${product.productId}">
+                                        <button type="submit" class="show-btn">공개</button>
+                                    </form>
+
+                                    <form th:action="@{/admin/products/delete}" method="post">
+                                        <input type="hidden" name="productId" th:value="${product.productId}">
+                                        <input type="text" name="deleteReason" placeholder="삭제 사유" required>
+                                        <button type="submit" class="delete-btn" onclick="return confirm('정말 삭제할까요?')">
+                                            삭제
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+
+                            <tr th:if="${products.empty}">
+                                <td colspan="10" class="empty-product-message">
+                                    등록된 상품이 없습니다.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="product-pagination">
+                    <a th:if="${!products.first}"
+                       th:href="@{/admin/products(page=${products.number - 1}, size=${products.size}, tradeStatus=${tradeStatus}, categories=${categories}, keyword=${keyword})}">
+                        이전
+                    </a>
+
+                    <span th:each="page : ${#numbers.sequence(0, products.totalPages - 1)}">
+                        <a th:if="${page != products.number}"
+                           th:href="@{/admin/products(page=${page}, size=${products.size}, tradeStatus=${tradeStatus}, categories=${categories}, keyword=${keyword})}"
+                           th:text="${page + 1}">
+                        </a>
+
+                        <strong th:if="${page == products.number}" th:text="${page + 1}"></strong>
+                    </span>
+
+                    <a th:if="${!products.last}"
+                       th:href="@{/admin/products(page=${products.number + 1}, size=${products.size}, tradeStatus=${tradeStatus}, categories=${categories}, keyword=${keyword})}">
+                        다음
+                    </a>
+                </div>
+            </section>
+        </section>
+    </main>
+
+    <div th:replace="~{common/footer :: footer}"></div>
+</body>
+
+</html>
