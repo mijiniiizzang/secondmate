@@ -23,7 +23,8 @@ public class SecurityConfig {
                 "/product/delete",
                 "/wishlist/**",
                 "/api/comments",
-                "/report/**"
+                "/report/**",
+                "/mypage/**"
             ).authenticated()
             .anyRequest().permitAll()
         )

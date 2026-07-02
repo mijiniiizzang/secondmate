@@ -35,9 +35,10 @@
 
                     <a class="header-icon-link" th:href="@{/user/messages}">
                         쪽지함
+                        <span id="notificationBadge" style="display: none;">N</span>
                     </a>
 
-                    <a class="header-user-link" th:href="@{/user/mypage}">
+                    <a class="header-user-link" th:href="@{/mypage}">
                         <span class="header-user-name"
                               th:text="${#authentication.principal.nickname} + '님'">
                         </span>
@@ -136,6 +137,18 @@
                 closeLoginModal();
             }
         });
+
+
+    </script>
+
+    <script sec:authorize="isAuthenticated()">
+        fetch("/user/messages/unread")
+            .then(response => response.json())
+            .then(hasUnreadNotification => {
+                if (hasUnreadNotification) {
+                    document.getElementById("notificationBadge").style.display = "inline";
+                }
+            })
     </script>
 
 </th:block>

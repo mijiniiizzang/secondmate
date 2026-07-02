@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link rel="stylesheet" th:href="@{/css/user/products.css}">
+    <th:block th:replace="~{common/head :: commonHead}"></th:block>
+    <title>내 상품 관리</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+
+<body class="my-products-page">
+
+    <div th:replace="~{common/header :: header}"></div>
+
+    <main class="my-products-container">
+
+        <div th:replace="~{user/mypage-sidebar :: userSidebar}"></div>
+
+        <section class="my-products-content">
+
+            <div class="my-products-title">
+                <p class="my-products-label">MY PRODUCTS</p>
+                <h1>내 상품 관리</h1>
+                <p>내가 등록한 상품과 거래 상태를 관리할 수 있어요.</p>
+            </div>
+
+            <div class="my-products-top">
+                <p>
+                    등록한 상품
+                    <strong th:text="${products.totalElements}">0</strong>개
+                </p>
+
+                <a th:href="@{/product/register}">
+                    상품 등록하기
+                </a>
+            </div>
+
+            <table class="my-products-table" th:if="${!products.empty}">
+                <thead>
+                    <tr>
+                        <th>거래 상태</th>
+                        <th>게시글 제목</th>
+                        <th>상품명</th>
+                        <th>등록일</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr th:each="product : ${products.content}">
+                        <td class="my-product-status-area">
+                            <span class="my-product-status"
+                                  th:text="${product.tradeStatus}">
+                                판매중
+                            </span>
+
+                            <button type="button"
+                                    class="my-product-status-menu-button"
+                                    onclick="toggleStatusMenu(this)">
+                                ⋮
+                            </button>
+
+                            <div class="my-product-status-menu">
+                                <button type="button"
+                                        th:data-product-id="${product.productId}"
+                                        th:data-trade-status="${product.tradeStatus}"
+                                        onclick="openStatusChange(this)">
+                                    변경
+                                </button>
+                            </div>
+                        </td>
+
+                        <td>
+                            <a th:href="@{/product/detail(productId=${product.productId})}"
+                               th:text="${product.title}">
+                                게시글 제목
+                            </a>
+                        </td>
+
+                        <td th:text="${product.name}">
+                            상품명
+                        </td>
+
+                        <td th:text="${#temporals.format(product.regDate, 'yyyy.MM.dd')}">
+                            2026.07.02
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <section class="my-products-empty" th:if="${products.empty}">
+                <p>아직 등록한 상품이 없습니다.</p>
+
+                <a th:href="@{/product/register}">
+                    첫 상품 등록하기
+                </a>
+            </section>
+
+            <nav class="my-products-pagination"
+                 th:if="${products.totalPages > 1}">
+
+                <a th:if="${!products.first}"
+                   th:href="@{/mypage/products(page=${products.number - 1})}">
+                    이전
+                </a>
+
+                <a th:each="pageNumber : ${#numbers.sequence(0, products.totalPages - 1)}"
+                   th:href="@{/mypage/products(page=${pageNumber})}"
+                   th:text="${pageNumber + 1}"
+                   th:classappend="${pageNumber == products.number} ? 'active'">
+                    1
+                </a>
+
+                <a th:if="${!products.last}"
+                   th:href="@{/mypage/products(page=${products.number + 1})}">
+                    다음
+                </a>
+            </nav>
+
+        </section>
+    </main>
+
+    <div th:replace="~{common/footer :: footer}"></div>
+
+    <div class="my-product-status-modal" id="statusChangeModal">
+        <div class="my-product-status-modal-box">
+            <h3>거래 상태 변경</h3>
+
+            <select id="changeTradeStatus">
+                <option value="ON_SALE">판매중</option>
+                <option value="RESERVED">예약중</option>
+                <option value="SOLD">판매완료</option>
+            </select>
+
+            <div class="my-product-status-modal-buttons">
+                <button type="button" onclick="changeTradeStatus()">저장</button>
+                <button type="button" onclick="closeStatusChange()">취소</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedProductId = null;
+
+        function toggleStatusMenu(button) {
+            const currentMenu = button.nextElementSibling;
+
+            document.querySelectorAll('.my-product-status-menu').forEach(menu => {
+                if (menu !== currentMenu) {
+                    menu.style.display = 'none';
+                }
+            });
+
+            currentMenu.style.display =
+                currentMenu.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function openStatusChange(button) {
+            selectedProductId = button.dataset.productId;
+
+            const currentStatus = button.dataset.tradeStatus;
+
+            document.getElementById('changeTradeStatus').value = currentStatus;
+            document.getElementById('statusChangeModal').style.display = 'flex';
+
+            document.querySelectorAll('.my-product-status-menu').forEach(menu => {
+                menu.style.display = 'none';
+            });
+        }
+
+        function closeStatusChange() {
+            selectedProductId = null;
+            document.getElementById('statusChangeModal').style.display = 'none';
+        }
+
+        function changeTradeStatus() {
+            const tradeStatus = document.getElementById('changeTradeStatus').value;
+
+            if (!selectedProductId) {
+                return;
+            }
+
+            $.ajax({
+                type: 'POST',
+                url: '/product/status',
+                data: {
+                    productId: selectedProductId,
+                    tradeStatus: tradeStatus
+                },
+                success: function(result) {
+                    if (result === 1) {
+                        alert('거래 상태가 변경되었습니다.');
+                        location.reload();
+                        return;
+                    }
+
+                    alert('거래 상태 변경에 실패했습니다. 다시 시도해주세요.');
+                },
+                error: function() {
+                    alert('거래 상태 변경에 실패했습니다. 다시 시도해주세요.');
+                }
+            });
+        }
+
+        document.addEventListener('click', function(event) {
+            if (!event.target.closest('.my-product-status-area')) {
+                document.querySelectorAll('.my-product-status-menu').forEach(menu => {
+                    menu.style.display = 'none';
+                });
+            }
+        });
+    </script>
+
+</body>
+</html>

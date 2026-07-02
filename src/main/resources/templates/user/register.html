@@ -6,7 +6,7 @@
     <title>회원가입</title>
 
     <link rel="stylesheet" href="/css/userRegister.css" th:href="@{/css/userRegister.css}">
-    <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=8d0f47ae6501392120a8bdcab71e77e4"></script>
+    <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=8d0f47ae6501392120a8bdcab71e77e4&libraries=services"></script>
 </head>
 
 <body class="register-page">
@@ -323,6 +323,39 @@
             }
 
             document.getElementById("address").value = address;
+
+            // 주소 -> 좌표 검색
+            geocoder.addressSearch(address, function(result, status) {
+                if(status !== kakao.maps.services.Status.OK) {
+                    alert("선택한 지역의 위치를 찾지 못했습니다.");
+                    return;
+                }
+
+                const lat = result[0].y;
+                const lng = result[0].x;
+
+                const position = new kakao.maps.LatLng(lat, lng);
+
+                // 지도 중심 이동
+                map.setCenter(position);
+                map.setLevel(6);
+
+                // 기존 핀 제거
+                if (marker) {
+                    marker.setMap(null);
+                }
+
+                // 선택한 시/도, 구/군 중심에 핀 생성
+                marker = new kakao.maps.Marker({
+                    position: position
+                });
+                
+                marker.setMap(map);
+
+                // form 전송용 좌표 저장
+                document.getElementById("latitude").value = lat;
+                document.getElementById("longitude").value = lng;
+            });
         }
 
         // 지도에서 선택한 좌표 저장
@@ -335,13 +368,18 @@
 
         const map = new kakao.maps.Map(mapContainer, mapOption);
 
+        const geocoder = new kakao.maps.services.Geocoder();
+
         let marker;
 
         kakao.maps.event.addListener(map, "click", function(mouseEvent) {
             const latlng = mouseEvent.latLng;
 
-            document.getElementById("latitude").value = latlng.getLat();
-            document.getElementById("longitude").value = latlng.getLng();
+            const lat = latlng.getLat();
+            const lng = latlng.getLng();
+
+            document.getElementById("latitude").value = lat;
+            document.getElementById("longitude").value = lng;
 
             if(marker) {
                 marker.setMap(null);
@@ -352,6 +390,7 @@
             });
 
             marker.setMap(map);
+
         });
 
     </script>

@@ -73,6 +73,15 @@
 
     <script>
         function closeReportModal(modalId) {
+            if (modalId === "acceptedReportModal") {
+                fetch("/report/modal/check", {
+                    method: "POST"
+                })
+                .finally(function() {
+                    document.getElementById(modalId).style.display = "none";
+                });
+                return;
+            }
             document.getElementById(modalId).style.display = "none";
         }
     </script>

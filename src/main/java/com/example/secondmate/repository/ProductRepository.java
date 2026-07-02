@@ -15,7 +15,7 @@ import com.example.secondmate.entity.Product;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
     // 특정 회원이 등록한 상품 검색
-    List<Product> findByUser_UserId(Long userId);
+    Page<Product> findByUser_UserId(Long userId, Pageable pageable);
     
     // 상품 이름으로 검색
     @Query("""

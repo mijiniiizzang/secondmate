@@ -4,7 +4,7 @@
 <head>
     <th:block th:replace="~{common/head :: commonHead}"></th:block>
     <title>상품 등록</title>
-    <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=8d0f47ae6501392120a8bdcab71e77e4&autoload=false"></script>
+    <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=8d0f47ae6501392120a8bdcab71e77e4&autoload=false&libraries=services"></script>
     <link rel="stylesheet" th:href="@{/css/productRegister.css}">
 </head>
 
@@ -100,7 +100,7 @@
                             <option th:selected="${savedCity == '경상남도'}" value="경상남도">경상남도</option>
                             <option th:selected="${savedCity == '제주도'}" value="제주도">제주도</option>
                         </select>
-                        <select id="gu" name="gu" disabled>
+                        <select id="gu" name="gu" disabled onchange="moveMapBySelectedRegion()">
                             <option value="">구/군 선택</option>
                         </select>
                     </div>
@@ -375,29 +375,72 @@
         const longitude = /*[[${longitude}]]*/ 126.9786567;
 
         kakao.maps.load(function () {
-            const position = new kakao.maps.LatLng(latitude, longitude);
+            const defaultPosition = new kakao.maps.LatLng(latitude, longitude);
 
             const mapOption = {
-                center: position,
+                center: defaultPosition,
                 level: 5
             };
 
             const map = new kakao.maps.Map(mapContainer, mapOption);
 
+            const geocoder = new kakao.maps.services.Geocoder();
+
             let marker = new kakao.maps.Marker({
-                position: position
+                position: defaultPosition
             });
 
             marker.setMap(map);
 
+            function moveMarker(position, level) {
+                map.setCenter(position);
+                map.setLevel(level);
+
+                marker.setPosition(position);
+
+                document.getElementById("latitude").value = position.getLat();
+                document.getElementById("longitude").value = position.getLng();
+            }
+
+            // 직접 선택한 시/도 + 구/군 기준으로 지도 이동
+            window.moveMapBySelectedRegion = function() {
+                const city = citySelect.value;
+                const gu = guSelect.value;
+
+                let address = "";
+
+                if (city === "세종특별자치시") {
+                    address = city;
+                } else {
+                    address = city + " " + gu;
+                }
+
+                geocoder.addressSearch(address, function (result, status) {
+                    if (status !== kakao.maps.services.Status.OK) {
+                        alert("선택한 지역의 위치를 찾지 못했습니다.");
+                        return;
+                    }
+
+                    const position = new kakao.maps.LatLng(
+                        result[0].y, result[0].x
+                    );
+
+                    moveMarker(position, 6);
+                });
+            };
+
+            // 지도 클릭 시 핀과 좌표만 변경
             kakao.maps.event.addListener(map, "click", function (mouseEvent) {
-                const latlng = mouseEvent.latLng;
-
-                document.getElementById("latitude").value = latlng.getLat();
-                document.getElementById("longitude").value = latlng.getLng();
-
-                marker.setPosition(latlng);
+                moveMarker(mouseEvent.latLng, map.getLevel());
             });
+
+            // 기본 주소 사용으로 다시 바꿨을 때
+            useDefaultAddr.addEventListener("change", function() {
+                if (this.checked) {
+                    moveMarker(defaultPosition, 5);
+                }
+            });
+
         });
     </script>
 </body>

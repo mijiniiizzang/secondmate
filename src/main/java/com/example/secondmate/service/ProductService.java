@@ -182,4 +182,11 @@ public class ProductService {
 
         return product.getUser().getUserId().equals(userId);
     }
+
+    // 내가 올린 상품 목록
+    public Page<ProductDTO> getMyProducts(Long userId, Pageable pageable) {
+        Page<Product> products = productRepository.findByUser_UserId(userId, pageable);
+
+        return products.map(this::toDTO);
+    }
 }

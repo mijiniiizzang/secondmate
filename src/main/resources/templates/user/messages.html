@@ -4,65 +4,184 @@
 <head>
     <th:block th:replace="~{common/head :: commonHead}"></th:block>
     <title>쪽지함</title>
+    <link rel="stylesheet" th:href="@{/css/messages.css}">
 </head>
 
-<body>
+<body class="messages-page">
     <div th:replace="~{common/header :: header}"></div>
 
-    <main>
-        <h1>쪽지함</h1>
-
-        <div>
-            <a th:href="@{/user/messages}">쪽지</a>
-            <a href="#">채팅</a>
+    <main class="messages-container">
+        <div class="messages-header">
+            <h1>쪽지함</h1>
+            <p class="messages-subtitle">신고 처리, 정지/해제 등 내 계정과 관련된 알림을 확인하세요.</p>
         </div>
 
-        <section>
-            <h2>쪽지</h2>
-
-            <table border="1">
+        <section class="messages-card">
+            <table>
                 <thead>
                     <tr>
-                        <th>제목</th>
-                        <th>내용</th>
-                        <th>읽음 여부</th>
-                        <th>받은 날짜</th>
+                        <th class="col-type">종류</th>
+                        <th class="col-title">제목</th>
+                        <th class="col-status">읽음 여부</th>
+                        <th class="col-date">받은 날짜</th>
                     </tr>
                 </thead>
 
                 <tbody>
-                    <tr th:each="notification : ${notifications.content}">
-                        <td th:text="${notification.title}"></td>
-                        <td th:text="${notification.content}"></td>
-                        <td th:text="${notification.read ? '읽음' : '안 읽음'}"></td>
-                        <td th:text="${#temporals.format(notification.createdAt, 'yyyy.MM.dd HH:mm')}"></td>
+                    <tr th:if="${notifications.empty}" class="empty-row">
+                        <td colspan="4">받은 알림이 없습니다.</td>
                     </tr>
 
-                    <tr th:if="${notifications.empty}">
-                        <td colspan="4">받은 쪽지가 없습니다.</td>
+                    <tr th:each="notification : ${notifications.content}"
+                        th:classappend="${!notification.read} ? 'is-unread'">
+                        <td class="col-type">
+                            <span th:switch="${notification.noteType.name()}">
+                                <span class="badge badge-positive" th:case="'REPORT_ACCEPTED'">신고 승인</span>
+                                <span class="badge badge-negative" th:case="'REPORT_REJECTED'">신고 반려</span>
+                                <span class="badge badge-caution" th:case="'PRODUCT_HIDDEN'">상품 숨김</span>
+                                <span class="badge badge-negative" th:case="'PRODUCT_DELETED'">상품 삭제</span>
+                                <span class="badge badge-caution" th:case="'COMMENT_HIDDEN'">댓글 숨김</span>
+                                <span class="badge badge-negative" th:case="'COMMENT_DELETED'">댓글 삭제</span>
+                                <span class="badge badge-negative" th:case="'USER_SUSPENDED'">계정 정지</span>
+                                <span class="badge badge-positive" th:case="'USER_UNSUSPENDED'">정지 해제</span>
+                                <span class="badge" th:case="*" th:text="${notification.noteType}">기타</span>
+                            </span>
+                        </td>
+
+                        <td class="col-title">
+                            <button type="button" class="notification-title-btn"
+                                th:data-id="${notification.notificationId}" th:data-title="${notification.title}"
+                                th:data-content="${notification.content}" onclick="openNotificationModal(this)">
+                                <span class="unread-dot" th:if="${!notification.read}"></span>
+                                <span th:text="${notification.title}">알림 제목</span>
+                            </button>
+                        </td>
+
+                        <td class="col-status" th:id="'read-status-' + ${notification.notificationId}"
+                            th:text="${notification.read ? '읽음' : '안 읽음'}">
+                            안 읽음
+                        </td>
+
+                        <td class="col-date" th:text="${#temporals.format(notification.createdAt, 'yyyy.MM.dd HH:mm')}">
+                            2026.07.02 14:00
+                        </td>
                     </tr>
                 </tbody>
             </table>
 
-            <div>
-                <a th:if="${!notifications.first}" th:href="@{/user/messages(page=${notifications.number - 1}, size=${notifications.size})}">
+            <nav class="messages-pagination" th:if="${notifications.totalPages > 0}">
+                <a class="page-link page-prev" th:if="${!notifications.first}"
+                    th:href="@{/user/messages(page=${notifications.number - 1})}">
                     이전
                 </a>
 
-                <span th:each="page : ${#numbers.sequence(0, notifications.totalPages - 1)}">
-                    <a th:if="${page != notifications.number}" th:href="@{/user/messages(page=${page}, size=${notifications.size})}" th:text="${page + 1}"></a>
+                <span class="page-numbers">
+                    <a class="page-link" th:each="page : ${#numbers.sequence(0, notifications.totalPages - 1)}"
+                        th:if="${page != notifications.number}" th:href="@{/user/messages(page=${page})}"
+                        th:text="${page + 1}">
+                    </a>
 
-                    <strong th:if="${page == notifications.number}" th:text="${page + 1}"></strong>
+                    <strong class="page-link page-current"
+                        th:each="page : ${#numbers.sequence(0, notifications.totalPages - 1)}"
+                        th:if="${page == notifications.number}" th:text="${page + 1}">
+                    </strong>
                 </span>
 
-                <a th:if="${!notifications.last}" th:href="@{/user/messages(page=${notifications.number + 1}, size=${notifications.size})}">
+                <a class="page-link page-next" th:if="${!notifications.last}"
+                    th:href="@{/user/messages(page=${notifications.number + 1})}">
                     다음
                 </a>
-            </div>
+            </nav>
         </section>
     </main>
 
+    <div id="notification-modal" class="notification-modal">
+        <div class="notification-modal-content">
+            <button type="button" class="modal-close-btn" onclick="closeNotificationModal()">×</button>
+
+            <h2 id="modal-title"></h2>
+
+            <p id="modal-content" style="white-space: pre-line;"></p>
+            <button type="button" id="notification-delete-btn" class="notification-delete-btn"
+                onclick="deleteNotification()">삭제</button>
+        </div>
+    </div>
+
     <div th:replace="~{common/footer :: footer}"></div>
+
+    <script>
+        let currentNotificationId = null;
+
+        function openNotificationModal(button) {
+            const notificationId = button.dataset.id;
+            const title = button.dataset.title;
+            const content = button.dataset.content;
+
+            currentNotificationId = notificationId;
+
+            document.getElementById("modal-title").textContent = title;
+            document.getElementById("modal-content").textContent = content;
+            document.getElementById("notification-modal").style.display = "flex";
+
+            fetch(`/user/messages/${notificationId}/read`, {
+                method: "POST"
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("읽음 처리 실패");
+                    }
+
+                    const readStatus = document.getElementById(`read-status-${notificationId}`);
+
+                    if (readStatus) {
+                        readStatus.textContent = "읽음";
+                    }
+                })
+                .catch(error => {
+                    console.error(error);
+                });
+        }
+
+        function deleteNotification() {
+            if (!currentNotificationId) {
+                return;
+            }
+
+            if (!confirm("이 쪽지를 삭제하시겠습니까?")) {
+                return;
+            }
+
+            fetch(`/user/messages/${currentNotificationId}/delete`, {
+                method: "POST"
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("쪽지 삭제 실패");
+                    }
+
+                    location.reload();
+                })
+                .catch(error => {
+                    console.error(error);
+                    alert("쪽지 삭제 중 오류가 발생했습니다.");
+                });
+        }
+
+
+        function closeNotificationModal() {
+            document.getElementById("notification-modal").style.display = "none";
+            currentNotificationId = null;
+        }
+
+        window.addEventListener("click", function (event) {
+            const modal = document.getElementById("notification-modal");
+
+            if (event.target === modal) {
+                closeNotificationModal();
+            }
+        });
+    </script>
+
 </body>
 
 </html>

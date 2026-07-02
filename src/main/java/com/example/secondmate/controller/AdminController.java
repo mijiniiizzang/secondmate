@@ -35,21 +35,21 @@ public class AdminController {
     private final ReportService reportService;
 
     // 관리자 마이페이지 홈화면
-@GetMapping("/home")
-public String adminHome(Model model) {
-    Page<Product> recentProducts = adminService.getRecentProducts();
+    @GetMapping("/home")
+    public String adminHome(Model model) {
+        Page<Product> recentProducts = adminService.getRecentProducts();
 
-    model.addAttribute("menu", "home");
-    model.addAttribute("totalUserCount", adminService.getTotalUserCount());
-    model.addAttribute("suspendedUserCount", adminService.getSuspendedUserCount());
-    model.addAttribute("todayProductCount", adminService.getTodayProductCount());
-    model.addAttribute("recentProducts", recentProducts.getContent());
-    model.addAttribute("totalReportCount", adminService.getTotalReportCount());
-    model.addAttribute("pendingReportCount", adminService.getPendingReportCount());
-    model.addAttribute("acceptedReportCount", adminService.getAcceptedReportCount());
+        model.addAttribute("menu", "home");
+        model.addAttribute("totalUserCount", adminService.getTotalUserCount());
+        model.addAttribute("suspendedUserCount", adminService.getSuspendedUserCount());
+        model.addAttribute("todayProductCount", adminService.getTodayProductCount());
+        model.addAttribute("recentProducts", recentProducts.getContent());
+        model.addAttribute("totalReportCount", adminService.getTotalReportCount());
+        model.addAttribute("pendingReportCount", adminService.getPendingReportCount());
+        model.addAttribute("acceptedReportCount", adminService.getAcceptedReportCount());
 
-    return "admin/home";
-}
+        return "admin/home";
+    }
 
     // 회원 관리
     @GetMapping("/users")

@@ -56,6 +56,9 @@ public class Report {
     @Enumerated(EnumType.STRING)
     @Column(nullable=false)
     private ReportType reportType;
+    @Builder.Default
+    @Column(nullable=false)
+    private boolean reportModalChecked = false;
 
     @CreationTimestamp
     private LocalDateTime regDate;

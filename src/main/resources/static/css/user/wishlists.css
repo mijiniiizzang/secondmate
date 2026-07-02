@@ -1,0 +1,291 @@
+.wishlists-page {
+    margin: 0;
+    color: #222;
+    background: #f7f8f7;
+}
+
+.wishlists-container {
+    display: flex;
+    gap: 32px;
+    width: min(1180px, calc(100% - 40px));
+    min-height: calc(100vh - 180px);
+    margin: 0 auto;
+    padding: 70px 0 100px;
+    box-sizing: border-box;
+}
+
+.wishlists-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.wishlists-title {
+    padding: 36px 40px;
+    border: 1px solid #dbe7df;
+    border-radius: 24px;
+    background: linear-gradient(135deg, #eaf4ee, #ffffff);
+}
+
+.wishlists-label {
+    margin: 0 0 10px;
+    color: #2f7d4a;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 1.2px;
+}
+
+.wishlists-title h1 {
+    margin: 0;
+    font-size: 32px;
+    line-height: 1.3;
+}
+
+.wishlists-title > p:last-child {
+    margin: 12px 0 0;
+    color: #68736b;
+    font-size: 15px;
+}
+
+/* 카테고리 */
+.wishlist-category-filter {
+    margin: 24px 0 18px;
+}
+
+.wishlist-category-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.wishlist-category-button {
+    cursor: pointer;
+}
+
+.wishlist-category-button input {
+    display: none;
+}
+
+.wishlist-category-button span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 36px;
+    padding: 0 13px;
+    border: 1px solid #dfe5e0;
+    border-radius: 999px;
+    background: #fff;
+    color: #667068;
+    font-size: 13px;
+    font-weight: 700;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.wishlist-category-button:hover span {
+    border-color: #a8cfb3;
+    background: #f1f7f3;
+    color: #2f7d4a;
+}
+
+.wishlist-category-button input:checked + span {
+    border-color: #2f7d4a;
+    background: #2f7d4a;
+    color: #fff;
+}
+
+/* 찜 목록 테이블 */
+.wishlists-table {
+    width: 100%;
+    overflow: hidden;
+    border: 1px solid #e2e6e3;
+    border-radius: 20px;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: #fff;
+}
+
+.wishlists-table thead {
+    background: #eaf4ee;
+}
+
+.wishlists-table th {
+    padding: 16px 18px;
+    color: #45524a;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.4px;
+    text-align: left;
+}
+
+.wishlists-table td {
+    padding: 17px 18px;
+    border-top: 1px solid #eef1ee;
+    color: #4e5952;
+    font-size: 14px;
+    vertical-align: middle;
+}
+
+.wishlists-table tbody tr {
+    transition: background 0.15s ease;
+}
+
+.wishlists-table tbody tr:hover {
+    background: #f4faf6;
+}
+
+.wishlists-table th:nth-child(3),
+.wishlists-table td:nth-child(3),
+.wishlists-table th:nth-child(4),
+.wishlists-table td:nth-child(4) {
+    width: 120px;
+    text-align: center;
+}
+
+.wishlists-table td a {
+    color: #222;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.wishlists-table td a:hover {
+    color: #2f7d4a;
+    text-decoration: underline;
+}
+
+.wishlists-table td:nth-child(3) span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 62px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: #e3f2e8;
+    color: #2f7d4a;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.wishlists-table td form {
+    margin: 0;
+}
+
+.wishlists-table td button {
+    padding: 8px 12px;
+    border: 1px solid #e2b6b1;
+    border-radius: 9px;
+    background: #fff4f3;
+    color: #b8524a;
+    font-size: 13px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.wishlists-table td button:hover {
+    border-color: #b8524a;
+    background: #f7e3e1;
+}
+
+/* 빈 목록 */
+.wishlists-empty {
+    padding: 80px 24px;
+    border: 1px solid #e2e6e3;
+    border-radius: 20px;
+    background: #fff;
+    text-align: center;
+}
+
+.wishlists-empty p {
+    margin: 0 0 20px;
+    color: #7c8580;
+    font-size: 15px;
+}
+
+.wishlists-empty a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 11px 16px;
+    border-radius: 10px;
+    background: #2f7d4a;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 800;
+    text-decoration: none;
+}
+
+.wishlists-empty a:hover {
+    background: #24663b;
+}
+
+/* 페이지네이션 */
+.wishlists-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 26px;
+}
+
+.wishlists-pagination a,
+.wishlists-pagination strong {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 34px;
+    height: 34px;
+    padding: 0 10px;
+    border-radius: 999px;
+    color: #5f6d63;
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+    box-sizing: border-box;
+}
+
+.wishlists-pagination a:hover {
+    background: #eaf4ee;
+    color: #2f7d4a;
+}
+
+.wishlists-pagination strong {
+    background: #2f7d4a;
+    color: #fff;
+}
+
+.wishlists-pagination span {
+    display: flex;
+    gap: 6px;
+}
+
+@media (max-width: 900px) {
+    .wishlists-container {
+        flex-direction: column;
+        gap: 24px;
+        padding-top: 32px;
+    }
+}
+
+@media (max-width: 700px) {
+    .wishlists-container {
+        width: min(100% - 28px, 1180px);
+        padding-bottom: 60px;
+    }
+
+    .wishlists-title {
+        padding: 30px 24px;
+        border-radius: 20px;
+    }
+
+    .wishlists-title h1 {
+        font-size: 27px;
+    }
+
+    .wishlists-table {
+        display: block;
+        overflow-x: auto;
+    }
+
+    .wishlists-table thead,
+    .wishlists-table tbody {
+        min-width: 620px;
+    }
+}

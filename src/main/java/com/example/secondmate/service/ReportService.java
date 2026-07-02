@@ -194,6 +194,8 @@ public class ReportService {
         } else {
             user.setSuspendedUntil(LocalDateTime.now().plusYears(100));
         }
+
+        notificationService.createUserSuspendedNotification(user);
     }
 
     // 로그인한 사용자가 받은 수락된 신고 목록 조회
@@ -204,6 +206,17 @@ public class ReportService {
     // 로그인한 사용자가 받은 수락된 신고 횟수
     public long getReportCount(Long userId, ReportStatus reportStatus) {
         return reportRepository.countByReportedUser_UserIdAndReportStatus(userId, reportStatus);
+    }
+
+    // 로그인 모달에 표시할 미확인 신고 수락 건수
+    public long getUncheckedAcceptedReportCount(Long userId) {
+        return reportRepository.countByReportedUser_UserIdAndReportStatusAndReportModalChecked(userId, ReportStatus.ACCEPTED, false);
+    }
+
+    // 신고 처리 모달 확인 처리
+    @Transactional
+    public void checkAcceptedReportModal(Long userId) {
+        reportRepository.checkAcceptedReportModal(userId, ReportStatus.ACCEPTED);
     }
 
     // 관리자 신고 목록 조회
@@ -221,5 +234,15 @@ public class ReportService {
     public Report getReport(Long reportId) {
         return reportRepository.findById(reportId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 신고"));
+    }
+
+    // 사용자가 신고한 내역 페이징 조회
+    public Page<Report> getMyReportList(Long userId, Pageable pageable) {
+        return reportRepository.findByReporter_UserId(userId, pageable);
+    }
+
+    // 사용자가 신고받은 내역 페이징 조회
+    public Page<Report> getMyReceivedReportList(Long userId, Pageable pageable) {
+        return reportRepository.findByReportedUser_UserId(userId, pageable);
     }
 }

@@ -57,6 +57,9 @@ public class Notification {
     @Enumerated(EnumType.STRING)
     @Column(nullable=false)
     private NotificationType noteType;
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="report_id")
+    private Report report;
 
     @Builder.Default
     @Column(nullable=false)

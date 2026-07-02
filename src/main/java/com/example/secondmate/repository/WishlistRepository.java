@@ -2,13 +2,19 @@ package com.example.secondmate.repository;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import com.example.secondmate.common.ProductCategory;
 import com.example.secondmate.entity.Wishlist;
 
 public interface WishlistRepository extends JpaRepository<Wishlist, Long> {
     // 특정 회원의 찜 목록 불러오기
-    List<Wishlist> findByUser_UserId(Long userId);
+    Page<Wishlist> findByUser_UserId(Long userId, Pageable pageable);
+
+    // 특정 회원의 찜 목록 카테고리별 분류
+    Page<Wishlist> findByUser_UserIdAndProduct_CategoryIn(Long userId, List<ProductCategory> categories, Pageable pageable);
 
     // 찜 했나?
     boolean existsByUser_UserIdAndProduct_ProductId(Long userId, Long productId);

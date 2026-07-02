@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link rel="stylesheet" th:href="@{/css/user/mypage-sidebar.css}">
+    <link rel="stylesheet" th:href="@{/css/user/mypage.css}">
+    <th:block th:replace="~{common/head :: commonHead}"></th:block>
+    <title>마이페이지</title>
+</head>
+<body class="user-home-page">
+    <div th:replace="~{common/header :: header}"></div>
+    <main class="user-home-container">
+        <div th:replace="~{user/mypage/mypage-sidebar :: userSidebar}"></div>
+
+        <section class="user-home-content">
+            <div class="user-home-title">
+                <div>
+                    <p class="user-home-label">USER DASHBOARD</p>
+                    <h1>나의 마이페이지</h1>
+                    <h3>안녕하세요, <span th:text="${user.nickname}">닉네임</span>님!</h3>
+                    <p>나의 정보를 확인하세요</p>
+                </div>
+            </div>
+
+            <section class="user-summary-section">
+                <div class="user-summary-card">
+                        <p>내가 올린 상품</p>
+                        <strong id="myProductCount">0</strong>개
+                </div>
+
+                <div class="user-summary-card">
+                    <p>찜한 상품</p>
+                    <strong id="myWishlistCount">0</strong>개
+                </div>
+
+                <div class="user-summary-card">
+                    <p>안 읽은 알림</p>
+                    <strong id="myUnreadNotificationCount">0</strong>건
+                </div>
+            </section>
+        </section>
+    </main>
+
+    <div th:replace="~{common/footer :: footer}"></div>
+</body>
+</html>

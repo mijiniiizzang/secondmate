@@ -1,0 +1,83 @@
+<th:block th:fragment="withdrawModal">
+
+    <div id="withdrawModal" class="withdraw-modal-wrapper">
+        <div class="withdraw-modal">
+            <button type="button" id="withdrawModalClose" class="withdraw-modal-close">
+                x
+            </button>
+
+            <h2>회원 탈퇴</h2>
+            <p>탈퇴하면 계정을 복구할 수 없습니다.</p>
+
+            <form id="withdrawForm">
+                <div class="withdraw-form-row">
+                    <label for="withdrawPassword">현재 비밀번호</label>
+                    <input type="password" id="withdrawPassword" name="password" required>
+                    <span id="withdrawMsg" class="form-msg"></span>
+                </div>
+
+                <button type="submit" class="withdraw-submit-btn">
+                    회원 탈퇴
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const withdrawModal = document.getElementById("withdrawModal");
+        const withdrawModalBtn = document.getElementById("withdrawModalBtn");
+        const withdrawModalClose = document.getElementById("withdrawModalClose");
+        const withdrawForm = document.getElementById("withdrawForm");
+        const withdrawMsg = document.getElementById("withdrawMsg");
+
+        function closeWithdrawModal() {
+            withdrawModal.style.display = "none";
+            withdrawForm.reset();
+            withdrawMsg.innerText = "";
+        }
+
+        withdrawModalBtn.addEventListener("click", function() {
+            withdrawModal.style.display = "flex";
+        });
+
+        withdrawModalClose.addEventListener("click", closeWithdrawModal);
+
+        withdrawModal.addEventListener("click", function(event) {
+            if (event.target === withdrawModal) {
+                closeWithdrawModal();
+            }
+        });
+
+        withdrawForm.addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            if (!confirm("정말 회원 탈퇴하시겠습니까?")) {
+                return;
+            }
+
+            const formData = new FormData(withdrawForm);
+
+            fetch("/mypage/withdraw", {
+                method: "POST",
+                body: formData
+            })
+            .then(response => {
+                if (response.status === 400) {
+                    withdrawMsg.innerText = "현재 비밀번호가 일치하지 않습니다.";
+                    withdrawMsg.style.color = "red";
+                    return;
+                }
+
+                if (!response.ok) {
+                    throw new Error();
+                }
+
+                alert("회원 탈퇴가 완료되었습니다.");
+                location.href = "/";
+            })
+            .catch(() => {
+                alert("회원 탈퇴 중 오류가 발생했습니다.");
+            });
+        });
+    </script>
+</th:block>

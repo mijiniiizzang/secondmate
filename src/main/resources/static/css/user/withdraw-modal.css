@@ -1,0 +1,129 @@
+.withdraw-modal-wrapper {
+    position: fixed;
+    inset: 0;
+    z-index: 3000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(20, 24, 21, 0.45);
+    box-sizing: border-box;
+}
+
+.withdraw-modal {
+    position: relative;
+    width: min(440px, 100%);
+    padding: 38px;
+    border-radius: 24px;
+    background: #fff;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18);
+    box-sizing: border-box;
+}
+
+.withdraw-modal h2 {
+    margin: 0 0 12px;
+    color: #222;
+    font-size: 24px;
+    font-weight: 800;
+    text-align: center;
+}
+
+.withdraw-modal > p {
+    margin: 0 0 28px;
+    color: #b8524a;
+    font-size: 14px;
+    font-weight: 700;
+    text-align: center;
+}
+
+.withdraw-modal-close {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    width: 34px;
+    height: 34px;
+    border: 0;
+    border-radius: 50%;
+    background: #f0f2f0;
+    color: #5f6d63;
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.withdraw-modal-close:hover {
+    background: #e2e6e3;
+    color: #222;
+}
+
+.withdraw-modal form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.withdraw-form-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.withdraw-form-row label {
+    width: 100%;
+    color: #47534b;
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.withdraw-form-row input {
+    width: 100%;
+    height: 44px;
+    padding: 0 14px;
+    border: 1px solid #dfe5e0;
+    border-radius: 10px;
+    color: #222;
+    font-size: 14px;
+    outline: none;
+    box-sizing: border-box;
+}
+
+.withdraw-form-row input:focus {
+    border-color: #b8524a;
+    box-shadow: 0 0 0 3px rgba(184, 82, 74, 0.1);
+}
+
+.withdraw-form-row .form-msg {
+    width: 100%;
+    min-height: 18px;
+    color: #b8524a;
+    font-size: 13px;
+}
+
+.withdraw-submit-btn {
+    width: 100%;
+    padding: 14px 18px;
+    border: 0;
+    border-radius: 12px;
+    background: #b8524a;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.withdraw-submit-btn:hover {
+    background: #9f4039;
+    transform: translateY(-1px);
+}
+
+@media (max-width: 520px) {
+    .withdraw-modal {
+        padding: 34px 24px 26px;
+        border-radius: 20px;
+    }
+
+    .withdraw-modal h2 {
+        font-size: 21px;
+    }
+}

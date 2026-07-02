@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.secondmate.common.UserStatus;
 import com.example.secondmate.entity.User;
 import com.example.secondmate.repository.UserRepository;
+import com.example.secondmate.service.NotificationService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -20,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AccountDetailsService implements UserDetailsService{
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
 
     @Override
     @Transactional
@@ -35,6 +37,7 @@ public class AccountDetailsService implements UserDetailsService{
             
             user.setStatus(UserStatus.ACTIVE);
             user.setSuspendedUntil(null);
+            notificationService.createUserUnsuspendedNotification(user);
         }
 
         // 정지 기간이면 로그인 차단
