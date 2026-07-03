@@ -1,5 +1,6 @@
 package com.example.secondmate.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -138,6 +139,13 @@ public class ProductService {
         Product product = productRepository.findById(productId)
                                            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품"));
         product.setTradeStatus(tradeStatus);
+
+        if (tradeStatus == TradeStatus.SOLD) {
+            product.setSoldAt(LocalDateTime.now());
+        } else {
+            product.setSoldAt(null);
+        }
+        
         productRepository.save(product);
         return 1;
     }

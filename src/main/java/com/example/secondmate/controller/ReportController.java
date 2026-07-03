@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.example.secondmate.common.ReportType;
 import com.example.secondmate.security.AccountDetails;
@@ -34,9 +35,9 @@ public class ReportController {
     }
 
     // 사용자 신고 접수
-    @PostMapping("/user/{reportedUserId}")
-    public String reportUser(@PathVariable Long reportedUserId, @RequestParam ReportType reportType, @RequestParam String reason, @AuthenticationPrincipal AccountDetails accountDetails) {
+    @PostMapping("/api/user/{reportedUserId}")
+    @ResponseBody
+    public void reportChatUser(@PathVariable Long reportedUserId, @RequestParam ReportType reportType, @RequestParam String reason, @AuthenticationPrincipal AccountDetails accountDetails) {
         reportService.reportUser(accountDetails.getUserId(), reportedUserId, reportType, reason);
-        return "redirect:/home";
     }
 }

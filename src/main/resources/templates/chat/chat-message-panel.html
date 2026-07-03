@@ -1,0 +1,269 @@
+<th:block th:fragment="chatMessagePanel">
+
+    <!-- 선택한 채팅방 화면 -->
+    <section id="chatRoomView" hidden>
+
+        <div>
+            <button type="button" onclick="showChatList()">
+                ← 목록
+            </button>
+
+            <button type="button" id="completeTradeButton" hidden onclick="completeTrade()">
+                거래 완료
+            </button>
+
+            <button type="button" onclick="openUserReportModal(selectedOpponentUserId, selectedOpponentNickname)">
+                신고
+            </button>
+
+            <button type="button" onclick="leaveChatRoom()">
+                나가기
+            </button>
+
+            <button type="button" onclick="closeChatPanel()">
+                닫기
+            </button>
+        </div>
+
+        <h3 id="chatProductTitle"></h3>
+
+        <p>
+            상대방 :
+            <span id="chatOpponentNickname"></span>
+        </p>
+
+        <div id="chatMessageList"></div>
+
+        <div>
+            <textarea id="chatContent" maxlength="2000" placeholder="메시지를 입력해주세요."></textarea>
+
+            <button type="button" onclick="sendChatMessage()">
+                전송
+            </button>
+        </div>
+
+    </section>
+
+    <script>
+        function openChatRoom(roomId) {
+            selectedRoomId = roomId;
+
+            Promise.all([
+                fetch("/chat/api/rooms/" + roomId),
+                fetch("/chat/api/rooms/" + roomId + "/messages")
+            ])
+                .then(responses => {
+                    if (!responses[0].ok || !responses[1].ok) {
+                        throw new Error("채팅방 조회 실패");
+                    }
+
+                    return Promise.all([
+                        responses[0].json(),
+                        responses[1].json()
+                    ]);
+                })
+                .then(([room, messages]) => {
+                    document.getElementById("chatListView").hidden = true;
+                    document.getElementById("chatRoomView").hidden = false;
+
+                    document.getElementById("chatProductTitle").textContent =
+                        room.productTitle;
+
+                    document.getElementById("chatOpponentNickname").textContent =
+                        room.opponentNickname;
+
+                    selectedOpponentUserId = room.opponentUserId;
+                    selectedOpponentNickname = room.opponentNickname;
+
+                    const completeTradeButton =
+                        document.getElementById("completeTradeButton");
+
+                    completeTradeButton.hidden =
+                        !room.seller || room.roomStatus === "FINISHED";
+
+                    document.getElementById("chatContent").disabled =
+                        room.roomStatus === "FINISHED";
+
+                    renderChatMessages(messages);
+
+                    if (typeof updateChatUnreadBadge === "function") {
+                        updateChatUnreadBadge();
+                    }
+                })
+                .catch(() => {
+                    alert("채팅방을 불러오지 못했습니다.");
+                    showChatList();
+                });
+        }
+
+        function renderChatMessages(messages) {
+            const chatMessageList =
+                document.getElementById("chatMessageList");
+
+            chatMessageList.innerHTML = "";
+
+            if (messages.length === 0) {
+                chatMessageList.textContent =
+                    "아직 메시지가 없습니다.";
+                return;
+            }
+
+            messages.forEach(message => {
+                appendChatMessage(message);
+            });
+        }
+
+        function appendChatMessage(message) {
+            const chatMessageList =
+                document.getElementById("chatMessageList");
+
+            if (chatMessageList.textContent === "아직 메시지가 없습니다.") {
+                chatMessageList.innerHTML = "";
+            }
+
+            const isMine = message.senderId === loginUserId;
+
+            const messageBox = document.createElement("div");
+
+            messageBox.classList.add(
+                isMine ? "my-message" : "other-message"
+            );
+
+            const sender = document.createElement("strong");
+            sender.textContent =
+                isMine ? "나" : message.senderNickname;
+
+            const content = document.createElement("p");
+            content.textContent = message.content;
+
+            const sentAt = new Date(message.sentAt);
+
+            const time = document.createElement("small");
+            time.className = "message-time";
+
+            time.textContent =
+                String(sentAt.getFullYear())
+                + "."
+                + String(sentAt.getMonth() + 1).padStart(2, "0")
+                + "."
+                + String(sentAt.getDate()).padStart(2, "0")
+                + " "
+                + String(sentAt.getHours()).padStart(2, "0")
+                + ":"
+                + String(sentAt.getMinutes()).padStart(2, "0");
+
+            const messageContentWrap = document.createElement("div");
+            messageContentWrap.className = "message-content-wrap";
+
+            if (isMine && message.readYn === "N") {
+                const unread = document.createElement("span");
+
+                unread.className = "message-unread";
+                unread.dataset.messageId = message.messageId;
+                unread.textContent = "1";
+
+                messageContentWrap.appendChild(unread);
+            }
+
+            messageContentWrap.appendChild(time);
+            messageContentWrap.appendChild(content);
+
+            messageBox.appendChild(sender);
+            messageBox.appendChild(messageContentWrap);
+
+            chatMessageList.appendChild(messageBox);
+
+            chatMessageList.scrollTop =
+                chatMessageList.scrollHeight;
+        }
+
+        function sendChatMessage() {
+            const chatContent =
+                document.getElementById("chatContent");
+
+            const content = chatContent.value.trim();
+
+            if (!content || selectedRoomId === null) {
+                return;
+            }
+
+            if (!stompClient || !stompClient.connected) {
+                alert("채팅 서버에 연결되지 않았습니다.");
+                return;
+            }
+
+            stompClient.send(
+                "/app/chat/send",
+                {},
+                JSON.stringify({
+                    roomId: selectedRoomId,
+                    content: content
+                })
+            );
+
+            chatContent.value = "";
+        }
+
+        function leaveChatRoom() {
+            if (selectedRoomId === null) {
+                return;
+            }
+
+            if (!confirm("채팅방을 나가시겠습니까?")) {
+                return;
+            }
+
+            fetch("/chat/api/rooms/" + selectedRoomId + "/leave", {
+                method: "POST"
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("채팅방 나가기 실패");
+                    }
+
+                    showChatList();
+
+                    if (typeof updateChatUnreadBadge === "function") {
+                        updateChatUnreadBadge();
+                    }
+                })
+                .catch(() => {
+                    alert("채팅방 나가기에 실패했습니다.");
+                });
+        }
+
+        function completeTrade() {
+            if (selectedRoomId === null) {
+                return;
+            }
+
+            if (!confirm("거래를 완료 처리하시겠습니까?")) {
+                return;
+            }
+
+            fetch("/chat/api/rooms/" + selectedRoomId + "/complete", {
+                method: "POST"
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("거래 완료 처리 실패");
+                    }
+
+                    alert("거래가 완료되었습니다.");
+                    openChatRoom(selectedRoomId);
+                })
+                .catch(() => {
+                    alert("거래 완료 처리에 실패했습니다.");
+                });
+        }
+
+        document.getElementById("chatContent")
+            .addEventListener("keydown", function (event) {
+                if (event.key === "Enter" && !event.shiftKey) {
+                    event.preventDefault();
+                    sendChatMessage();
+                }
+            });
+    </script>
+
+</th:block>

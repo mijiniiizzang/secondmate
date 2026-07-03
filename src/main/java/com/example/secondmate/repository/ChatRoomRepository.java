@@ -16,4 +16,7 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
 
     // 내 채팅방 찾기(판매자)
     List<ChatRoom> findByProduct_User_UserId(Long userId);
+
+    // 구매자와 판매자 모두 채팅방을 나간 방 조회
+    List<ChatRoom> findByBuyerLeftAtIsNotNullAndSellerLeftAtIsNotNull();
 }

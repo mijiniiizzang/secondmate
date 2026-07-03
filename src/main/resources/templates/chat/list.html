@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <th:block th:replace="~{common/head :: commonHead}"></th:block>
+    <title>채팅 목록</title>
+</head>
+
+<body>
+
+    <div th:replace="~{common/header :: header}"></div>
+
+    <main>
+
+        <h1>채팅 목록</h1>
+
+        <p th:if="${#lists.isEmpty(chatRooms)}">
+            진행 중인 채팅이 없습니다.
+        </p>
+
+        <ul th:if="${!#lists.isEmpty(chatRooms)}">
+
+            <li th:each="room : ${chatRooms}">
+                <a th:href="@{/chat/room/{roomId}(roomId=${room.roomId})}">
+
+                    <strong th:text="${room.productTitle}">
+                        상품 제목
+                    </strong>
+
+                    <p>
+                        상대방 :
+                        <span th:text="${room.opponentNickname}">
+                            상대방 닉네임
+                        </span>
+                    </p>
+
+                    <p>
+                        상태 :
+                        <span th:text="${room.roomStatus.statusName}">
+                            진행중
+                        </span>
+                    </p>
+
+                    <p th:text="${#temporals.format(room.createdAt, 'yyyy.MM.dd HH:mm')}">
+                        2026.07.03 12:00
+                    </p>
+
+                </a>
+            </li>
+
+        </ul>
+
+    </main>
+
+    <div th:replace="~{common/footer :: footer}"></div>
+
+</body>
+</html>

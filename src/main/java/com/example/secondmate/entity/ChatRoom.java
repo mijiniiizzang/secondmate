@@ -49,6 +49,9 @@ public class ChatRoom {
     @CreationTimestamp
     private LocalDateTime createdAt;
 
+    private LocalDateTime buyerLeftAt;
+    private LocalDateTime sellerLeftAt;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable=false)
     private RoomStatus roomStatus;

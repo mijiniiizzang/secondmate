@@ -137,6 +137,10 @@
                             신고
                         </button>
 
+                        <form th:action="@{/chat/room}" method="POST" sec:authorize="isAuthenticated()" th:if="${!isOwner}">
+                            <input type="hidden" name="productId" th:value="${product.productId}">
+                            <button type="submit" class="product-chat-button">채팅하기</button>
+                        </form>
                         <a class="product-list-button"
                            th:href="@{/product/list}">
                             목록

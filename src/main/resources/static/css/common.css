@@ -30,18 +30,21 @@ button {
     position: sticky;
     top: 0;
     z-index: 1000;
+
     background-color: rgba(255, 255, 255, 0.92);
     backdrop-filter: blur(10px);
+
     border-bottom: 1px solid #ece6df;
 }
 
 .header-container {
-    width: min(1180px, calc(100% - 40px));
-    min-height: 68px;
-    margin: 0 auto;
     display: flex;
     align-items: center;
     justify-content: space-between;
+
+    width: min(1180px, calc(100% - 40px));
+    min-height: 68px;
+    margin: 0 auto;
 }
 
 .header-left,
@@ -51,10 +54,6 @@ button {
 .user-menu {
     display: flex;
     align-items: center;
-}
-
-.header-left {
-    gap: 20px;
 }
 
 .header-right {
@@ -69,6 +68,7 @@ button {
     color: #68717b;
     font-size: 14px;
     font-weight: 700;
+
     transition: 0.2s;
 }
 
@@ -84,34 +84,42 @@ button {
 .header-text-link,
 .header-icon-link,
 .header-user-link,
-.header-admin-link {
+.header-admin-link,
+.header-chat-btn {
     color: #68717b;
     font-size: 14px;
     font-weight: 700;
+
     transition: 0.2s;
 }
 
 .header-text-link:hover,
 .header-icon-link:hover,
 .header-user-link:hover,
-.header-admin-link:hover {
+.header-admin-link:hover,
+.header-chat-btn:hover {
     color: #30343b;
 }
 
 .header-login-btn,
 .header-write-btn,
-.header-logout-btn {
+.header-logout-btn,
+.header-chat-btn {
     border: none;
     font-size: 14px;
     font-weight: 700;
+
     transition: 0.2s;
 }
 
+/* 로그인 */
 .header-login-btn {
     min-width: 82px;
     height: 38px;
     padding: 0 16px;
+
     border-radius: 999px;
+
     background-color: #697789;
     color: #ffffff;
 }
@@ -120,13 +128,17 @@ button {
     background-color: #566576;
 }
 
+/* 글쓰기 */
 .header-write-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
+
     height: 38px;
     padding: 0 15px;
+
     border-radius: 999px;
+
     background-color: #697789;
     color: #ffffff;
 }
@@ -135,6 +147,73 @@ button {
     background-color: #566576;
 }
 
+/* 채팅 */
+.header-chat-btn {
+    position: relative;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 38px;
+    padding: 0 4px;
+
+    background-color: transparent;
+}
+
+.header-chat-btn:hover {
+    background-color: transparent;
+}
+
+/* 채팅 안 읽은 개수 */
+#chatUnreadBadge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-width: 18px;
+    height: 18px;
+    margin-left: 4px;
+    padding: 0 5px;
+
+    border-radius: 999px;
+
+    background-color: #ff5a5f;
+    color: #ffffff;
+
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 18px;
+}
+
+/* 쪽지 알림 */
+.header-icon-link {
+    position: relative;
+
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+#notificationBadge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-width: 17px;
+    height: 17px;
+    padding: 0 5px;
+
+    border-radius: 999px;
+
+    background-color: #ff5a5f;
+    color: #ffffff;
+
+    font-size: 10px;
+    font-weight: 700;
+}
+
+/* 마이페이지 */
 .header-user-link {
     display: inline-flex;
     align-items: center;
@@ -155,6 +234,7 @@ button {
 
 .header-logout-btn {
     padding: 0;
+
     background-color: transparent;
     color: #9aa2ac;
 }
@@ -187,11 +267,16 @@ button {
         padding: 0 12px;
     }
 
+    .header-chat-btn {
+        min-height: 34px;
+    }
+
     .header-text-link,
     .header-icon-link,
     .header-user-link,
     .header-admin-link,
-    .header-logout-btn {
+    .header-logout-btn,
+    .header-chat-btn {
         font-size: 13px;
     }
 }

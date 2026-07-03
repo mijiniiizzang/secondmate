@@ -74,6 +74,7 @@ public class Product {
     private boolean hidden = false;
     @Column(length=500)
     private String hiddenReason;
+    private LocalDateTime soldAt;
 
     @CreationTimestamp
     private LocalDateTime regDate;

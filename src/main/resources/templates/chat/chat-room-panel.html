@@ -1,0 +1,138 @@
+<th:block th:fragment="chatRoomPanel">
+
+    <!-- 채팅방 목록 화면 -->
+    <section id="chatListView">
+
+        <div>
+            <h3>채팅</h3>
+
+            <button type="button" onclick="closeChatPanel()">
+                닫기
+            </button>
+        </div>
+
+        <div id="chatRoomList">
+            채팅방을 불러오는 중입니다.
+        </div>
+
+    </section>
+
+    <script>
+        function showChatList() {
+            selectedRoomId = null;
+
+            document.getElementById("chatListView").hidden = false;
+            document.getElementById("chatRoomView").hidden = true;
+
+            loadChatRooms();
+
+            if (typeof updateChatUnreadBadge === "function") {
+                updateChatUnreadBadge();
+            }
+        }
+
+        function loadChatRooms() {
+            const chatRoomList =
+                document.getElementById("chatRoomList");
+
+            chatRoomList.textContent =
+                "채팅방을 불러오는 중입니다.";
+
+            fetch("/chat/api/rooms")
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("채팅방 목록 조회 실패");
+                    }
+
+                    return response.json();
+                })
+                .then(chatRooms => {
+                    chatRoomList.innerHTML = "";
+
+                    if (chatRooms.length === 0) {
+                        chatRoomList.textContent =
+                            "진행 중인 채팅이 없습니다.";
+                        return;
+                    }
+
+                    chatRooms.forEach(room => {
+                        const roomButton =
+                            document.createElement("button");
+
+                        roomButton.type = "button";
+
+                        roomButton.onclick = function () {
+                            openChatRoom(room.roomId);
+                        };
+
+                        const productTitle =
+                            document.createElement("strong");
+
+                        productTitle.textContent =
+                            room.productTitle;
+
+                        const lastMessage =
+                            document.createElement("p");
+
+                        lastMessage.textContent =
+                            room.lastMessage || "아직 메시지가 없습니다.";
+
+                        const roomInfo =
+                            document.createElement("span");
+
+                        roomInfo.textContent =
+                            "상대방 : " + room.opponentNickname;
+
+                        const sentAt =
+                            document.createElement("small");
+
+                        sentAt.textContent =
+                            formatChatRoomTime(room.lastMessageSentAt);
+
+                        roomButton.appendChild(productTitle);
+                        roomButton.appendChild(lastMessage);
+                        roomButton.appendChild(roomInfo);
+                        roomButton.appendChild(sentAt);
+
+                        if (room.unreadCount > 0) {
+                            const unreadCount =
+                                document.createElement("span");
+
+                            unreadCount.textContent =
+                                room.unreadCount;
+
+                            unreadCount.className =
+                                "chat-room-unread-count";
+
+                            roomButton.appendChild(unreadCount);
+                        }
+
+                        chatRoomList.appendChild(roomButton);
+                    });
+                })
+                .catch(() => {
+                    chatRoomList.textContent =
+                        "채팅방을 불러오지 못했습니다.";
+                });
+        }
+
+        function formatChatRoomTime(sentAt) {
+            if (!sentAt) {
+                return "";
+            }
+
+            const date = new Date(sentAt);
+
+            return String(date.getFullYear())
+                + "."
+                + String(date.getMonth() + 1).padStart(2, "0")
+                + "."
+                + String(date.getDate()).padStart(2, "0")
+                + " "
+                + String(date.getHours()).padStart(2, "0")
+                + ":"
+                + String(date.getMinutes()).padStart(2, "0");
+        }
+    </script>
+
+</th:block>

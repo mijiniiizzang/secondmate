@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <th:block th:replace="~{common/head :: commonHead}"></th:block>
+    <title>채팅방</title>
+</head>
+
+<body>
+
+    <div th:replace="~{common/header :: header}"></div>
+
+    <main>
+
+        <a th:href="@{/chat/list}">채팅 목록</a>
+
+        <h1 th:text="${room.productTitle}">
+            상품 제목
+        </h1>
+
+        <p>
+            대화 상대 :
+            <span th:text="${room.opponentNickname}">
+                상대방 닉네임
+            </span>
+        </p>
+
+        <p>
+            거래 상태 :
+            <span th:text="${room.roomStatus.statusName}">
+                진행중
+            </span>
+        </p>
+
+        <hr>
+
+        <div th:if="${#lists.isEmpty(messages)}">
+            아직 메시지가 없습니다.
+        </div>
+
+        <div th:each="message : ${messages}">
+
+            <div th:if="${message.mine}">
+                <strong>나</strong>
+                <p th:text="${message.content}">메시지 내용</p>
+                <small th:text="${#temporals.format(message.sentAt, 'yyyy.MM.dd HH:mm')}">
+                    2026.07.03 12:00
+                </small>
+            </div>
+
+            <div th:unless="${message.mine}">
+                <strong th:text="${message.senderNickname}">
+                    상대방
+                </strong>
+                <p th:text="${message.content}">메시지 내용</p>
+                <small th:text="${#temporals.format(message.sentAt, 'yyyy.MM.dd HH:mm')}">
+                    2026.07.03 12:00
+                </small>
+            </div>
+
+            <hr>
+
+        </div>
+
+        <form th:action="@{/chat/room/{roomId}/message(roomId=${room.roomId})}"
+              method="post">
+
+            <textarea name="content"
+                      required
+                      maxlength="2000"
+                      placeholder="메시지를 입력해주세요."></textarea>
+
+            <button type="submit">전송</button>
+
+        </form>
+
+    </main>
+
+    <div th:replace="~{common/footer :: footer}"></div>
+
+</body>
+</html>

@@ -24,7 +24,9 @@ public class SecurityConfig {
                 "/wishlist/**",
                 "/api/comments",
                 "/report/**",
-                "/mypage/**"
+                "/mypage/**",
+                "/chat/**",
+                "/ws/**"
             ).authenticated()
             .anyRequest().permitAll()
         )
