@@ -1,0 +1,121 @@
+<th:block th:fragment="inquiryDetailModal">
+    <div id="userInquiryDetailModal" class="user-inquiry-detail-modal-wrapper">
+        <div class="user-inquiry-detail-modal">
+            <button type="button" class="user-inquiry-detail-modal-close" onclick="closeInquiryDetailModal()">×</button>
+
+            <div class="user-inquiry-detail-modal-header">
+                <p class="mypage-inquiries-label">INQUIRY DETAIL</p>
+                <h2 id="userModalInquiryTitle"></h2>
+            </div>
+
+            <div class="user-inquiry-detail-info-list">
+                <div>
+                    <span>문의유형</span>
+                    <strong id="userModalInquiryType"></strong>
+                </div>
+
+                <div>
+                    <span>답변 상태</span>
+                    <strong id="userModalInquiryStatus"></strong>
+                </div>
+
+                <div>
+                    <span>작성일</span>
+                    <strong id="userModalInquiryRegDate"></strong>
+                </div>
+
+                <div id="userAnsweredAtRow">
+                    <span>답변일</span>
+                    <strong id="userModalInquiryAnsweredAt"></strong>
+                </div>
+            </div>
+
+            <div class="user-inquiry-detail-content-box">
+                <p>문의 내용</p>
+                <div id="userModalInquiryContent"></div>
+            </div>
+
+            <div id="userInquiryAnswerView" class="user-inquiry-detail-content-box">
+                <p>관리자 답변</p>
+                <div id="userModalInquiryAnswer"></div>
+            </div>
+
+            <div class="user-inquiry-detail-button-area">
+                <button type="button" onclick="closeInquiryDetailModal()">닫기</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openInquiryDetailModal(inquiryId) {
+            fetch(`/mypage/inquiries/detail?inquiryId=${inquiryId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("문의 정보를 불러오지 못했습니다.");
+                    }
+
+                    return response.json();
+                })
+                .then(inquiry => {
+                    document.getElementById("userModalInquiryTitle").textContent = inquiry.title;
+                    document.getElementById("userModalInquiryType").textContent = getUserInquiryTypeLabel(inquiry.inquiryType);
+                    document.getElementById("userModalInquiryRegDate").textContent = formatUserInquiryDateTime(inquiry.regDate);
+                    document.getElementById("userModalInquiryContent").textContent = inquiry.content;
+
+                    if (inquiry.inquiryStatus === "WAITING") {
+                        document.getElementById("userModalInquiryStatus").textContent = "답변 대기";
+                        document.getElementById("userInquiryAnswerView").style.display = "none";
+                    } else {
+                        document.getElementById("userModalInquiryStatus").textContent = "답변 완료";
+                        document.getElementById("userModalInquiryAnswer").textContent = inquiry.answer ? inquiry.answer : "";
+                        document.getElementById("userInquiryAnswerView").style.display = "block";
+                    }
+
+                    if (inquiry.answeredAt) {
+                        document.getElementById("userModalInquiryAnsweredAt").textContent =
+                            formatUserInquiryDateTime(inquiry.answeredAt);
+                        document.getElementById("userAnsweredAtRow").style.display = "flex";
+                    } else {
+                        document.getElementById("userAnsweredAtRow").style.display = "none";
+                    }
+
+                    document.getElementById("userInquiryDetailModal").style.display = "flex";
+                })
+                .catch(error => {
+                    alert(error.message);
+                });
+        }
+
+        function closeInquiryDetailModal() {
+            document.getElementById("userInquiryDetailModal").style.display = "none";
+        }
+
+        function getUserInquiryTypeLabel(inquiryType) {
+            const inquiryTypeMap = {
+                ACCOUNT: "계정 문의",
+                PRODUCT: "상품 문의",
+                REPORT: "신고 문의",
+                SERVICE: "서비스 이용 문의",
+                ETC: "기타"
+            };
+
+            return inquiryTypeMap[inquiryType];
+        }
+
+        function formatUserInquiryDateTime(dateTime) {
+            const date = new Date(dateTime);
+
+            return date.getFullYear() + "."
+                + String(date.getMonth() + 1).padStart(2, "0") + "."
+                + String(date.getDate()).padStart(2, "0") + " "
+                + String(date.getHours()).padStart(2, "0") + ":"
+                + String(date.getMinutes()).padStart(2, "0");
+        }
+
+        document.getElementById("userInquiryDetailModal").addEventListener("click", function (event) {
+            if (event.target === this) {
+                closeInquiryDetailModal();
+            }
+        });
+    </script>
+</th:block>

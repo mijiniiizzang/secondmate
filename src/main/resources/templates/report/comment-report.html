@@ -19,4 +19,26 @@
         <textarea name="reason" rows="5" cols="30" placeholder="신고 사유를 입력해주세요" required></textarea>
         <button type="submit">신고접수</button>
     </form>
+
+    <script>
+        document.getElementById('commentReportForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const form = event.currentTarget;
+
+            $.ajax({
+                type: 'POST',
+                url: form.action,
+                data: $(form).serialize(),
+                success: function() {
+                    alert('신고가 접수되었습니다.');
+                    closeCommentReport();
+                    form.reset();
+                },
+                error: function() {
+                    alert('이미 신고된 댓글입니다.');
+                }
+            });
+        });
+    </script>
 </th:block>

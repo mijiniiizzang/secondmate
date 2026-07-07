@@ -16,14 +16,18 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.example.secondmate.common.ProductCategory;
+import com.example.secondmate.dto.InquiryDTO;
 import com.example.secondmate.dto.ProductDTO;
 import com.example.secondmate.dto.UserUpdateDTO;
 import com.example.secondmate.dto.UserUpdatePasswordDTO;
 import com.example.secondmate.dto.WishlistDTO;
+import com.example.secondmate.entity.Inquiry;
 import com.example.secondmate.entity.Report;
 import com.example.secondmate.security.AccountDetails;
+import com.example.secondmate.service.InquiryService;
 import com.example.secondmate.service.ProductService;
 import com.example.secondmate.service.UserService;
 import com.example.secondmate.service.WishlistService;
@@ -38,11 +42,13 @@ public class MyPageController {
     private final UserService userService;
     private final ProductService productService;
     private final WishlistService wishlistService;
+    private final InquiryService inquiryService;
 
     // 마이페이지 기본 화면
     @GetMapping
     public String mypage(@AuthenticationPrincipal AccountDetails accountDetails, Model model) {
         model.addAttribute("user", userService.getUser(accountDetails.getUserId()));
+        model.addAttribute("myInquiryCount", inquiryService.getMyInquiryCount(accountDetails.getUserId()));
 
         return "user/mypage/mypage";
     }
@@ -85,7 +91,8 @@ public class MyPageController {
 
     // 회원 탈퇴
     @PostMapping("/withdraw")
-    public ResponseEntity<Void> withdraw(@RequestParam String password, @AuthenticationPrincipal AccountDetails accountDetails) {
+    public ResponseEntity<Void> withdraw(@RequestParam String password,
+            @AuthenticationPrincipal AccountDetails accountDetails) {
         try {
             userService.deleteUser(accountDetails.getUserId(), password);
             return ResponseEntity.ok().build();
@@ -96,20 +103,22 @@ public class MyPageController {
 
     // 내가 쓴 글
     @GetMapping("/products")
-    public String myProducts(@AuthenticationPrincipal AccountDetails accountDetails, @PageableDefault(size=5, sort="regDate", direction=Sort.Direction.DESC) Pageable pageable, Model model) {
+    public String myProducts(@AuthenticationPrincipal AccountDetails accountDetails,
+            @PageableDefault(size = 5, sort = "regDate", direction = Sort.Direction.DESC) Pageable pageable,
+            Model model) {
         Page<ProductDTO> products = productService.getMyProducts(accountDetails.getUserId(), pageable);
 
         model.addAttribute("products", products);
-        
+
         return "user/mypage/products";
     }
 
     // 찜 내역
     @GetMapping("/wishlists")
-    public String wishlists(@AuthenticationPrincipal AccountDetails accountDetails, @RequestParam(required=false) List<ProductCategory> categories,
-                            @PageableDefault(size=5, sort="regDate", direction=Sort.Direction.DESC) Pageable pageable,
-                            Model model
-    ) {
+    public String wishlists(@AuthenticationPrincipal AccountDetails accountDetails,
+            @RequestParam(required = false) List<ProductCategory> categories,
+            @PageableDefault(size = 5, sort = "regDate", direction = Sort.Direction.DESC) Pageable pageable,
+            Model model) {
         Page<WishlistDTO> wishlists = wishlistService.getWishlistList(accountDetails.getUserId(), categories, pageable);
 
         model.addAttribute("wishlists", wishlists);
@@ -119,9 +128,9 @@ public class MyPageController {
 
     // 신고 내역
     @GetMapping("/reports")
-    public String reports(@RequestParam(defaultValue="sent") String type, @PageableDefault(size=10, sort="regDate", direction=Sort.Direction.DESC) Pageable pageable,
-                          @AuthenticationPrincipal AccountDetails accountDetails, Model model
-    ) {
+    public String reports(@RequestParam(defaultValue = "sent") String type,
+            @PageableDefault(size = 10, sort = "regDate", direction = Sort.Direction.DESC) Pageable pageable,
+            @AuthenticationPrincipal AccountDetails accountDetails, Model model) {
         Long userId = accountDetails.getUserId();
 
         Page<Report> reports;
@@ -136,7 +145,7 @@ public class MyPageController {
         model.addAttribute("menu", "reports");
         model.addAttribute("type", type);
         model.addAttribute("reports", reports);
-        
+
         return "user/mypage/reports";
     }
 
@@ -144,6 +153,64 @@ public class MyPageController {
     @GetMapping("/chats")
     public String chats() {
         return "user/chats";
+    }
+
+    // 문의내역
+    @GetMapping("/inquiries")
+    public String inquiries(
+            @AuthenticationPrincipal AccountDetails accountDetails,
+            @PageableDefault(size = 10, sort = "regDate", direction = Sort.Direction.DESC) Pageable pageable,
+            Model model) {
+        Page<Inquiry> inquiries = inquiryService.getMyInquiryList(accountDetails.getUserId(), pageable);
+
+        model.addAttribute("menu", "inquiries");
+        model.addAttribute("inquiries", inquiries);
+        model.addAttribute("inquiryDTO", new InquiryDTO());
+
+        return "user/mypage/inquiries";
+    }
+
+    // 문의 작성 화면
+    @GetMapping("/inquiries/register")
+    public String inquiryRegisterForm(Model model) {
+        model.addAttribute("inquiryDTO", new InquiryDTO());
+
+        return "user/mypage/inquiry-register";
+    }
+
+    // 문의 작성 처리
+    @PostMapping("/inquiries/register")
+    public String inquiryRegister(@ModelAttribute InquiryDTO inquiryDTO,
+            @AuthenticationPrincipal AccountDetails accountDetails) {
+        inquiryService.createInquiry(accountDetails.getUserId(), inquiryDTO);
+        return "redirect:/mypage/inquiries";
+    }
+
+    // 문의 상세
+    @GetMapping("/inquiries/detail")
+    @ResponseBody
+    public InquiryDTO inquiryDetail(
+            @RequestParam Long inquiryId,
+            @AuthenticationPrincipal AccountDetails accountDetails) {
+
+        Inquiry inquiry = inquiryService.getInquiry(inquiryId);
+
+        if (!inquiry.getUser().getUserId().equals(accountDetails.getUserId())) {
+            throw new IllegalArgumentException("권한 없음");
+        }
+
+        return InquiryDTO.builder()
+                .inquiryId(inquiry.getInquiryId())
+                .userId(inquiry.getUser().getUserId())
+                .nickname(inquiry.getUser().getNickname())
+                .title(inquiry.getTitle())
+                .content(inquiry.getContent())
+                .inquiryType(inquiry.getInquiryType())
+                .inquiryStatus(inquiry.getInquiryStatus())
+                .answer(inquiry.getAnswer())
+                .answeredAt(inquiry.getAnsweredAt())
+                .regDate(inquiry.getRegDate())
+                .build();
     }
 
 }

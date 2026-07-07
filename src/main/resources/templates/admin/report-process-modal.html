@@ -14,7 +14,11 @@
                         <h2>신고 상세</h2>
                     </div>
 
-                    <button type="button" class="report-modal-close" onclick="closeReportDetailModal()">×</button>
+                    <button type="button"
+                            class="report-modal-close"
+                            onclick="closeReportDetailModal()">
+                        ×
+                    </button>
                 </div>
 
                 <div class="report-detail-list">
@@ -43,7 +47,7 @@
                     <div class="report-form-group">
                         <label for="action">처리 선택</label>
 
-                        <select id="action" name="action" onchange="changeReportAction()" required>
+                        <select id="action" name="action" required>
                             <option value="">선택</option>
                             <option value="ACCEPT">수락</option>
                             <option value="HIDE" id="hideActionOption">수락 후 숨김</option>
@@ -52,7 +56,7 @@
                         </select>
                     </div>
 
-                    <div id="reasonArea" hidden>
+                    <div id="reasonArea">
                         <div class="report-form-group">
                             <label for="processReason">처리 사유</label>
 
@@ -68,14 +72,22 @@
 
                         <div class="report-form-group">
                             <label for="detailReason">상세 사유</label>
-                            <textarea id="detailReason" name="detailReason" placeholder="상세 사유를 입력하세요."></textarea>
+                            <textarea id="detailReason"
+                                      name="detailReason"
+                                      placeholder="상세 사유를 입력하세요."></textarea>
                         </div>
                     </div>
 
-                    <button type="submit" class="report-process-btn">처리하기</button>
+                    <button type="submit" class="report-process-btn">
+                        처리하기
+                    </button>
                 </div>
 
-                <button type="button" class="report-modal-cancel-btn" onclick="closeReportDetailModal()">닫기</button>
+                <button type="button"
+                        class="report-modal-cancel-btn"
+                        onclick="closeReportDetailModal()">
+                    닫기
+                </button>
             </form>
         </div>
     </div>
@@ -108,9 +120,6 @@
             document.getElementById("action").value = "";
             document.getElementById("processReason").value = "";
             document.getElementById("detailReason").value = "";
-            document.getElementById("reasonArea").hidden = true;
-            document.getElementById("processReason").required = false;
-            document.getElementById("detailReason").required = false;
             document.getElementById("reportProcessArea").hidden = !isPending;
 
             modal.hidden = false;
@@ -120,15 +129,6 @@
         function closeReportDetailModal() {
             document.getElementById("reportDetailModal").hidden = true;
             document.body.style.overflow = "";
-        }
-
-        function changeReportAction() {
-            const action = document.getElementById("action").value;
-            const needsReason = action === "HIDE" || action === "DELETE";
-
-            document.getElementById("reasonArea").hidden = !needsReason;
-            document.getElementById("processReason").required = needsReason;
-            document.getElementById("detailReason").required = needsReason;
         }
 
         document.getElementById("reportDetailModal").addEventListener("click", function(event) {

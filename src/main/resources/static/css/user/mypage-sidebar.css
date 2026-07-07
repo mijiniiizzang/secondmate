@@ -4,7 +4,7 @@
     padding: 28px 18px;
     border: 1px solid #e2e6e3;
     border-radius: 20px;
-    background: #fff;
+    background: #ffffff;
     box-sizing: border-box;
 }
 
@@ -15,13 +15,13 @@
     font-weight: 800;
 }
 
-.user-menu {
+.user-sidebar .user-menu {
     display: flex;
     flex-direction: column;
     gap: 6px;
 }
 
-.user-menu a {
+.user-sidebar .user-menu a {
     display: flex;
     align-items: center;
     min-height: 46px;
@@ -34,18 +34,18 @@
     transition: background 0.15s ease, color 0.15s ease;
 }
 
-.user-menu a:hover {
+.user-sidebar .user-menu a:hover {
     background: #f1f7f3;
     color: #2f7d4a;
 }
 
-.user-menu a.active {
+.user-sidebar .user-menu a.active {
     background: #e3f2e8;
     color: #2f7d4a;
     font-weight: 800;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 700px) {
     .user-sidebar {
         width: 100%;
         flex: none;
@@ -56,22 +56,23 @@
         margin: 0 0 16px;
     }
 
-    .user-menu {
+    .user-sidebar .user-menu {
         display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
         gap: 8px;
     }
 
-    .user-menu a {
+    .user-sidebar .user-menu a {
         justify-content: center;
+        min-height: 42px;
         padding: 0 10px;
         font-size: 14px;
         text-align: center;
     }
 }
 
-@media (max-width: 600px) {
-    .user-menu {
+@media (max-width: 500px) {
+    .user-sidebar .user-menu {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }

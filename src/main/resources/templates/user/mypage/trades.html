@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link rel="stylesheet" th:href="@{/css/user/mypage-sidebar.css}">
+    <link rel="stylesheet" th:href="@{/css/user/trades.css}">
+    <th:block th:replace="~{common/head :: commonHead}"></th:block>
+    <title>내 거래내역</title>
+</head>
+
+<body class="trades-page">
+
+    <div th:replace="~{common/header :: header}"></div>
+
+    <main class="trades-container">
+
+        <div th:replace="~{user/mypage/mypage-sidebar :: userSidebar}"></div>
+
+        <section class="trades-content">
+
+            <div class="trades-title">
+                <p class="trades-label">MY TRADES</p>
+                <h1>내 거래내역</h1>
+                <p>구매하거나 판매한 상품을 확인할 수 있어요.</p>
+            </div>
+
+            <section class="trades-section">
+                <div class="trades-section-title">
+                    <h2>구매내역</h2>
+                    <span th:text="${purchaseTrades.size()} + '건'">0건</span>
+                </div>
+
+                <table class="trades-table" th:if="${!purchaseTrades.isEmpty()}">
+                    <thead>
+                        <tr>
+                            <th>상품 제목</th>
+                            <th>상품명</th>
+                            <th>구매날짜</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr th:each="trade : ${purchaseTrades}">
+                            <td>
+                                <a th:href="@{/product/detail(productId=${trade.productId})}"
+                                   th:text="${trade.productTitle}">
+                                    상품 제목
+                                </a>
+                            </td>
+
+                            <td th:text="${trade.productName}">
+                                상품명
+                            </td>
+
+                            <td th:text="${trade.completedAt != null
+                                ? #temporals.format(trade.completedAt, 'yyyy.MM.dd')
+                                : '-'}">
+                                2026.07.07
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="trades-empty" th:if="${purchaseTrades.isEmpty()}">
+                    구매한 상품이 없습니다.
+                </div>
+            </section>
+
+            <section class="trades-section">
+                <div class="trades-section-title">
+                    <h2>판매내역</h2>
+                    <span th:text="${salesTrades.size()} + '건'">0건</span>
+                </div>
+
+                <table class="trades-table" th:if="${!salesTrades.isEmpty()}">
+                    <thead>
+                        <tr>
+                            <th>상품 제목</th>
+                            <th>상품명</th>
+                            <th>거래상태</th>
+                            <th>거래날짜</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr th:each="trade : ${salesTrades}">
+                            <td>
+                                <a th:href="@{/product/detail(productId=${trade.productId})}"
+                                   th:text="${trade.productTitle}">
+                                    상품 제목
+                                </a>
+                            </td>
+
+                            <td th:text="${trade.productName}">
+                                상품명
+                            </td>
+
+                            <td>
+                                <span th:if="${trade.tradeStatus.name() == 'RESERVED'}">
+                                    예약중
+                                </span>
+
+                                <span th:if="${trade.tradeStatus.name() == 'SOLD'}">
+                                    판매완료
+                                </span>
+                            </td>
+
+                            <td th:text="${trade.tradeStatus.name() == 'SOLD'
+                                ? #temporals.format(trade.completedAt, 'yyyy.MM.dd')
+                                : #temporals.format(trade.tradeDate, 'yyyy.MM.dd')}">
+                                2026.07.07
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="trades-empty" th:if="${salesTrades.isEmpty()}">
+                    판매한 상품이 없습니다.
+                </div>
+            </section>
+
+        </section>
+    </main>
+
+    <div th:replace="~{common/footer :: footer}"></div>
+
+</body>
+</html>

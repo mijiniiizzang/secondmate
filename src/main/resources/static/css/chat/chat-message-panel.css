@@ -20,9 +20,29 @@
     margin-right: auto;
 }
 
-#completeTradeButton {
-    background: #222222 !important;
-    color: #ffffff !important;
+#tradeStatusSelect {
+    height: 34px;
+    padding: 0 28px 0 12px;
+
+    border: 0;
+    border-radius: 8px;
+    outline: none;
+
+    background: #222222;
+    color: #ffffff;
+
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+#tradeStatusSelect:focus {
+    box-shadow: 0 0 0 3px rgba(34, 34, 34, 0.14);
+}
+
+#tradeStatusSelect:disabled {
+    background: #aaaaaa;
+    cursor: not-allowed;
 }
 
 #chatRoomView > h3 {

@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
+    <link rel="stylesheet" th:href="@{/css/user/mypage-sidebar.css}">
     <link rel="stylesheet" th:href="@{/css/user/wishlists.css}">
     <th:block th:replace="~{common/head :: commonHead}"></th:block>
     <title>찜한 상품</title>
@@ -12,7 +14,7 @@
 
     <main class="wishlists-container">
 
-        <div th:replace="~{user/mypage-sidebar :: userSidebar}"></div>
+        <div th:replace="~{user/mypage/mypage-sidebar :: userSidebar}"></div>
 
         <section class="wishlists-content">
 
@@ -22,99 +24,77 @@
                 <p>관심 있는 상품을 확인할 수 있어요.</p>
             </div>
 
-            <form class="wishlist-category-filter"
-                  th:action="@{/mypage/wishlists}"
-                  method="get">
+            <form class="wishlist-category-filter" th:action="@{/mypage/wishlists}" method="get">
 
                 <div class="wishlist-category-list">
 
                     <label class="wishlist-category-button">
-                        <input type="checkbox"
-                               name="categories"
-                               value="ELECTRONICS"
-                               th:checked="${categories != null and categories.contains(T(com.example.secondmate.common.ProductCategory).ELECTRONICS)}"
-                               onchange="this.form.submit()">
+                        <input type="checkbox" name="categories" value="ELECTRONICS"
+                            th:checked="${categories != null and categories.contains(T(com.example.secondmate.common.ProductCategory).ELECTRONICS)}"
+                            onchange="this.form.submit()">
                         <span>전자제품</span>
                     </label>
 
                     <label class="wishlist-category-button">
-                        <input type="checkbox"
-                               name="categories"
-                               value="FASHION"
-                               th:checked="${categories != null and categories.contains(T(com.example.secondmate.common.ProductCategory).FASHION)}"
-                               onchange="this.form.submit()">
+                        <input type="checkbox" name="categories" value="FASHION"
+                            th:checked="${categories != null and categories.contains(T(com.example.secondmate.common.ProductCategory).FASHION)}"
+                            onchange="this.form.submit()">
                         <span>의류</span>
                     </label>
 
                     <label class="wishlist-category-button">
-                        <input type="checkbox"
-                               name="categories"
-                               value="BEAUTY"
-                               th:checked="${categories != null and categories.contains(T(com.example.secondmate.common.ProductCategory).BEAUTY)}"
-                               onchange="this.form.submit()">
+                        <input type="checkbox" name="categories" value="BEAUTY"
+                            th:checked="${categories != null and categories.contains(T(com.example.secondmate.common.ProductCategory).BEAUTY)}"
+                            onchange="this.form.submit()">
                         <span>미용/화장품</span>
                     </label>
 
                     <label class="wishlist-category-button">
-                        <input type="checkbox"
-                               name="categories"
-                               value="BOOK"
-                               th:checked="${categories != null and categories.contains(T(com.example.secondmate.common.ProductCategory).BOOK)}"
-                               onchange="this.form.submit()">
+                        <input type="checkbox" name="categories" value="BOOK"
+                            th:checked="${categories != null and categories.contains(T(com.example.secondmate.common.ProductCategory).BOOK)}"
+                            onchange="this.form.submit()">
                         <span>도서</span>
                     </label>
 
                     <label class="wishlist-category-button">
-                        <input type="checkbox"
-                               name="categories"
-                               value="SPORTS"
-                               th:checked="${categories != null and categories.contains(T(com.example.secondmate.common.ProductCategory).SPORTS)}"
-                               onchange="this.form.submit()">
+                        <input type="checkbox" name="categories" value="SPORTS"
+                            th:checked="${categories != null and categories.contains(T(com.example.secondmate.common.ProductCategory).SPORTS)}"
+                            onchange="this.form.submit()">
                         <span>스포츠용품</span>
                     </label>
 
                     <label class="wishlist-category-button">
-                        <input type="checkbox"
-                               name="categories"
-                               value="FURNITURE"
-                               th:checked="${categories != null and categories.contains(T(com.example.secondmate.common.ProductCategory).FURNITURE)}"
-                               onchange="this.form.submit()">
+                        <input type="checkbox" name="categories" value="FURNITURE"
+                            th:checked="${categories != null and categories.contains(T(com.example.secondmate.common.ProductCategory).FURNITURE)}"
+                            onchange="this.form.submit()">
                         <span>가구</span>
                     </label>
 
                     <label class="wishlist-category-button">
-                        <input type="checkbox"
-                               name="categories"
-                               value="HOBBY"
-                               th:checked="${categories != null and categories.contains(T(com.example.secondmate.common.ProductCategory).HOBBY)}"
-                               onchange="this.form.submit()">
+                        <input type="checkbox" name="categories" value="HOBBY"
+                            th:checked="${categories != null and categories.contains(T(com.example.secondmate.common.ProductCategory).HOBBY)}"
+                            onchange="this.form.submit()">
                         <span>취미</span>
                     </label>
 
                     <label class="wishlist-category-button">
-                        <input type="checkbox"
-                               name="categories"
-                               value="FOOD"
-                               th:checked="${categories != null and categories.contains(T(com.example.secondmate.common.ProductCategory).FOOD)}"
-                               onchange="this.form.submit()">
+                        <input type="checkbox" name="categories" value="FOOD"
+                            th:checked="${categories != null and categories.contains(T(com.example.secondmate.common.ProductCategory).FOOD)}"
+                            onchange="this.form.submit()">
                         <span>음식</span>
                     </label>
 
                     <label class="wishlist-category-button">
-                        <input type="checkbox"
-                               name="categories"
-                               value="TICKET"
-                               th:checked="${categories != null and categories.contains(T(com.example.secondmate.common.ProductCategory).TICKET)}"
-                               onchange="this.form.submit()">
+                        <input type="checkbox" name="categories" value="TICKET"
+                            th:checked="${categories != null and categories.contains(T(com.example.secondmate.common.ProductCategory).TICKET)}"
+                            onchange="this.form.submit()">
                         <span>티켓</span>
                     </label>
 
                     <label class="wishlist-category-button">
-                        <input type="checkbox"
-                               name="categories"
-                               value="ETC"
-                               th:checked="${categories != null and categories.contains(T(com.example.secondmate.common.ProductCategory).ETC)}"
-                               onchange="this.form.submit()">
+                        <input type="checkbox" name="categories" value="ETC"
+                            th:checked="${categories != null and categories.contains(T(com.example.secondmate.common.ProductCategory).ETC)}"
+                            onchange="this.form.submit()">
                         <span>기타</span>
                     </label>
 
@@ -135,7 +115,7 @@
                     <tr th:each="wishlist : ${wishlists.content}">
                         <td>
                             <a th:href="@{/product/detail(productId=${wishlist.productId})}"
-                               th:text="${wishlist.productDTO.title}">
+                                th:text="${wishlist.productDTO.title}">
                                 게시글 제목
                             </a>
                         </td>
@@ -159,11 +139,10 @@
                         </td>
 
                         <td>
-                            <form th:action="@{/wishlist/toggle/{productId}(productId=${wishlist.productId})}"
-                                  method="post">
+                            <form th:action="@{/wishlist/delete/{productId}(productId=${wishlist.productId})}"
+                                method="post">
 
-                                <button type="submit"
-                                        onclick="return confirm('찜 목록에서 삭제하시겠습니까?')">
+                                <button type="submit" onclick="return confirm('찜 목록에서 삭제하시겠습니까?')">
                                     찜 해제
                                 </button>
                             </form>
@@ -180,29 +159,26 @@
                 </a>
             </section>
 
-            <nav class="wishlists-pagination"
-                 th:if="${wishlists.totalPages > 1}">
+            <nav class="wishlists-pagination" th:if="${wishlists.totalPages > 1}">
 
                 <a th:if="${!wishlists.first}"
-                   th:href="@{/mypage/wishlists(page=${wishlists.number - 1}, categories=${categories})}">
+                    th:href="@{/mypage/wishlists(page=${wishlists.number - 1}, categories=${categories})}">
                     이전
                 </a>
 
                 <span th:each="page : ${#numbers.sequence(0, wishlists.totalPages - 1)}">
 
                     <a th:if="${page != wishlists.number}"
-                       th:href="@{/mypage/wishlists(page=${page}, categories=${categories})}"
-                       th:text="${page + 1}">
+                        th:href="@{/mypage/wishlists(page=${page}, categories=${categories})}" th:text="${page + 1}">
                     </a>
 
-                    <strong th:if="${page == wishlists.number}"
-                            th:text="${page + 1}">
+                    <strong th:if="${page == wishlists.number}" th:text="${page + 1}">
                     </strong>
 
                 </span>
 
                 <a th:if="${!wishlists.last}"
-                   th:href="@{/mypage/wishlists(page=${wishlists.number + 1}, categories=${categories})}">
+                    th:href="@{/mypage/wishlists(page=${wishlists.number + 1}, categories=${categories})}">
                     다음
                 </a>
 
@@ -214,4 +190,5 @@
     <div th:replace="~{common/footer :: footer}"></div>
 
 </body>
+
 </html>

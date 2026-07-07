@@ -116,10 +116,10 @@ public class ChatController {
         return chatService.getUnreadCount(accountDetails.getUserId());
     }
 
-    // 거래 완료 처리
-    @PostMapping("/api/rooms/{roomId}/complete")
+    // 거래 상태 변경
+    @PostMapping("/api/rooms/{roomId}/trade-status")
     @ResponseBody
-    public void completeTrade(@PathVariable Long roomId, @AuthenticationPrincipal AccountDetails accountDetails) {
-        chatService.completeTrade(roomId, accountDetails.getUserId());
+    public void changeTradeStatus(@PathVariable Long roomId, @RequestParam int tradeStatusId, @AuthenticationPrincipal AccountDetails accountDetails) {
+        chatService.changeTradeStatus(roomId, accountDetails.getUserId(), tradeStatusId);
     }
 }

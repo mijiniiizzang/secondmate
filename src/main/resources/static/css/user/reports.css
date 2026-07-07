@@ -1,10 +1,10 @@
-.my-products-page {
+.reports-page {
     margin: 0;
     color: #222;
     background: #f7f8f7;
 }
 
-.my-products-container {
+.reports-container {
     display: flex;
     gap: 32px;
     width: min(1180px, calc(100% - 40px));
@@ -14,19 +14,19 @@
     box-sizing: border-box;
 }
 
-.my-products-content {
+.reports-content {
     flex: 1;
     min-width: 0;
 }
 
-.my-products-title {
+.reports-title {
     padding: 36px 40px;
     border: 1px solid #dbe7df;
     border-radius: 24px;
     background: linear-gradient(135deg, #eaf4ee, #ffffff);
 }
 
-.my-products-label {
+.reports-label {
     margin: 0 0 10px;
     color: #2f7d4a;
     font-size: 12px;
@@ -34,134 +34,163 @@
     letter-spacing: 1.2px;
 }
 
-.my-products-title h1 {
+.reports-title h1 {
     margin: 0;
     font-size: 32px;
     line-height: 1.3;
 }
 
-.my-products-title > p:last-child {
+.reports-title > p:last-child {
     margin: 12px 0 0;
     color: #68736b;
     font-size: 15px;
 }
 
-.my-products-top {
+.reports-tab-menu {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
+    gap: 10px;
     margin: 26px 0 16px;
 }
 
-.my-products-top p {
-    margin: 0;
-    color: #5f6d63;
-    font-size: 15px;
-}
-
-.my-products-top strong {
-    margin: 0 2px;
-    color: #2f7d4a;
-    font-size: 19px;
-}
-
-.my-products-top a,
-.my-products-empty a {
+.reports-tab-menu a {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 11px 16px;
-    border-radius: 10px;
+    min-height: 40px;
+    padding: 0 16px;
+    border: 1px solid #dfe5e0;
+    border-radius: 999px;
+    background: #fff;
+    color: #68736b;
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.reports-tab-menu a:hover {
+    border-color: #b9d7c1;
+    background: #eef7f0;
+    color: #2f7d4a;
+}
+
+.reports-tab-menu a.active {
+    border-color: #2f7d4a;
     background: #2f7d4a;
     color: #fff;
-    font-size: 14px;
-    font-weight: 800;
-    text-decoration: none;
-    transition: background 0.15s ease, transform 0.15s ease;
 }
 
-.my-products-top a:hover,
-.my-products-empty a:hover {
-    background: #24663b;
-    transform: translateY(-1px);
+.reports-list-section {
+    width: 100%;
 }
 
-.my-products-table {
+.reports-table {
     width: 100%;
     border: 1px solid #e2e6e3;
     border-radius: 20px;
     border-collapse: separate;
     border-spacing: 0;
     background: #fff;
+    overflow: hidden;
 }
 
-.my-products-table thead {
+.reports-table thead {
     background: #eaf4ee;
 }
 
-.my-products-table th {
+.reports-table th {
     padding: 16px 18px;
     color: #45524a;
     font-size: 12px;
     font-weight: 800;
     letter-spacing: 0.4px;
-    text-align: left;
+    text-align: center;
 }
 
-.my-products-table td {
+.reports-table td {
     padding: 17px 18px;
     border-top: 1px solid #eef1ee;
     color: #4e5952;
     font-size: 14px;
+    text-align: center;
     vertical-align: middle;
 }
 
-.my-products-table tbody tr {
+.reports-table tbody tr {
+    cursor: pointer;
     transition: background 0.15s ease;
 }
 
-.my-products-table tbody tr:hover {
+.reports-table tbody tr:hover {
     background: #f4faf6;
 }
 
-.my-products-table td:nth-child(1),
-.my-products-table th:nth-child(1) {
-    width: 150px;
-    text-align: center;
+.reports-table th:nth-child(1),
+.reports-table td:nth-child(1) {
+    width: 120px;
 }
 
-.my-products-table td:nth-child(4),
-.my-products-table th:nth-child(4) {
-    width: 130px;
+.reports-table th:nth-child(2),
+.reports-table td:nth-child(2) {
+    width: 90px;
+}
+
+.reports-table th:nth-child(3),
+.reports-table td:nth-child(3) {
+    width: 120px;
+}
+
+.reports-table th:nth-child(4),
+.reports-table td:nth-child(4) {
+    min-width: 180px;
+    text-align: left;
+}
+
+.reports-table th:nth-child(5),
+.reports-table td:nth-child(5) {
+    width: 90px;
+}
+
+.reports-table th:nth-child(6),
+.reports-table td:nth-child(6) {
+    width: 115px;
     color: #737b76;
-    text-align: center;
 }
 
-.my-products-table td a {
-    color: #222;
-    font-weight: 700;
-    text-decoration: none;
+.report-reason {
+    max-width: 260px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
-.my-products-table td a:hover {
-    color: #2f7d4a;
-    text-decoration: underline;
-}
-
-.my-product-status {
+.report-status {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: 62px;
+    min-width: 54px;
     padding: 6px 10px;
     border-radius: 999px;
-    background: #e3f2e8;
-    color: #2f7d4a;
     font-size: 12px;
     font-weight: 800;
 }
 
-.my-products-empty {
+.report-status.pending {
+    background: #fff4d8;
+    color: #b7791f;
+}
+
+.report-status.accepted {
+    background: #e3f2e8;
+    color: #2f7d4a;
+}
+
+.report-status.rejected {
+    background: #f5e7e7;
+    color: #b44343;
+}
+
+.reports-empty {
     padding: 80px 24px;
     border: 1px solid #e2e6e3;
     border-radius: 20px;
@@ -169,20 +198,20 @@
     text-align: center;
 }
 
-.my-products-empty p {
-    margin: 0 0 20px;
+.reports-empty p {
+    margin: 0;
     color: #7c8580;
     font-size: 15px;
 }
 
-.my-products-pagination {
+.reports-pagination {
     display: flex;
     justify-content: center;
     gap: 6px;
     margin-top: 26px;
 }
 
-.my-products-pagination a {
+.reports-pagination a {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -196,18 +225,18 @@
     text-decoration: none;
 }
 
-.my-products-pagination a:hover {
+.reports-pagination a:hover {
     background: #eaf4ee;
     color: #2f7d4a;
 }
 
-.my-products-pagination a.active {
+.reports-pagination a.active {
     background: #2f7d4a;
     color: #fff;
 }
 
 @media (max-width: 900px) {
-    .my-products-container {
+    .reports-container {
         flex-direction: column;
         gap: 24px;
         padding-top: 32px;
@@ -215,33 +244,35 @@
 }
 
 @media (max-width: 700px) {
-    .my-products-container {
+    .reports-container {
         width: min(100% - 28px, 1180px);
         padding-bottom: 60px;
     }
 
-    .my-products-title {
+    .reports-title {
         padding: 30px 24px;
         border-radius: 20px;
     }
 
-    .my-products-title h1 {
+    .reports-title h1 {
         font-size: 27px;
     }
 
-    .my-products-top {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 14px;
+    .reports-tab-menu {
+        flex-wrap: wrap;
     }
 
-    .my-products-table {
+    .reports-table {
         display: block;
         overflow-x: auto;
     }
 
-    .my-products-table th,
-    .my-products-table td {
+    .reports-table th,
+    .reports-table td {
         white-space: nowrap;
+    }
+
+    .report-reason {
+        max-width: 220px;
     }
 }

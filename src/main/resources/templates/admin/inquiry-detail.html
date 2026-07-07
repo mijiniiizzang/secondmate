@@ -1,0 +1,161 @@
+<th:block th:fragment="inquiryModal">
+    <div id="inquiryModal" class="inquiry-modal-wrapper">
+        <div class="inquiry-modal">
+            <button type="button" class="inquiry-modal-close" onclick="closeInquiryModal()">×</button>
+
+            <div class="inquiry-modal-header">
+                <p class="admin-panel-label">INQUIRY DETAIL</p>
+                <h2 id="modalInquiryTitle"></h2>
+            </div>
+
+            <div class="inquiry-info-list">
+                <div>
+                    <span>문의유형</span>
+                    <strong id="modalInquiryType"></strong>
+                </div>
+
+                <div>
+                    <span>작성자</span>
+                    <strong id="modalNickname"></strong>
+                </div>
+
+                <div>
+                    <span>답변 상태</span>
+                    <strong id="modalInquiryStatus"></strong>
+                </div>
+
+                <div>
+                    <span>작성일</span>
+                    <strong id="modalRegDate"></strong>
+                </div>
+
+                <div id="answeredAtRow">
+                    <span>답변일</span>
+                    <strong id="modalAnsweredAt"></strong>
+                </div>
+            </div>
+
+            <div class="inquiry-content-box">
+                <p>문의 내용</p>
+                <div id="modalInquiryContent"></div>
+            </div>
+
+            <div id="inquiryAnswerView" class="inquiry-content-box">
+                <p>관리자 답변</p>
+                <div id="modalInquiryAnswerText"></div>
+            </div>
+
+            <div class="inquiry-modal-button-area" id="inquiryActionButtonArea">
+                <button type="button" onclick="closeInquiryModal()">닫기</button>
+                <button type="button" id="openAnswerFormButton" onclick="openAnswerForm()">답변 작성</button>
+            </div>
+
+            <form id="inquiryAnswerForm" th:action="@{/admin/inquiries/answer}" method="post" style="display: none;">
+                <input type="hidden" name="inquiryId" id="modalInquiryIdInput">
+
+                <div class="inquiry-answer-box">
+                    <p>관리자 답변</p>
+
+                    <textarea name="answer" id="modalInquiryAnswer" rows="7" required
+                        placeholder="답변 내용을 입력하세요."></textarea>
+                </div>
+
+                <div class="inquiry-modal-button-area">
+                    <button type="button" onclick="closeAnswerForm()">취소</button>
+                    <button type="submit">답변 저장</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function openInquiryModal(inquiryId) {
+            fetch(`/admin/inquiries/detail?inquiryId=${inquiryId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("문의 정보를 불러오지 못했습니다.");
+                    }
+
+                    return response.json();
+                })
+                .then(inquiry => {
+                    document.getElementById("modalInquiryType").textContent = getInquiryTypeLabel(inquiry.inquiryType);
+                    document.getElementById("modalInquiryTitle").textContent = inquiry.title;
+                    document.getElementById("modalNickname").textContent = inquiry.nickname;
+                    document.getElementById("modalRegDate").textContent = formatDateTime(inquiry.regDate);
+                    document.getElementById("modalInquiryContent").textContent = inquiry.content;
+                    document.getElementById("modalInquiryIdInput").value = inquiry.inquiryId;
+                    document.getElementById("modalInquiryAnswer").value = "";
+
+                    if (inquiry.inquiryStatus === "WAITING") {
+                        document.getElementById("modalInquiryStatus").textContent = "답변 대기";
+                        document.getElementById("inquiryAnswerView").style.display = "none";
+                        document.getElementById("openAnswerFormButton").style.display = "inline-block";
+                    } else {
+                        document.getElementById("modalInquiryStatus").textContent = "답변 완료";
+                        document.getElementById("inquiryAnswerView").style.display = "block";
+                        document.getElementById("modalInquiryAnswerText").textContent = inquiry.answer ? inquiry.answer : "";
+                        document.getElementById("openAnswerFormButton").style.display = "none";
+                    }
+
+                    if (inquiry.answeredAt) {
+                        document.getElementById("answeredAtRow").style.display = "flex";
+                        document.getElementById("modalAnsweredAt").textContent = formatDateTime(inquiry.answeredAt);
+                    } else {
+                        document.getElementById("answeredAtRow").style.display = "none";
+                    }
+
+                    document.getElementById("inquiryAnswerForm").style.display = "none";
+                    document.getElementById("inquiryActionButtonArea").style.display = "flex";
+                    document.getElementById("inquiryModal").style.display = "flex";
+                })
+                .catch(error => {
+                    alert(error.message);
+                });
+        }
+
+        function closeInquiryModal() {
+            document.getElementById("inquiryModal").style.display = "none";
+            document.getElementById("inquiryAnswerForm").style.display = "none";
+            document.getElementById("inquiryActionButtonArea").style.display = "flex";
+        }
+
+        function openAnswerForm() {
+            document.getElementById("inquiryAnswerForm").style.display = "block";
+            document.getElementById("inquiryActionButtonArea").style.display = "none";
+        }
+
+        function closeAnswerForm() {
+            document.getElementById("inquiryAnswerForm").style.display = "none";
+            document.getElementById("inquiryActionButtonArea").style.display = "flex";
+        }
+
+        function getInquiryTypeLabel(inquiryType) {
+            const inquiryTypeMap = {
+                ACCOUNT: "계정 문의",
+                PRODUCT: "상품 문의",
+                REPORT: "신고 문의",
+                SERVICE: "서비스 이용 문의",
+                ETC: "기타"
+            };
+
+            return inquiryTypeMap[inquiryType];
+        }
+
+        function formatDateTime(dateTime) {
+            const date = new Date(dateTime);
+
+            return date.getFullYear() + "."
+                + String(date.getMonth() + 1).padStart(2, "0") + "."
+                + String(date.getDate()).padStart(2, "0") + " "
+                + String(date.getHours()).padStart(2, "0") + ":"
+                + String(date.getMinutes()).padStart(2, "0");
+        }
+
+        document.getElementById("inquiryModal").addEventListener("click", function (event) {
+            if (event.target === this) {
+                closeInquiryModal();
+            }
+        });
+    </script>
+</th:block>

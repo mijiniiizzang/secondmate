@@ -1,17 +1,432 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <th:block th:replace="~{common/head :: commonHead}"></th:block>
     <title>상품 수정</title>
+
+    <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=8d0f47ae6501392120a8bdcab71e77e4&autoload=false&libraries=services"></script>
+    <link rel="stylesheet" th:href="@{/css/productRegister.css}">
 </head>
-<body>
+
+<body class="product-register-page">
+
     <div th:replace="~{common/header :: header}"></div>
-    <h1>상품 수정</h1>
-    <form th:action="@{/product/edit}" method="POST" enctype="multipart/form-data">
-        <input type="hidden" name="productId" th:value="${product.productId}">
-        <p>제목 : <input type="text" name="title" th:value="${product.title}"></p>
-        <p>상품명 : <input type="text" name="name" th:value="${product.name}"></p>
-        <p>작성자 : <span th:value="${product.writer}"></span></p>
-    </form>
+
+    <main class="product-register-wrap">
+
+        <h1>상품 게시글 수정</h1>
+
+        <form th:action="@{/product/edit}" method="POST" enctype="multipart/form-data" class="product-register-form">
+
+            <input type="hidden" name="productId" th:value="${product.productId}">
+
+            <div class="product-basic-info">
+
+                <div class="input-group title-group">
+                    <label for="title">제목</label>
+                    <input type="text" id="title" name="title" th:value="${product.title}" placeholder="제목을 입력해주세요" required>
+                </div>
+
+                <div class="input-row">
+
+                    <div class="input-group">
+                        <label for="name">상품명</label>
+                        <input type="text" id="name" name="name" th:value="${product.name}" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label>작성자</label>
+                        <span th:text="${#authentication.principal.nickname}"></span>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="price">가격</label>
+                        <input type="number" id="price" name="price" th:value="${product.price}" required>
+                        <span>원</span>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="category">카테고리</label>
+
+                        <select id="category" name="category" required>
+                            <option value="">선택</option>
+                            <option value="ELECTRONICS" th:selected="${product.category.name() == 'ELECTRONICS'}">전자제품</option>
+                            <option value="FASHION" th:selected="${product.category.name() == 'FASHION'}">의류</option>
+                            <option value="BEAUTY" th:selected="${product.category.name() == 'BEAUTY'}">미용/화장품</option>
+                            <option value="BOOK" th:selected="${product.category.name() == 'BOOK'}">도서</option>
+                            <option value="SPORTS" th:selected="${product.category.name() == 'SPORTS'}">스포츠용품</option>
+                            <option value="FURNITURE" th:selected="${product.category.name() == 'FURNITURE'}">가구</option>
+                            <option value="HOBBY" th:selected="${product.category.name() == 'HOBBY'}">취미</option>
+                            <option value="FOOD" th:selected="${product.category.name() == 'FOOD'}">음식</option>
+                            <option value="TICKET" th:selected="${product.category.name() == 'TICKET'}">티켓</option>
+                            <option value="ETC" th:selected="${product.category.name() == 'ETC'}">기타</option>
+                        </select>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="input-group content-group">
+                <label for="content">내용</label>
+                <textarea id="content" name="content" required th:text="${product.content}"></textarea>
+            </div>
+
+            <section class="location-section">
+
+                <div class="location-title-row">
+                    <div>
+                        <h2>거래 희망 지역</h2>
+                        <p>기존 거래 희망 지역이 선택되어 있습니다.</p>
+                    </div>
+                </div>
+
+                <div class="location-select-row">
+
+                    <select id="city" name="city" required onchange="changeGu()">
+                        <option value="">시/도 선택</option>
+                        <option value="서울특별시" th:selected="${product.city == '서울특별시'}">서울특별시</option>
+                        <option value="부산광역시" th:selected="${product.city == '부산광역시'}">부산광역시</option>
+                        <option value="대구광역시" th:selected="${product.city == '대구광역시'}">대구광역시</option>
+                        <option value="인천광역시" th:selected="${product.city == '인천광역시'}">인천광역시</option>
+                        <option value="광주광역시" th:selected="${product.city == '광주광역시'}">광주광역시</option>
+                        <option value="대전광역시" th:selected="${product.city == '대전광역시'}">대전광역시</option>
+                        <option value="울산광역시" th:selected="${product.city == '울산광역시'}">울산광역시</option>
+                        <option value="세종특별자치시" th:selected="${product.city == '세종특별자치시'}">세종특별자치시</option>
+                        <option value="경기도" th:selected="${product.city == '경기도'}">경기도</option>
+                        <option value="강원도" th:selected="${product.city == '강원도'}">강원도</option>
+                        <option value="충청북도" th:selected="${product.city == '충청북도'}">충청북도</option>
+                        <option value="충청남도" th:selected="${product.city == '충청남도'}">충청남도</option>
+                        <option value="전라북도" th:selected="${product.city == '전라북도'}">전라북도</option>
+                        <option value="전라남도" th:selected="${product.city == '전라남도'}">전라남도</option>
+                        <option value="경상북도" th:selected="${product.city == '경상북도'}">경상북도</option>
+                        <option value="경상남도" th:selected="${product.city == '경상남도'}">경상남도</option>
+                        <option value="제주도" th:selected="${product.city == '제주도'}">제주도</option>
+                    </select>
+
+                    <select id="gu" name="gu" required onchange="moveMapBySelectedRegion()">
+                        <option value="">구/군 선택</option>
+                    </select>
+
+                </div>
+
+            </section>
+
+            <p>거래 장소 선택</p>
+
+            <div id="map"></div>
+
+            <input type="hidden" id="latitude" name="latitude" th:value="${product.latitude}">
+            <input type="hidden" id="longitude" name="longitude" th:value="${product.longitude}">
+
+            <div class="form-group">
+
+                <label>기존 상품 사진</label>
+
+                <div id="existingImagePreview">
+
+                    <p th:if="${product.imageList == null or #lists.isEmpty(product.imageList)}">
+                        등록된 사진이 없습니다.
+                    </p>
+
+                    <div th:each="image : ${product.imageList}" class="existing-image-box" th:data-image-id="${image.imageId}">
+
+                        <img th:src="@{'/upload/' + ${image.imageChgName}}" th:alt="${product.name}" style="width:120px; height:120px; object-fit:cover;">
+
+                        <button type="button" th:onclick="'deleteExistingImage(' + ${image.imageId} + ')'">삭제</button>
+
+                    </div>
+
+                </div>
+
+                <div id="deleteImageInputArea"></div>
+
+            </div>
+
+            <div class="form-group">
+
+                <label for="files">새 상품 사진 추가</label>
+
+                <input type="file" id="files" name="files" multiple accept="image/*">
+
+                <div id="imagePreview"></div>
+
+            </div>
+
+            <button type="submit">수정 완료</button>
+
+        </form>
+
+    </main>
+
+    <div th:replace="~{common/footer :: footer}"></div>
+
+    <script th:inline="javascript">
+
+        const productCity = /*[[${product.city}]]*/ '';
+        const productGu = /*[[${product.gu}]]*/ '';
+
+        const latitude = /*[[${product.latitude}]]*/ 37.566826;
+        const longitude = /*[[${product.longitude}]]*/ 126.9786567;
+
+        const citySelect = document.getElementById("city");
+        const guSelect = document.getElementById("gu");
+
+        const areaData = {
+            "서울특별시": [
+                "강남구", "강동구", "강북구", "강서구", "관악구",
+                "광진구", "구로구", "금천구", "노원구", "도봉구",
+                "동대문구", "동작구", "마포구", "서대문구", "서초구",
+                "성동구", "성북구", "송파구", "양천구", "영등포구",
+                "용산구", "은평구", "종로구", "중구", "중랑구"
+            ],
+
+            "부산광역시": [
+                "강서구", "금정구", "기장군", "남구", "동구",
+                "동래구", "부산진구", "북구", "사상구", "사하구",
+                "서구", "수영구", "연제구", "영도구", "중구", "해운대구"
+            ],
+
+            "대구광역시": [
+                "군위군", "남구", "달서구", "달성군", "동구",
+                "북구", "서구", "수성구", "중구"
+            ],
+
+            "인천광역시": [
+                "강화군", "계양구", "남동구", "동구", "미추홀구",
+                "부평구", "서구", "연수구", "옹진군", "중구"
+            ],
+
+            "광주광역시": [
+                "광산구", "남구", "동구", "북구", "서구"
+            ],
+
+            "대전광역시": [
+                "대덕구", "동구", "서구", "유성구", "중구"
+            ],
+
+            "울산광역시": [
+                "남구", "동구", "북구", "울주군", "중구"
+            ],
+
+            "세종특별자치시": [
+                "세종특별자치시"
+            ],
+
+            "경기도": [
+                "가평군", "고양시", "과천시", "광명시", "광주시",
+                "구리시", "군포시", "김포시", "남양주시", "동두천시",
+                "부천시", "성남시", "수원시", "시흥시", "안산시",
+                "안성시", "안양시", "양주시", "양평군", "여주시",
+                "연천군", "오산시", "용인시", "의왕시", "의정부시",
+                "이천시", "파주시", "평택시", "포천시", "하남시", "화성시"
+            ],
+
+            "강원도": [
+                "강릉시", "고성군", "동해시", "삼척시", "속초시",
+                "양구군", "양양군", "영월군", "원주시", "인제군",
+                "정선군", "철원군", "춘천시", "태백시", "평창군",
+                "홍천군", "화천군", "횡성군"
+            ],
+
+            "충청북도": [
+                "괴산군", "단양군", "보은군", "영동군", "옥천군",
+                "음성군", "제천시", "증평군", "진천군", "청주시", "충주시"
+            ],
+
+            "충청남도": [
+                "계룡시", "공주시", "금산군", "논산시", "당진시",
+                "보령시", "부여군", "서산시", "서천군", "아산시",
+                "예산군", "천안시", "청양군", "태안군", "홍성군"
+            ],
+
+            "전라북도": [
+                "고창군", "군산시", "김제시", "남원시", "무주군",
+                "부안군", "순창군", "완주군", "익산시", "임실군",
+                "장수군", "전주시", "정읍시", "진안군"
+            ],
+
+            "전라남도": [
+                "강진군", "고흥군", "곡성군", "광양시", "구례군",
+                "나주시", "담양군", "목포시", "무안군", "보성군",
+                "순천시", "신안군", "여수시", "영광군", "영암군",
+                "완도군", "장성군", "장흥군", "진도군", "함평군",
+                "해남군", "화순군"
+            ],
+
+            "경상북도": [
+                "경산시", "경주시", "고령군", "구미시", "김천시",
+                "문경시", "봉화군", "상주시", "성주군", "안동시",
+                "영덕군", "영양군", "영주시", "영천시", "예천군",
+                "울릉군", "울진군", "의성군", "청도군", "청송군",
+                "칠곡군", "포항시"
+            ],
+
+            "경상남도": [
+                "거제시", "거창군", "고성군", "김해시", "남해군",
+                "밀양시", "사천시", "산청군", "양산시", "의령군",
+                "진주시", "창녕군", "창원시", "통영시", "하동군",
+                "함안군", "함양군", "합천군"
+            ],
+
+            "제주도": [
+                "서귀포시", "제주시"
+            ]
+        };
+
+        function changeGu() {
+            const city = citySelect.value;
+
+            guSelect.innerHTML = '<option value="">구/군 선택</option>';
+
+            if (!areaData[city]) {
+                return;
+            }
+
+            areaData[city].forEach(function (item) {
+                const option = document.createElement("option");
+
+                option.value = item;
+                option.textContent = item;
+
+                guSelect.appendChild(option);
+            });
+        }
+
+        citySelect.value = productCity;
+        changeGu();
+        guSelect.value = productGu;
+
+        function deleteExistingImage(imageId) {
+            const imageBox = document.querySelector(`.existing-image-box[data-image-id="${imageId}"]`);
+
+            if (imageBox) {
+                imageBox.remove();
+            }
+
+            const input = document.createElement("input");
+
+            input.type = "hidden";
+            input.name = "deleteImageIds";
+            input.value = imageId;
+
+            document.getElementById("deleteImageInputArea").appendChild(input);
+        }
+
+        const fileInput = document.getElementById("files");
+        let selectedFiles = new DataTransfer();
+
+        fileInput.addEventListener("change", function () {
+
+            Array.from(fileInput.files).forEach(function (file) {
+                selectedFiles.items.add(file);
+            });
+
+            fileInput.files = selectedFiles.files;
+
+            renderImagePreview();
+        });
+
+        function renderImagePreview() {
+            const preview = document.getElementById("imagePreview");
+
+            preview.innerHTML = "";
+
+            Array.from(selectedFiles.files).forEach(function (file, index) {
+                const reader = new FileReader();
+
+                reader.onload = function (event) {
+                    const imageBox = document.createElement("div");
+
+                    imageBox.innerHTML = `
+                        <img src="${event.target.result}" style="width:120px; height:120px; object-fit:cover;">
+                        <button type="button" onclick="deleteNewImage(${index})">삭제</button>
+                    `;
+
+                    preview.appendChild(imageBox);
+                };
+
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function deleteNewImage(index) {
+            const newFiles = new DataTransfer();
+
+            Array.from(selectedFiles.files).forEach(function (file, fileIndex) {
+                if (fileIndex !== index) {
+                    newFiles.items.add(file);
+                }
+            });
+
+            selectedFiles = newFiles;
+            fileInput.files = selectedFiles.files;
+
+            renderImagePreview();
+        }
+
+        const mapContainer = document.getElementById("map");
+
+        kakao.maps.load(function () {
+
+            const defaultPosition = new kakao.maps.LatLng(latitude, longitude);
+
+            const map = new kakao.maps.Map(mapContainer, {
+                center: defaultPosition,
+                level: 5
+            });
+
+            const geocoder = new kakao.maps.services.Geocoder();
+
+            let marker = new kakao.maps.Marker({
+                position: defaultPosition
+            });
+
+            marker.setMap(map);
+
+            function moveMarker(position, level) {
+                map.setCenter(position);
+                map.setLevel(level);
+
+                marker.setPosition(position);
+
+                document.getElementById("latitude").value = position.getLat();
+                document.getElementById("longitude").value = position.getLng();
+            }
+
+            window.moveMapBySelectedRegion = function () {
+                const city = citySelect.value;
+                const gu = guSelect.value;
+
+                if (!city || !gu) {
+                    return;
+                }
+
+                let address = city + " " + gu;
+
+                if (city === "세종특별자치시") {
+                    address = city;
+                }
+
+                geocoder.addressSearch(address, function (result, status) {
+                    if (status !== kakao.maps.services.Status.OK) {
+                        alert("선택한 지역의 위치를 찾지 못했습니다.");
+                        return;
+                    }
+
+                    const position = new kakao.maps.LatLng(result[0].y, result[0].x);
+
+                    moveMarker(position, 6);
+                });
+            };
+
+            kakao.maps.event.addListener(map, "click", function (mouseEvent) {
+                moveMarker(mouseEvent.latLng, map.getLevel());
+            });
+
+        });
+
+    </script>
+
 </body>
 </html>

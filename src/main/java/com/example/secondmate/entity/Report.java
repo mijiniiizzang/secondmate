@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 import org.hibernate.annotations.CreationTimestamp;
 
+import com.example.secondmate.common.ProcessReason;
 import com.example.secondmate.common.ReportStatus;
 import com.example.secondmate.common.ReportType;
 import com.example.secondmate.common.TargetType;
@@ -32,32 +33,36 @@ import lombok.Setter;
 @Builder
 public class Report {
     @Id
-    @GeneratedValue(strategy=GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long reportId;
-    
-    @ManyToOne(fetch=FetchType.LAZY)
-    @JoinColumn(name="reporter_id", nullable=false)
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "reporter_id", nullable = false)
     private User reporter;
 
-    @ManyToOne(fetch=FetchType.LAZY)
-    @JoinColumn(name="reported_user_id", nullable=false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "reported_user_id", nullable = false)
     private User reportedUser;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable=false)
+    @Column(nullable = false)
     private TargetType targetType;
 
     private Long targetId;
     private String reason;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable=false)
+    @Column(nullable = false)
     private ReportStatus reportStatus;
     @Enumerated(EnumType.STRING)
-    @Column(nullable=false)
+    @Column(nullable = false)
     private ReportType reportType;
+    @Enumerated(EnumType.STRING)
+    private ProcessReason processReason;
+    @Column(length = 1000)
+    private String detailReason;
     @Builder.Default
-    @Column(nullable=false)
+    @Column(nullable = false)
     private boolean reportModalChecked = false;
 
     @CreationTimestamp

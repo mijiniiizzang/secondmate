@@ -44,6 +44,7 @@
                                 <span class="badge badge-negative" th:case="'COMMENT_DELETED'">댓글 삭제</span>
                                 <span class="badge badge-negative" th:case="'USER_SUSPENDED'">계정 정지</span>
                                 <span class="badge badge-positive" th:case="'USER_UNSUSPENDED'">정지 해제</span>
+                                <span class="badge badge-positive" th:case="'INQUIRY_ANSWERED'">문의 답변</span>
                                 <span class="badge" th:case="*" th:text="${notification.noteType}">기타</span>
                             </span>
                         </td>

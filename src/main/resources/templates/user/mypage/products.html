@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
+    <link rel="stylesheet" th:href="@{/css/user/mypage-sidebar.css}">
     <link rel="stylesheet" th:href="@{/css/user/products.css}">
     <th:block th:replace="~{common/head :: commonHead}"></th:block>
     <title>내 상품 관리</title>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 
 <body class="my-products-page">
@@ -13,14 +13,14 @@
 
     <main class="my-products-container">
 
-        <div th:replace="~{user/mypage-sidebar :: userSidebar}"></div>
+        <div th:replace="~{user/mypage/mypage-sidebar :: userSidebar}"></div>
 
         <section class="my-products-content">
 
             <div class="my-products-title">
                 <p class="my-products-label">MY PRODUCTS</p>
                 <h1>내 상품 관리</h1>
-                <p>내가 등록한 상품과 거래 상태를 관리할 수 있어요.</p>
+                <p>내가 등록한 상품과 거래 상태를 확인할 수 있어요.</p>
             </div>
 
             <div class="my-products-top">
@@ -51,21 +51,6 @@
                                   th:text="${product.tradeStatus}">
                                 판매중
                             </span>
-
-                            <button type="button"
-                                    class="my-product-status-menu-button"
-                                    onclick="toggleStatusMenu(this)">
-                                ⋮
-                            </button>
-
-                            <div class="my-product-status-menu">
-                                <button type="button"
-                                        th:data-product-id="${product.productId}"
-                                        th:data-trade-status="${product.tradeStatus}"
-                                        onclick="openStatusChange(this)">
-                                    변경
-                                </button>
-                            </div>
                         </td>
 
                         <td>
@@ -119,95 +104,6 @@
     </main>
 
     <div th:replace="~{common/footer :: footer}"></div>
-
-    <div class="my-product-status-modal" id="statusChangeModal">
-        <div class="my-product-status-modal-box">
-            <h3>거래 상태 변경</h3>
-
-            <select id="changeTradeStatus">
-                <option value="ON_SALE">판매중</option>
-                <option value="RESERVED">예약중</option>
-                <option value="SOLD">판매완료</option>
-            </select>
-
-            <div class="my-product-status-modal-buttons">
-                <button type="button" onclick="changeTradeStatus()">저장</button>
-                <button type="button" onclick="closeStatusChange()">취소</button>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        let selectedProductId = null;
-
-        function toggleStatusMenu(button) {
-            const currentMenu = button.nextElementSibling;
-
-            document.querySelectorAll('.my-product-status-menu').forEach(menu => {
-                if (menu !== currentMenu) {
-                    menu.style.display = 'none';
-                }
-            });
-
-            currentMenu.style.display =
-                currentMenu.style.display === 'block' ? 'none' : 'block';
-        }
-
-        function openStatusChange(button) {
-            selectedProductId = button.dataset.productId;
-
-            const currentStatus = button.dataset.tradeStatus;
-
-            document.getElementById('changeTradeStatus').value = currentStatus;
-            document.getElementById('statusChangeModal').style.display = 'flex';
-
-            document.querySelectorAll('.my-product-status-menu').forEach(menu => {
-                menu.style.display = 'none';
-            });
-        }
-
-        function closeStatusChange() {
-            selectedProductId = null;
-            document.getElementById('statusChangeModal').style.display = 'none';
-        }
-
-        function changeTradeStatus() {
-            const tradeStatus = document.getElementById('changeTradeStatus').value;
-
-            if (!selectedProductId) {
-                return;
-            }
-
-            $.ajax({
-                type: 'POST',
-                url: '/product/status',
-                data: {
-                    productId: selectedProductId,
-                    tradeStatus: tradeStatus
-                },
-                success: function(result) {
-                    if (result === 1) {
-                        alert('거래 상태가 변경되었습니다.');
-                        location.reload();
-                        return;
-                    }
-
-                    alert('거래 상태 변경에 실패했습니다. 다시 시도해주세요.');
-                },
-                error: function() {
-                    alert('거래 상태 변경에 실패했습니다. 다시 시도해주세요.');
-                }
-            });
-        }
-
-        document.addEventListener('click', function(event) {
-            if (!event.target.closest('.my-product-status-area')) {
-                document.querySelectorAll('.my-product-status-menu').forEach(menu => {
-                    menu.style.display = 'none';
-                });
-            }
-        });
-    </script>
 
 </body>
 </html>

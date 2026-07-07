@@ -1,0 +1,81 @@
+<th:block th:fragment="inquiryRegisterModal">
+    <div id="inquiryRegisterModal" class="inquiry-register-modal-wrapper">
+        <div class="inquiry-register-modal">
+            <button type="button" class="inquiry-register-modal-close" onclick="closeInquiryRegisterModal()">×</button>
+
+            <div class="inquiry-register-modal-header">
+                <p>NEW INQUIRY</p>
+                <h2>문의하기</h2>
+                <span>궁금한 점이나 이용 중 불편한 사항을 남겨주세요.</span>
+            </div>
+
+            <form th:action="@{/mypage/inquiries/register}"
+                  th:object="${inquiryDTO}"
+                  method="post"
+                  class="inquiry-register-form"
+                  onsubmit="alert('문의가 등록되었습니다.');">
+
+                <div class="inquiry-form-group">
+                    <label for="inquiryType">문의 유형</label>
+
+                    <select id="inquiryType" th:field="*{inquiryType}" required>
+                        <option value="">문의 유형 선택</option>
+                        <option value="ACCOUNT">계정 문의</option>
+                        <option value="PRODUCT">상품 문의</option>
+                        <option value="REPORT">신고 문의</option>
+                        <option value="SERVICE">서비스 이용 문의</option>
+                        <option value="ETC">기타</option>
+                    </select>
+                </div>
+
+                <div class="inquiry-form-group">
+                    <label for="title">제목</label>
+
+                    <input type="text"
+                           id="title"
+                           th:field="*{title}"
+                           maxlength="100"
+                           placeholder="문의 제목을 입력하세요."
+                           required>
+                </div>
+
+                <div class="inquiry-form-group">
+                    <label for="content">문의 내용</label>
+
+                    <textarea id="content"
+                              th:field="*{content}"
+                              rows="8"
+                              maxlength="2000"
+                              placeholder="문의 내용을 입력하세요."
+                              required></textarea>
+                </div>
+
+                <div class="inquiry-register-button-area">
+                    <button type="button" class="inquiry-cancel-button" onclick="closeInquiryRegisterModal()">
+                        취소
+                    </button>
+
+                    <button type="submit" class="inquiry-submit-button">
+                        문의 등록
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function openInquiryRegisterModal() {
+            document.getElementById("inquiryRegisterModal").style.display = "flex";
+        }
+
+        function closeInquiryRegisterModal() {
+            document.getElementById("inquiryRegisterModal").style.display = "none";
+        }
+
+        document.getElementById("inquiryRegisterModal").addEventListener("click", function(event) {
+            if (event.target === this) {
+                closeInquiryRegisterModal();
+            }
+        });
+    </script>
+</th:block>

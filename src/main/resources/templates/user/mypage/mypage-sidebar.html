@@ -28,9 +28,14 @@
                 거래 내역
             </a>
             
-            <a th:href="@{/mypage/alerts}"
+            <a th:href="@{/mypage/reports}"
                th:classappend="${menu == 'reports'} ? 'active'">
                 내 신고 내역
+            </a>
+
+            <a th:href="@{/mypage/inquiries}"
+               th:classappend="${menu == 'inquiries'} ? 'active' : ''">
+                문의 내역
             </a>
         </nav>
     </aside>

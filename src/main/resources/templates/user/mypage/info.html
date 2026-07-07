@@ -16,8 +16,18 @@
 
     <main class="info-container">
         <section class="info-content">
-            <h1>내 회원정보</h1>
-            <p class="info-intro">회원정보를 조회·수정할 수 있습니다.</p>
+            <div class="info-page-header">
+                <div>
+                    <h1>내 회원정보</h1>
+                    <p class="info-intro">회원정보를 조회·수정할 수 있습니다.</p>
+                </div>
+
+                <div class="info-header-button-area">
+                    <button type="button" id="editBtn" class="info-header-btn">회원정보 수정</button>
+                    <button type="button" id="passwordModalBtn" class="info-header-btn password-btn">비밀번호 변경</button>
+                    <button type="submit" id="saveBtn" class="info-submit-btn" style="display: none;">저장</button>
+                </div>
+            </div>
 
             <form class="info-form" th:action="@{/mypage/info}" method="POST" id="getPhone">
                 <div class="info-form-row">
@@ -90,11 +100,7 @@
                 <input type="hidden" id="latitude" name="latitude" th:value="${user.latitude}">
                 <input type="hidden" id="address" name="address" th:value="${user.address}">
 
-                <button type="button" id="editBtn" class="info-submit-btn">회원정보 수정</button>
-                <button type="button" id="passwordModalBtn" class="info-submit-btn">비밀번호 변경</button>
                 <button type="button" id="withdrawModalBtn" class="info-submit-btn">회원탈퇴</button>
-
-                <button type="submit" id="saveBtn" class="info-submit-btn" style="display: none;">저장</button>
 
             </form>
         </section>

@@ -20,11 +20,11 @@ import lombok.RequiredArgsConstructor;
 public class WishlistController {
     private final WishlistService wishlistService;
 
-    // 찜 목록에서 삭제
-    @PostMapping("/delete/{userId}/{productId}")
-    public String deleteWishlist(@PathVariable Long userId, @PathVariable Long productId) {
-        wishlistService.deleteWishlist(userId, productId);
-        return "redirect:/wishlist/list/" + userId;
+    // 마이페이지 찜 목록에서 삭제
+    @PostMapping("/delete/{productId}")
+    public String deleteWishlist(@PathVariable Long productId, @AuthenticationPrincipal AccountDetails accountDetails) {
+        wishlistService.deleteWishlist(accountDetails.getUserId(), productId);
+        return "redirect:/mypage/wishlists";
     }
 
     // 찜 있으면 삭제, 없으면 추가

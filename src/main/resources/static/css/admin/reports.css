@@ -387,8 +387,7 @@
     background-color: #faf8f6;
 }
 
-.report-process-area[hidden],
-#reasonArea[hidden] {
+.report-process-area[hidden] {
     display: none !important;
 }
 
@@ -414,6 +413,7 @@
     color: #454c56;
     font-size: 13px;
     outline: none;
+    box-sizing: border-box;
 }
 
 .report-form-group select {

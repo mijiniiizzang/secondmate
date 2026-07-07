@@ -49,7 +49,7 @@
     <script>
         function openUserReportModal(reportedUserId, reportedUserNickname) {
             document.getElementById("userReportForm").action =
-                "/report/user/" + reportedUserId;
+                "/report/api/user/" + reportedUserId;
 
             document.getElementById("reportedUserNickname").textContent =
                 reportedUserNickname;
@@ -60,6 +60,26 @@
         function closeUserReportModal() {
             document.getElementById("userReportModal").hidden = true;
         }
+
+        document.getElementById('userReportForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const form = event.currentTarget;
+
+            $.ajax({
+                type: 'POST',
+                url: form.action,
+                data: $(form).serialize(),
+                success: function() {
+                    alert('신고가 접수되었습니다.');
+                    closeUserReportModal();
+                    form.reset();
+                },
+                error: function() {
+                    alert('이미 신고된 사용자입니다.');
+                }
+            });
+        });
     </script>
 
 </th:block>

@@ -162,6 +162,7 @@ public class AdminService {
 
     // 처리 완료 신고 수
     public long getAcceptedReportCount() {
-        return reportRepository.countByReportStatus(ReportStatus.ACCEPTED);
+        return reportRepository.countByReportStatus(ReportStatus.ACCEPTED)
+                + reportRepository.countByReportStatus(ReportStatus.REJECTED);
     }
 }

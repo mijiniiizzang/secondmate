@@ -1,0 +1,135 @@
+<th:block th:fragment="reportDetailModal">
+
+    <div class="my-report-detail-modal" id="myReportDetailModal">
+        <div class="my-report-detail-box">
+
+            <button type="button"
+                    class="my-report-detail-close"
+                    onclick="closeMyReportDetail()">
+                ×
+            </button>
+
+            <p class="my-report-detail-label">REPORT DETAIL</p>
+            <h2>신고 상세</h2>
+
+            <div class="my-report-detail-list">
+
+                <div class="my-report-detail-item">
+                    <span>신고 대상</span>
+                    <strong id="detailTargetUser"></strong>
+                </div>
+
+                <div class="my-report-detail-item">
+                    <span>대상 종류</span>
+                    <strong id="detailTargetType"></strong>
+                </div>
+
+                <div class="my-report-detail-item">
+                    <span>신고 유형</span>
+                    <strong id="detailReportType"></strong>
+                </div>
+
+                <div class="my-report-detail-item my-report-detail-reason">
+                    <span>신고 사유</span>
+                    <p id="detailReason"></p>
+                </div>
+
+                <div class="my-report-detail-item">
+                    <span>처리 상태</span>
+                    <strong id="detailReportStatus"></strong>
+                </div>
+
+                <div class="my-report-detail-item">
+                    <span>처리 사유</span>
+                    <strong id="detailProcessReason"></strong>
+                </div>
+
+                <div class="my-report-detail-item my-report-detail-reason">
+                    <span>상세 사유</span>
+                    <p id="detailAdminReason"></p>
+                </div>
+
+                <div class="my-report-detail-item">
+                    <span>신고일</span>
+                    <strong id="detailRegDate"></strong>
+                </div>
+
+            </div>
+
+            <button type="button"
+                    class="my-report-detail-confirm"
+                    onclick="closeMyReportDetail()">
+                확인
+            </button>
+
+        </div>
+    </div>
+
+    <script>
+        document.querySelectorAll('.report-row').forEach(row => {
+            row.addEventListener('click', function() {
+                const targetType = this.dataset.targetType;
+                const reportStatus = this.dataset.status;
+
+                let targetTypeText = '';
+
+                if (targetType === 'PRODUCT') {
+                    targetTypeText = '상품';
+                } else if (targetType === 'COMMENT') {
+                    targetTypeText = '댓글';
+                } else if (targetType === 'USER') {
+                    targetTypeText = '사용자';
+                }
+
+                let reportStatusText = '';
+
+                if (reportStatus === 'PENDING') {
+                    reportStatusText = '처리중';
+                } else if (reportStatus === 'ACCEPTED') {
+                    reportStatusText = '수락';
+                } else if (reportStatus === 'REJECTED') {
+                    reportStatusText = '반려';
+                }
+
+                document.getElementById('detailTargetUser').textContent =
+                    this.dataset.targetUser;
+
+                document.getElementById('detailTargetType').textContent =
+                    targetTypeText;
+
+                document.getElementById('detailReportType').textContent =
+                    this.dataset.reportType;
+
+                document.getElementById('detailReason').textContent =
+                    this.dataset.reason;
+
+                document.getElementById('detailReportStatus').textContent =
+                    reportStatusText;
+
+                document.getElementById('detailProcessReason').textContent =
+                    this.dataset.processReason || '-';
+
+                document.getElementById('detailAdminReason').textContent =
+                    this.dataset.detailReason || '-';
+
+                document.getElementById('detailRegDate').textContent =
+                    this.dataset.regDate;
+
+                document.getElementById('myReportDetailModal').style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            });
+        });
+
+        function closeMyReportDetail() {
+            document.getElementById('myReportDetailModal').style.display = 'none';
+            document.body.style.overflow = '';
+        }
+
+        document.getElementById('myReportDetailModal').addEventListener('click', function(event) {
+            if (event.target === this) {
+                closeMyReportDetail();
+            }
+        });
+    </script>
+
+</th:block>

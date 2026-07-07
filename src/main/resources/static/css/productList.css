@@ -136,6 +136,20 @@ body > form:first-of-type {
     font-weight: 700;
 }
 
+/* 거래 희망 지역 */
+.filter-sidebar p + #city {
+    margin-top: 2px;
+}
+
+.filter-sidebar #city,
+.filter-sidebar #gu {
+    background: #ffffff;
+}
+
+.filter-sidebar #gu {
+    margin-top: 2px;
+}
+
 .filter-sidebar button[type="button"] {
     width: 100%;
     height: 34px;

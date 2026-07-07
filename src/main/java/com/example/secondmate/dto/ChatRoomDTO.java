@@ -26,6 +26,7 @@ public class ChatRoomDTO {
     private Long opponentUserId;
 
     private RoomStatus roomStatus;
+    private int tradeStatusId;
     private LocalDateTime createdAt;
 
     private String lastMessage;

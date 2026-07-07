@@ -50,66 +50,85 @@ public class ProductController {
     // 게시글 목록 페이지
     @GetMapping("/list")
     public void listProducts(
-        @RequestParam(required=false) String keyword,
-        @RequestParam(required=false) ProductCategory category,
-        @RequestParam(required=false) List<ProductCategory> categories,
-        @RequestParam(required=false) Boolean availableOnly,
-        @RequestParam(required=false) Long minPrice,
-        @RequestParam(required=false) Long maxPrice,
-        @RequestParam(required=false) String city,
-        @RequestParam(required=false) String gu,
-        @PageableDefault(
-            size = 20,
-            sort = "productId",
-            direction = Sort.Direction.DESC
-        ) Pageable pageable, Model model,
-        @AuthenticationPrincipal AccountDetails accountDetails
-    ) {
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) ProductCategory category,
+            @RequestParam(required = false) List<ProductCategory> categories,
+            @RequestParam(required = false) Boolean availableOnly,
+            @RequestParam(required = false) Long minPrice,
+            @RequestParam(required = false) Long maxPrice,
+            @RequestParam(required = false) String city,
+            @RequestParam(required = false) String gu,
+            @PageableDefault(size = 20, sort = "productId", direction = Sort.Direction.DESC) Pageable pageable,
+            Model model,
+            @AuthenticationPrincipal AccountDetails accountDetails) {
         // 홈에서 카테고리 하나만 선택한 경우
-        if(category != null && (categories == null || categories.isEmpty())) {
+        if (category != null && (categories == null || categories.isEmpty())) {
             categories = List.of(category);
         }
 
-        // 아무 카테고리도 선택하지 않은 경우 전체 카테고리
-        if(categories != null && categories.isEmpty()) {
-            categories = null;
+        // 빈 문자열은 검색 조건에서 제외
+        if (keyword != null && keyword.isBlank()) {
+            keyword = null;
+        }
+
+        if (city != null && city.isBlank()) {
+            city = null;
+        }
+
+        if (gu != null && gu.isBlank()) {
+            gu = null;
         }
 
         // 거래 가능 체크 시 판매중 상품만 조회
-        TradeStatus tradeStatus = Boolean.TRUE.equals(availableOnly) ? TradeStatus.ON_SALE : null;
-        
-        Page<ProductDTO> products = productService.search(
-            null,
-            categories,
-            null,
-            null,
-            tradeStatus,
-            minPrice,
-            maxPrice,
-            pageable
-        );
+        TradeStatus tradeStatus = Boolean.TRUE.equals(availableOnly)
+                ? TradeStatus.ON_SALE
+                : null;
 
-        // 로그인한 사람만 찜버튼 누를 수 있음
-        if(accountDetails != null) {
-            for(ProductDTO product : products.getContent()) {
-                boolean isWished = wishlistService.isWished(accountDetails.getUserId(), product.getProductId());
+        Page<ProductDTO> products = productService.search(
+                keyword,
+                categories,
+                city,
+                gu,
+                tradeStatus,
+                minPrice,
+                maxPrice,
+                pageable);
+
+        // 로그인한 사람만 찜 여부 조회
+        if (accountDetails != null) {
+            for (ProductDTO product : products.getContent()) {
+                boolean isWished = wishlistService.isWished(
+                        accountDetails.getUserId(),
+                        product.getProductId());
+
                 product.setWished(isWished);
             }
         }
 
         model.addAttribute("products", products);
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("category", category);
+        model.addAttribute("categories", categories);
         model.addAttribute("availableOnly", availableOnly);
-        model.addAttribute("selectedCategories", categories == null ? Collections.emptySet() : categories.stream()
-                                                                                                         .map(Enum::name)
-                                                                                                         .collect(Collectors.toSet()));
+        model.addAttribute("minPrice", minPrice);
+        model.addAttribute("maxPrice", maxPrice);
+        model.addAttribute("city", city);
+        model.addAttribute("gu", gu);
+
+        model.addAttribute(
+                "selectedCategories",
+                categories == null
+                        ? Collections.emptySet()
+                        : categories.stream()
+                                .map(Enum::name)
+                                .collect(Collectors.toSet()));
     }
 
     // 상품 등록
     @GetMapping("/register")
     public String registerForm(
-        Model model,
-        @AuthenticationPrincipal AccountDetails accountDetails
-    ) {
+            Model model,
+            @AuthenticationPrincipal AccountDetails accountDetails) {
         User user = userService.getUser(accountDetails.getUserId());
 
         String[] addressParts = user.getAddress().split(" ", 2);
@@ -128,14 +147,14 @@ public class ProductController {
     // 게시글 등록 처리
     @PostMapping("/register")
     public String registerProduct(
-            @ModelAttribute ProductDTO productDTO, 
-            List<MultipartFile> files, 
+            @ModelAttribute ProductDTO productDTO,
+            List<MultipartFile> files,
             @AuthenticationPrincipal AccountDetails accountDetails) {
-        
+
         List<ProductImageDTO> imageList = new ArrayList<>();
 
-        for(MultipartFile file : files) {
-            if(!file.isEmpty()) {
+        for (MultipartFile file : files) {
+            if (!file.isEmpty()) {
                 String originalName = file.getOriginalFilename();
                 String changedName = UUID.randomUUID().toString();
 
@@ -148,10 +167,10 @@ public class ProductController {
                 }
 
                 ProductImageDTO imageDTO = ProductImageDTO.builder()
-                                                          .imageRealName(originalName)
-                                                          .imageChgName(changedName)
-                                                          .imagePath(uploadDir)
-                                                          .build();
+                        .imageRealName(originalName)
+                        .imageChgName(changedName)
+                        .imagePath(uploadDir)
+                        .build();
                 imageList.add(imageDTO);
             }
         }
@@ -195,19 +214,19 @@ public class ProductController {
 
     @PostMapping("/edit")
     public String editProduct(
-            Long productId, 
-            ProductDTO productDTO, 
-            List<MultipartFile> files, 
+            Long productId,
+            ProductDTO productDTO,
+            List<MultipartFile> files,
             @AuthenticationPrincipal AccountDetails accountDetails) {
-        
+
         if (!productService.isProductOwner(productId, accountDetails.getUserId())) {
             return "redirect:/product/detail?productId=" + productId;
         }
 
         List<ProductImageDTO> imageList = new ArrayList<>();
 
-        for(MultipartFile file : files) {
-            if(!file.isEmpty()) {
+        for (MultipartFile file : files) {
+            if (!file.isEmpty()) {
                 String originalName = file.getOriginalFilename();
                 String changedName = UUID.randomUUID().toString();
 
@@ -220,10 +239,10 @@ public class ProductController {
                 }
 
                 ProductImageDTO imageDTO = ProductImageDTO.builder()
-                                                          .imageRealName(originalName)
-                                                          .imageChgName(changedName)
-                                                          .imagePath(uploadDir)
-                                                          .build();
+                        .imageRealName(originalName)
+                        .imageChgName(changedName)
+                        .imagePath(uploadDir)
+                        .build();
                 imageList.add(imageDTO);
             }
         }
@@ -247,12 +266,12 @@ public class ProductController {
     @PostMapping("/status")
     @ResponseBody
     public int updateTradeStatus(
-            @RequestParam Long productId, 
+            @RequestParam Long productId,
             @RequestParam TradeStatus tradeStatus,
             @AuthenticationPrincipal AccountDetails accountDetails) {
-        
+
         // 작성자 본인인지 확인
-        if(!productService.isProductOwner(productId, accountDetails.getUserId())) {
+        if (!productService.isProductOwner(productId, accountDetails.getUserId())) {
             return 0;
         }
 

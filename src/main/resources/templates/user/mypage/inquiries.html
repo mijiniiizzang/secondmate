@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <th:block th:replace="~{common/head :: commonHead}"></th:block>
+    <link rel="stylesheet" th:href="@{/css/user/mypage-sidebar.css}">
+    <link rel="stylesheet" th:href="@{/css/user/inquiries.css}">
+    <link rel="stylesheet" th:href="@{/css/user/inquiry-detail.css}">
+    <title>문의 내역</title>
+</head>
+
+<body class="mypage-inquiries-page">
+    <div th:replace="~{common/header :: header}"></div>
+
+    <main class="mypage-inquiries-container">
+        <div th:replace="~{user/mypage/mypage-sidebar :: userSidebar}"></div>
+
+        <section class="mypage-inquiries-content">
+            <div class="mypage-inquiries-heading">
+                <div>
+                    <p class="mypage-inquiries-label">INQUIRY</p>
+                    <h1>문의 내역</h1>
+                    <p>관리자에게 남긴 문의와 답변을 확인할 수 있습니다.</p>
+                </div>
+
+                <button type="button" class="inquiry-register-button" onclick="openInquiryRegisterModal()">
+                    문의하기
+                </button>
+            </div>
+
+            <section class="mypage-inquiries-panel">
+                <div class="mypage-inquiries-panel-header">
+                    <div>
+                        <p class="mypage-inquiries-label">MY INQUIRIES</p>
+                        <h2>내 문의 목록</h2>
+                    </div>
+
+                    <span class="inquiry-total-count">
+                        총 <strong th:text="${inquiries.totalElements}"></strong>건
+                    </span>
+                </div>
+
+                <div class="mypage-inquiry-table-wrap">
+                    <table class="mypage-inquiry-table">
+                        <thead>
+                            <tr>
+                                <th>문의번호</th>
+                                <th>문의유형</th>
+                                <th>제목</th>
+                                <th>답변 상태</th>
+                                <th>작성일</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <tr th:each="inquiry : ${inquiries.content}"
+                                class="mypage-inquiry-row"
+                                th:attr="data-inquiry-id=${inquiry.inquiryId}"
+                                onclick="openInquiryDetailModal(this.dataset.inquiryId)">
+
+                                <td th:text="${inquiry.inquiryId}"></td>
+
+                                <td th:text="${inquiry.inquiryType.label}"></td>
+
+                                <td class="mypage-inquiry-title-cell" th:text="${inquiry.title}"></td>
+
+                                <td>
+                                    <span class="mypage-inquiry-status waiting-status"
+                                        th:if="${inquiry.inquiryStatus.name() == 'WAITING'}">
+                                        답변 대기
+                                    </span>
+
+                                    <span class="mypage-inquiry-status answered-status"
+                                        th:if="${inquiry.inquiryStatus.name() == 'ANSWERED'}">
+                                        답변 완료
+                                    </span>
+                                </td>
+
+                                <td th:text="${#temporals.format(inquiry.regDate, 'yyyy.MM.dd HH:mm')}"></td>
+                            </tr>
+
+                            <tr th:if="${inquiries.empty}">
+                                <td colspan="5" class="empty-inquiry-message">
+                                    문의 내역이 없습니다.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="mypage-inquiry-pagination" th:if="${inquiries.totalPages > 0}">
+                    <a th:if="${!inquiries.first}"
+                        th:href="@{/mypage/inquiries(page=${inquiries.number - 1}, size=${inquiries.size})}">
+                        이전
+                    </a>
+
+                    <span th:each="page : ${#numbers.sequence(0, inquiries.totalPages - 1)}">
+                        <a th:if="${page != inquiries.number}"
+                            th:href="@{/mypage/inquiries(page=${page}, size=${inquiries.size})}"
+                            th:text="${page + 1}">
+                        </a>
+
+                        <strong th:if="${page == inquiries.number}" th:text="${page + 1}">
+                        </strong>
+                    </span>
+
+                    <a th:if="${!inquiries.last}"
+                        th:href="@{/mypage/inquiries(page=${inquiries.number + 1}, size=${inquiries.size})}">
+                        다음
+                    </a>
+                </div>
+            </section>
+        </section>
+    </main>
+
+    <div th:replace="~{user/mypage/inquiry-register :: inquiryRegisterModal}"></div>
+    <div th:replace="~{user/mypage/inquiry-detail :: inquiryDetailModal}"></div>
+    <div th:replace="~{common/footer :: footer}"></div>
+</body>
+
+</html>

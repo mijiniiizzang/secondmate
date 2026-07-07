@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.secondmate.common.ProcessReason;
 import com.example.secondmate.common.ReportStatus;
 import com.example.secondmate.common.ReportType;
 import com.example.secondmate.common.TargetType;
@@ -133,21 +134,25 @@ public class ReportService {
 
     // 신고 처리 상태 변경
     @Transactional
-    public void changeReportStatus(Long reportId, ReportStatus reportStatus) {
+    public void changeReportStatus(
+            Long reportId,
+            ReportStatus reportStatus,
+            ProcessReason processReason,
+            String detailReason) {
         Report report = reportRepository.findById(reportId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 신고"));
 
-        // 이미 처리된 신고를 다시 하지 못하게
         if (report.getReportStatus() != ReportStatus.PENDING) {
             throw new IllegalArgumentException("이미 처리된 신고");
         }
 
         report.setReportStatus(reportStatus);
+        report.setProcessReason(processReason);
+        report.setDetailReason(detailReason);
+
         notificationService.createReportProcessedNotification(report, reportStatus);
 
-        // 관리자가 신고를 처리한 경우에만 제재 처리
         if (reportStatus == ReportStatus.ACCEPTED) {
-            // 댓글 신고 : 댓글 숨김 처리
             if (report.getTargetType() == TargetType.COMMENT) {
                 Comment comment = commentRepository.findById(report.getTargetId())
                         .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 댓글"));
@@ -155,10 +160,11 @@ public class ReportService {
                 comment.setHidden(true);
             }
 
-            // 상품 신고 : 수락된 신고 3건 이상일 경우
             if (report.getTargetType() == TargetType.PRODUCT) {
                 long productReportCount = reportRepository.countByTargetTypeAndTargetIdAndReportStatus(
-                        TargetType.PRODUCT, report.getTargetId(), ReportStatus.ACCEPTED);
+                        TargetType.PRODUCT,
+                        report.getTargetId(),
+                        ReportStatus.ACCEPTED);
 
                 if (productReportCount >= 3) {
                     Product product = productRepository.findById(report.getTargetId())
@@ -168,11 +174,12 @@ public class ReportService {
                 }
             }
 
-            // 신고 수락 누적 3건 이상이면 계정 정지
             long userReportCount = reportRepository.countByReportedUser_UserIdAndReportStatus(
-                    report.getReportedUser().getUserId(), ReportStatus.ACCEPTED);
+                    report.getReportedUser().getUserId(),
+                    ReportStatus.ACCEPTED);
 
-            if (userReportCount >= 3 && report.getReportedUser().getStatus() != UserStatus.SUSPENDED) {
+            if (userReportCount >= 3
+                    && report.getReportedUser().getStatus() != UserStatus.SUSPENDED) {
                 suspendUser(report.getReportedUser());
             }
         }
@@ -210,7 +217,8 @@ public class ReportService {
 
     // 로그인 모달에 표시할 미확인 신고 수락 건수
     public long getUncheckedAcceptedReportCount(Long userId) {
-        return reportRepository.countByReportedUser_UserIdAndReportStatusAndReportModalChecked(userId, ReportStatus.ACCEPTED, false);
+        return reportRepository.countByReportedUser_UserIdAndReportStatusAndReportModalChecked(userId,
+                ReportStatus.ACCEPTED, false);
     }
 
     // 신고 처리 모달 확인 처리

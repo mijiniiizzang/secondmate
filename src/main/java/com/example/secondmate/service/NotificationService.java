@@ -9,6 +9,7 @@ import com.example.secondmate.common.ProcessReason;
 import com.example.secondmate.common.ReportStatus;
 import com.example.secondmate.dto.NotificationDTO;
 import com.example.secondmate.entity.Comment;
+import com.example.secondmate.entity.Inquiry;
 import com.example.secondmate.entity.Notification;
 import com.example.secondmate.entity.Product;
 import com.example.secondmate.entity.Report;
@@ -133,6 +134,21 @@ public class NotificationService {
                                                 .noteType(NotificationType.USER_UNSUSPENDED)
                                                 .build();
 
+        notificationRepository.save(notification);
+    }
+
+    // 문의 답변 알림 생성
+    public void createInquiryAnsweredNotification(Inquiry inquiry) {
+        Notification notification = Notification.builder()
+                                                .user(inquiry.getUser())
+                                                .product(null)
+                                                .productTitle("문의 답변")
+                                                .title("[문의] 답변 등록")
+                                                .content("문의하신 '" + inquiry.getTitle() + "'에 답변이 등록되었습니다."
+                                                         + "\n\n자세한 내용은 마이페이지에서 확인해주세요.")
+                                                .noteType(NotificationType.INQUIRY_ANSWERED)
+                                                .build();
+                                        
         notificationRepository.save(notification);
     }
 

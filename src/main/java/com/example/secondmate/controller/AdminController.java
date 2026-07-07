@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -11,17 +12,23 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.example.secondmate.common.InquiryStatus;
+import com.example.secondmate.common.InquiryType;
 import com.example.secondmate.common.ProcessReason;
 import com.example.secondmate.common.ProductCategory;
 import com.example.secondmate.common.ReportStatus;
 import com.example.secondmate.common.TargetType;
 import com.example.secondmate.common.TradeStatus;
 import com.example.secondmate.common.UserStatus;
+import com.example.secondmate.dto.InquiryDTO;
+import com.example.secondmate.entity.Inquiry;
 import com.example.secondmate.entity.Product;
 import com.example.secondmate.entity.Report;
 import com.example.secondmate.entity.User;
 import com.example.secondmate.service.AdminService;
+import com.example.secondmate.service.InquiryService;
 import com.example.secondmate.service.ReportService;
 
 import lombok.RequiredArgsConstructor;
@@ -33,6 +40,7 @@ public class AdminController {
 
     private final AdminService adminService;
     private final ReportService reportService;
+    private final InquiryService inquiryService;
 
     // 관리자 마이페이지 홈화면
     @GetMapping("/home")
@@ -47,6 +55,8 @@ public class AdminController {
         model.addAttribute("totalReportCount", adminService.getTotalReportCount());
         model.addAttribute("pendingReportCount", adminService.getPendingReportCount());
         model.addAttribute("acceptedReportCount", adminService.getAcceptedReportCount());
+        model.addAttribute("waitingInquiryCount", inquiryService.getWaitingInquiryCount());
+        model.addAttribute("answeredInquiryCount", inquiryService.getAnsweredInquiryCount());
 
         return "admin/home";
     }
@@ -161,20 +171,30 @@ public class AdminController {
 
     // 신고 처리
     @PostMapping("/reports/process")
-    public String processReport(@RequestParam Long reportId,
+    public String processReport(
+            @RequestParam Long reportId,
             @RequestParam String action,
             @RequestParam(required = false) ProcessReason processReason,
             @RequestParam(required = false) String detailReason) {
-
         Report report = reportService.getReport(reportId);
 
         if ("REJECT".equals(action)) {
-            reportService.changeReportStatus(reportId, ReportStatus.REJECTED);
+            reportService.changeReportStatus(
+                    reportId,
+                    ReportStatus.REJECTED,
+                    processReason,
+                    detailReason);
+
             return "redirect:/admin/reports";
         }
 
         if ("ACCEPT".equals(action)) {
-            reportService.changeReportStatus(reportId, ReportStatus.ACCEPTED);
+            reportService.changeReportStatus(
+                    reportId,
+                    ReportStatus.ACCEPTED,
+                    processReason,
+                    detailReason);
+
             return "redirect:/admin/reports";
         }
 
@@ -187,25 +207,41 @@ public class AdminController {
                 throw new IllegalArgumentException("회원 신고는 숨김 또는 삭제 처리할 수 없습니다.");
             }
 
-            reportService.changeReportStatus(reportId, ReportStatus.ACCEPTED);
+            reportService.changeReportStatus(
+                    reportId,
+                    ReportStatus.ACCEPTED,
+                    processReason,
+                    detailReason);
 
             if ("HIDE".equals(action)) {
                 if (report.getTargetType() == TargetType.PRODUCT) {
-                    adminService.hideProduct(report.getTargetId(), processReason, detailReason);
+                    adminService.hideProduct(
+                            report.getTargetId(),
+                            processReason,
+                            detailReason);
                 }
 
                 if (report.getTargetType() == TargetType.COMMENT) {
-                    adminService.hideComment(report.getTargetId(), processReason, detailReason);
+                    adminService.hideComment(
+                            report.getTargetId(),
+                            processReason,
+                            detailReason);
                 }
             }
 
             if ("DELETE".equals(action)) {
                 if (report.getTargetType() == TargetType.PRODUCT) {
-                    adminService.deleteProduct(report.getTargetId(), processReason, detailReason);
+                    adminService.deleteProduct(
+                            report.getTargetId(),
+                            processReason,
+                            detailReason);
                 }
 
                 if (report.getTargetType() == TargetType.COMMENT) {
-                    adminService.deleteComment(report.getTargetId(), processReason, detailReason);
+                    adminService.deleteComment(
+                            report.getTargetId(),
+                            processReason,
+                            detailReason);
                 }
             }
 
@@ -213,5 +249,57 @@ public class AdminController {
         }
 
         throw new IllegalArgumentException("잘못된 신고 처리 방식입니다.");
+    }
+
+    // 문의 관리
+    @GetMapping("/inquiries")
+    public String adminInquiries(
+            @RequestParam(required = false) InquiryStatus inquiryStatus,
+            @RequestParam(required = false) List<InquiryType> inquiryTypes,
+            @PageableDefault(size = 10, sort = "regDate", direction = Sort.Direction.DESC) Pageable pageable,
+            Model model) {
+
+        if (inquiryTypes != null && inquiryTypes.isEmpty()) {
+            inquiryTypes = null;
+        }
+
+        Page<Inquiry> inquiries = inquiryService.getAdminInquiryList(
+                inquiryStatus,
+                inquiryTypes,
+                pageable);
+
+        model.addAttribute("menu", "inquiries");
+        model.addAttribute("inquiries", inquiries);
+        model.addAttribute("inquiryStatus", inquiryStatus);
+        model.addAttribute("inquiryTypes", inquiryTypes);
+
+        return "admin/inquiries";
+    }
+
+    // 문의 상세
+    @GetMapping("/inquiries/detail")
+    @ResponseBody
+    public InquiryDTO adminInquiryDetail(@RequestParam Long inquiryId) {
+        Inquiry inquiry = inquiryService.getInquiry(inquiryId);
+
+        return InquiryDTO.builder()
+                .inquiryId(inquiry.getInquiryId())
+                .userId(inquiry.getUser().getUserId())
+                .nickname(inquiry.getUser().getNickname())
+                .title(inquiry.getTitle())
+                .content(inquiry.getContent())
+                .inquiryType(inquiry.getInquiryType())
+                .inquiryStatus(inquiry.getInquiryStatus())
+                .answer(inquiry.getAnswer())
+                .answeredAt(inquiry.getAnsweredAt())
+                .regDate(inquiry.getRegDate())
+                .build();
+    }
+
+    // 문의 답변 등록
+    @PostMapping("/inquiries/answer")
+    public String answerInquiry(@RequestParam Long inquiryId, @RequestParam String answer) {
+        inquiryService.answerInquiry(inquiryId, answer);
+        return "redirect:/admin/inquiries";
     }
 }

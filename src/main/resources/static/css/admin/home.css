@@ -5,7 +5,7 @@
 .admin-home-container {
     width: min(1180px, calc(100% - 40px));
     margin: 0 auto;
-    padding: 34px 0 60px;
+    padding: 24px 0 40px;
     display: flex;
     gap: 30px;
     align-items: flex-start;
@@ -20,7 +20,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 28px;
+    margin-bottom: 20px;
 }
 
 .admin-home-label,
@@ -49,7 +49,7 @@
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 16px;
-    margin-bottom: 22px;
+    margin-bottom: 16px;
 }
 
 .admin-summary-card,
@@ -61,8 +61,8 @@
 }
 
 .admin-summary-card {
-    min-height: 190px;
-    padding: 22px;
+    min-height: 150px;
+    padding: 18px;
 }
 
 .admin-card-top {
@@ -83,14 +83,14 @@
 
 .admin-summary-card strong {
     display: block;
-    margin-top: 22px;
+    margin-top: 14px;
     color: #30343b;
-    font-size: 34px;
+    font-size: 30px;
     letter-spacing: -1px;
 }
 
 .admin-summary-card p {
-    margin: 7px 0 18px;
+    margin: 5px 0 12px;
     color: #9aa2ac;
     font-size: 13px;
 }
@@ -112,11 +112,11 @@
 .admin-dashboard-grid {
     display: grid;
     grid-template-columns: minmax(0, 1.65fr) minmax(270px, 1fr);
-    gap: 22px;
+    gap: 16px;
 }
 
 .admin-panel {
-    padding: 24px;
+    padding: 20px;
 }
 
 .admin-panel-header {
@@ -124,7 +124,7 @@
     align-items: flex-start;
     justify-content: space-between;
     gap: 15px;
-    margin-bottom: 22px;
+    margin-bottom: 16px;
 }
 
 .admin-panel-header h2 {
@@ -149,8 +149,8 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 16px;
-    padding: 14px 16px;
+    margin-bottom: 12px;
+    padding: 11px 14px;
     border-radius: 12px;
     background-color: #f7f4f1;
 }
@@ -223,54 +223,64 @@
     text-align: center !important;
 }
 
-.report-status-list {
+.report-status-list,
+.inquiry-status-list {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 9px;
 }
 
-.report-status-item {
+.report-status-item,
+.inquiry-status-item {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 16px;
+    padding: 12px 14px;
     border-radius: 12px;
     background-color: #f7f8fa;
 }
 
-.report-status-item span {
+.report-status-item span,
+.inquiry-status-item span {
     color: #68717b;
     font-size: 14px;
     font-weight: 700;
 }
 
-.report-status-item strong {
+.report-status-item strong,
+.inquiry-status-item strong {
     color: #30343b;
     font-size: 20px;
 }
 
-.pending-report {
+.pending-report,
+.waiting-inquiry {
     background-color: #fff7ed;
 }
 
-.pending-report strong {
+.pending-report strong,
+.waiting-inquiry strong {
     color: #d78a4f;
 }
 
-.completed-report {
+.completed-report,
+.answered-inquiry {
     background-color: #f0f6f1;
 }
 
-.completed-report strong {
+.completed-report strong,
+.answered-inquiry strong {
     color: #63896d;
 }
 
-.report-action-link {
+.report-action-link,
+.inquiry-action-link,
+.admin-summary-card .inquiry-action-link {
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 46px;
-    margin-top: 20px;
+    height: 40px;
+    margin-top: 14px;
     border-radius: 10px;
     background-color: #697789;
     color: #ffffff;
@@ -278,8 +288,11 @@
     font-weight: 800;
 }
 
-.report-action-link:hover {
+.report-action-link:hover,
+.inquiry-action-link:hover,
+.admin-summary-card .inquiry-action-link:hover {
     background-color: #566576;
+    color: #ffffff;
 }
 
 @media (max-width: 980px) {

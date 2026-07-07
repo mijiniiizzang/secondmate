@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link rel="stylesheet" th:href="@{/css/user/mypage-sidebar.css}">
+    <link rel="stylesheet" th:href="@{/css/user/report-detail.css}">
+    <link rel="stylesheet" th:href="@{/css/user/reports.css}">
+    <th:block th:replace="~{common/head :: commonHead}"></th:block>
+    <title>내 신고내역</title>
+</head>
+
+<body class="reports-page">
+
+    <div th:replace="~{common/header :: header}"></div>
+
+    <main class="reports-container">
+
+        <div th:replace="~{user/mypage/mypage-sidebar :: userSidebar}"></div>
+
+        <section class="reports-content">
+
+            <div class="reports-title">
+                <p class="reports-label">MY REPORTS</p>
+                <h1>내 신고내역</h1>
+                <p>내가 신고한 내역과 신고받은 내역을 확인할 수 있어요.</p>
+            </div>
+
+            <nav class="reports-tab-menu">
+                <a th:href="@{/mypage/reports(type='sent')}"
+                   th:classappend="${type == 'sent'} ? 'active'">
+                    내가 신고한 내역
+                </a>
+
+                <a th:href="@{/mypage/reports(type='received')}"
+                   th:classappend="${type == 'received'} ? 'active'">
+                    신고받은 내역
+                </a>
+            </nav>
+
+            <section class="reports-list-section">
+
+                <table class="reports-table" th:if="${!reports.empty}">
+                    <thead>
+                        <tr>
+                            <th th:text="${type == 'sent' ? '신고 대상' : '신고자'}">
+                                신고 대상
+                            </th>
+                            <th>대상 종류</th>
+                            <th>신고 유형</th>
+                            <th>신고 사유</th>
+                            <th>처리 상태</th>
+                            <th>신고일</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr th:each="report : ${reports.content}"
+                            class="report-row"
+                            th:data-target-user="${type == 'sent' ? report.reportedUser.nickname : '비공개'}"
+                            th:data-target-type="${report.targetType}"
+                            th:data-report-type="${report.reportType.typeName}"
+                            th:data-reason="${report.reason}"
+                            th:data-status="${report.reportStatus}"
+                            th:data-process-reason="${report.processReason != null ? report.processReason.reasonName : ''}"
+                            th:data-detail-reason="${report.detailReason != null ? report.detailReason : ''}"
+                            th:data-reg-date="${#temporals.format(report.regDate, 'yyyy.MM.dd')}">
+
+                            <td th:text="${type == 'sent' ? report.reportedUser.nickname : '비공개'}">
+                                사용자
+                            </td>
+
+                            <td>
+                                <span th:if="${report.targetType.name() == 'PRODUCT'}">
+                                    상품
+                                </span>
+
+                                <span th:if="${report.targetType.name() == 'COMMENT'}">
+                                    댓글
+                                </span>
+
+                                <span th:if="${report.targetType.name() == 'USER'}">
+                                    사용자
+                                </span>
+                            </td>
+
+                            <td th:text="${report.reportType.typeName}">
+                                신고 유형
+                            </td>
+
+                            <td class="report-reason"
+                                th:text="${report.reason}">
+                                신고 사유
+                            </td>
+
+                            <td>
+                                <span class="report-status pending"
+                                      th:if="${report.reportStatus.name() == 'PENDING'}">
+                                    처리중
+                                </span>
+
+                                <span class="report-status accepted"
+                                      th:if="${report.reportStatus.name() == 'ACCEPTED'}">
+                                    수락
+                                </span>
+
+                                <span class="report-status rejected"
+                                      th:if="${report.reportStatus.name() == 'REJECTED'}">
+                                    반려
+                                </span>
+                            </td>
+
+                            <td th:text="${#temporals.format(report.regDate, 'yyyy.MM.dd')}">
+                                2026.07.07
+                            </td>
+
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="reports-empty" th:if="${reports.empty}">
+                    <p th:text="${type == 'sent' ? '신고한 내역이 없습니다.' : '신고받은 내역이 없습니다.'}">
+                        신고 내역이 없습니다.
+                    </p>
+                </div>
+
+            </section>
+
+            <nav class="reports-pagination"
+                 th:if="${reports.totalPages > 1}">
+
+                <a th:if="${!reports.first}"
+                   th:href="@{/mypage/reports(type=${type}, page=${reports.number - 1})}">
+                    이전
+                </a>
+
+                <a th:each="pageNumber : ${#numbers.sequence(0, reports.totalPages - 1)}"
+                   th:href="@{/mypage/reports(type=${type}, page=${pageNumber})}"
+                   th:text="${pageNumber + 1}"
+                   th:classappend="${pageNumber == reports.number} ? 'active'">
+                    1
+                </a>
+
+                <a th:if="${!reports.last}"
+                   th:href="@{/mypage/reports(type=${type}, page=${reports.number + 1})}">
+                    다음
+                </a>
+
+            </nav>
+
+        </section>
+    </main>
+
+    <th:block th:replace="~{user/mypage/report-detail :: reportDetailModal}"></th:block>
+
+    <div th:replace="~{common/footer :: footer}"></div>
+
+</body>
+</html>

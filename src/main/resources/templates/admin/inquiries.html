@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <th:block th:replace="~{common/head :: commonHead}"></th:block>
+    <link rel="stylesheet" th:href="@{/css/admin/inquiries.css}">
+    <link rel="stylesheet" th:href="@{/css/admin/inquiry-detail.css}">
+    <link rel="stylesheet" th:href="@{/css/admin/common.css}">
+    <title>문의 관리</title>
+</head>
+
+<body class="admin-inquiries-page">
+    <div th:replace="~{common/header :: header}"></div>
+
+    <main class="admin-inquiries-container">
+        <div th:replace="~{admin/common :: adminSidebar}"></div>
+
+        <section class="admin-inquiries-content">
+            <div class="admin-inquiries-heading">
+                <div>
+                    <p class="admin-inquiries-label">INQUIRY MANAGEMENT</p>
+                    <h1>문의 관리</h1>
+                    <p>사용자가 남긴 문의를 확인하고 답변할 수 있습니다.</p>
+                </div>
+            </div>
+
+            <section class="admin-inquiries-panel">
+                <div class="admin-inquiries-panel-header">
+                    <div>
+                        <p class="admin-inquiries-label">INQUIRY LIST</p>
+                        <h2>문의 목록</h2>
+                    </div>
+
+                    <span class="inquiry-total-count">
+                        총 <strong th:text="${inquiries.totalElements}"></strong>건
+                    </span>
+                </div>
+
+                <div class="inquiry-filter-area">
+                    <form class="inquiry-filter-form" th:action="@{/admin/inquiries}" method="get">
+
+                        <div class="inquiry-filter-group">
+                            <p>답변 상태</p>
+
+                            <label><input type="radio" name="inquiryStatus" value="" th:checked="${inquiryStatus == null}"> 전체</label>
+
+                            <label><input type="radio" name="inquiryStatus" value="WAITING" th:checked="${inquiryStatus != null and inquiryStatus.name() == 'WAITING'}"> 답변 대기</label>
+
+                            <label><input type="radio" name="inquiryStatus" value="ANSWERED" th:checked="${inquiryStatus != null and inquiryStatus.name() == 'ANSWERED'}"> 답변 완료</label>
+                        </div>
+
+                        <div class="inquiry-filter-group">
+                            <p>문의 유형</p>
+
+                            <label><input type="checkbox" name="inquiryTypes" value="ACCOUNT" th:checked="${inquiryTypes != null and inquiryTypes.contains(T(com.example.secondmate.common.InquiryType).ACCOUNT)}"> 계정 문의</label>
+
+                            <label><input type="checkbox" name="inquiryTypes" value="PRODUCT" th:checked="${inquiryTypes != null and inquiryTypes.contains(T(com.example.secondmate.common.InquiryType).PRODUCT)}"> 상품 문의</label>
+
+                            <label><input type="checkbox" name="inquiryTypes" value="REPORT" th:checked="${inquiryTypes != null and inquiryTypes.contains(T(com.example.secondmate.common.InquiryType).REPORT)}"> 신고 문의</label>
+
+                            <label><input type="checkbox" name="inquiryTypes" value="SERVICE" th:checked="${inquiryTypes != null and inquiryTypes.contains(T(com.example.secondmate.common.InquiryType).SERVICE)}"> 서비스 이용 문의</label>
+
+                            <label><input type="checkbox" name="inquiryTypes" value="ETC" th:checked="${inquiryTypes != null and inquiryTypes.contains(T(com.example.secondmate.common.InquiryType).ETC)}"> 기타</label>
+                        </div>
+
+                        <button type="submit">조회</button>
+                    </form>
+                </div>
+
+                <div class="inquiry-table-wrap">
+                    <table class="inquiry-table">
+                        <thead>
+                            <tr>
+                                <th>문의번호</th>
+                                <th>문의유형</th>
+                                <th>제목</th>
+                                <th>작성자</th>
+                                <th>처리 상태</th>
+                                <th>작성일</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <tr th:each="inquiry : ${inquiries.content}"
+                                class="inquiry-row"
+                                th:attr="data-inquiry-id=${inquiry.inquiryId}"
+                                onclick="openInquiryModal(this.dataset.inquiryId)">
+
+                                <td th:text="${inquiry.inquiryId}"></td>
+
+                                <td th:text="${inquiry.inquiryType.label}"></td>
+
+                                <td class="inquiry-title-cell" th:text="${inquiry.title}"></td>
+
+                                <td th:text="${inquiry.user.nickname}"></td>
+
+                                <td>
+                                    <span class="inquiry-status-badge waiting-status"
+                                          th:if="${inquiry.inquiryStatus.name() == 'WAITING'}">
+                                        답변 대기
+                                    </span>
+
+                                    <span class="inquiry-status-badge answered-status"
+                                          th:if="${inquiry.inquiryStatus.name() == 'ANSWERED'}">
+                                        답변 완료
+                                    </span>
+                                </td>
+
+                                <td th:text="${#temporals.format(inquiry.regDate, 'yyyy.MM.dd HH:mm')}"></td>
+                            </tr>
+
+                            <tr th:if="${inquiries.empty}">
+                                <td colspan="6" class="empty-inquiry-message">
+                                    문의 내역이 없습니다.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="inquiry-pagination" th:if="${inquiries.totalPages > 0}">
+                    <a th:if="${!inquiries.first}"
+                       th:href="@{/admin/inquiries(page=${inquiries.number - 1}, size=${inquiries.size}, inquiryStatus=${inquiryStatus}, inquiryTypes=${inquiryTypes})}">
+                        이전
+                    </a>
+
+                    <span th:each="page : ${#numbers.sequence(0, inquiries.totalPages - 1)}">
+                        <a th:if="${page != inquiries.number}"
+                           th:href="@{/admin/inquiries(page=${page}, size=${inquiries.size}, inquiryStatus=${inquiryStatus}, inquiryTypes=${inquiryTypes})}"
+                           th:text="${page + 1}">
+                        </a>
+
+                        <strong th:if="${page == inquiries.number}" th:text="${page + 1}"></strong>
+                    </span>
+
+                    <a th:if="${!inquiries.last}"
+                       th:href="@{/admin/inquiries(page=${inquiries.number + 1}, size=${inquiries.size}, inquiryStatus=${inquiryStatus}, inquiryTypes=${inquiryTypes})}">
+                        다음
+                    </a>
+                </div>
+            </section>
+        </section>
+    </main>
+
+    <div th:replace="~{admin/inquiry-detail :: inquiryModal}"></div>
+    <div th:replace="~{common/footer :: footer}"></div>
+</body>
+
+</html>

@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head>
     <th:block th:replace="~{common/head :: commonHead}"></th:block>
@@ -20,44 +19,36 @@
 
                 <!-- 상품 이미지 -->
                 <div th:if="${product.imageList != null and !#lists.isEmpty(product.imageList)}"
-                     class="product-image-slider-wrap">
+                    class="product-image-slider-wrap">
 
-                    <button type="button"
-                            class="image-slide-button image-prev"
-                            onclick="moveProductImages(-1)">
+                    <button type="button" class="image-slide-button image-prev" onclick="moveProductImages(-1)">
                         ‹
                     </button>
 
                     <div class="product-image-area" id="productImageArea">
-                        <div class="product-image-box"
-                             th:each="image : ${product.imageList}">
+                        <div class="product-image-box" th:each="image : ${product.imageList}">
 
-                            <img th:src="@{'/upload/' + ${image.imageChgName}}"
-                                 th:alt="${product.name}">
+                            <img th:src="@{'/upload/' + ${image.imageChgName}}" th:alt="${product.name}">
                         </div>
                     </div>
 
-                    <button type="button"
-                            class="image-slide-button image-next"
-                            onclick="moveProductImages(1)">
+                    <button type="button" class="image-slide-button image-next" onclick="moveProductImages(1)">
                         ›
                     </button>
                 </div>
 
                 <div th:if="${product.imageList == null or #lists.isEmpty(product.imageList)}"
-                     class="product-empty-image">
+                    class="product-empty-image">
                     등록된 사진이 없습니다.
                 </div>
 
                 <!-- 상품 정보 -->
                 <div class="product-info-area">
 
-                    <span class="product-category"
-                          th:text="${product.category}">
+                    <span class="product-category" th:text="${product.category}">
                     </span>
 
-                    <h1 class="product-title"
-                        th:text="${product.title}">
+                    <h1 class="product-title" th:text="${product.title}">
                     </h1>
 
                     <p class="product-price">
@@ -79,22 +70,8 @@
                         <div class="product-info-row">
                             <dt>거래 상태</dt>
                             <dd>
-                                <span class="product-status"
-                                      th:text="${product.tradeStatus}">
+                                <span class="product-status" th:text="${product.tradeStatus}">
                                 </span>
-
-                                <div th:if="${isOwner}" style="margin-top: 10px;">
-                                    <select id="tradeStatus" name="tradeStatus">
-                                        <option value="">변경</option>
-                                        <option value="ON_SALE">판매중</option>
-                                        <option value="RESERVED">예약중</option>
-                                        <option value="SOLD">판매완료</option>
-                                    </select>
-
-                                    <button type="button" id="changeStatus">
-                                        상태 변경
-                                    </button>
-                                </div>
                             </dd>
                         </div>
 
@@ -113,13 +90,10 @@
                     <div class="product-action-row">
 
                         <div class="wishlist-area">
-                            <button type="button"
-                                    id="wishlist-btn"
-                                    class="wishlist-button"
-                                    th:data-logged-in="${#authorization.expression('isAuthenticated()')}">
+                            <button type="button" id="wishlist-btn" class="wishlist-button"
+                                th:data-logged-in="${#authorization.expression('isAuthenticated()')}">
 
-                                <span id="heart-icon"
-                                      th:text="${isWished} ? '♥' : '♡'">
+                                <span id="heart-icon" th:text="${isWished} ? '♥' : '♡'">
                                     ♡
                                 </span>
                             </button>
@@ -129,20 +103,17 @@
                             </span>
                         </div>
 
-                        <button type="button"
-                                class="product-report-button"
-                                sec:authorize="isAuthenticated()"
-                                th:if="${!isOwner}"
-                                onclick="openProductReport()">
+                        <button type="button" class="product-report-button" sec:authorize="isAuthenticated()"
+                            th:if="${!isOwner}" onclick="openProductReport()">
                             신고
                         </button>
 
-                        <form th:action="@{/chat/room}" method="POST" sec:authorize="isAuthenticated()" th:if="${!isOwner}">
+                        <form th:action="@{/chat/room}" method="POST" sec:authorize="isAuthenticated()"
+                            th:if="${!isOwner}">
                             <input type="hidden" name="productId" th:value="${product.productId}">
                             <button type="submit" class="product-chat-button">채팅하기</button>
                         </form>
-                        <a class="product-list-button"
-                           th:href="@{/product/list}">
+                        <a class="product-list-button" th:href="@{/product/list}">
                             목록
                         </a>
 
@@ -155,20 +126,19 @@
             <section class="product-content-area">
                 <h2 class="section-title">상품 설명</h2>
 
-                <p class="product-content"
-                   th:text="${product.content}">
+                <p class="product-content" th:text="${product.content}">
                 </p>
             </section>
 
             <!-- 작성자 수정 / 삭제 -->
             <div class="owner-action-row" th:if="${isOwner}">
 
-                <form th:action="@{/product/edit(productId=${product.productId})}">
+                <form th:action="@{/product/edit}" method="get">
+                    <input type="hidden" name="productId" th:value="${product.productId}">
                     <button type="submit">수정</button>
                 </form>
 
-                <form th:action="@{/product/delete(productId=${product.productId})}"
-                      method="POST">
+                <form th:action="@{/product/delete(productId=${product.productId})}" method="POST">
                     <button type="submit">삭제</button>
                 </form>
 
@@ -185,8 +155,7 @@
                         <span th:text="${#authentication.principal.nickname}"></span>
                     </p>
 
-                    <textarea id="comment-content"
-                              placeholder="댓글을 입력해주세요."></textarea>
+                    <textarea id="comment-content" placeholder="댓글을 입력해주세요."></textarea>
 
                     <button id="comment-submit">등록</button>
 
@@ -360,32 +329,6 @@
             });
         });
 
-        $('#changeStatus').click(function () {
-            const tradeStatus = $('#tradeStatus').val();
-
-            if (!tradeStatus) {
-                alert('변경할 거래 상태를 선택해주세요.');
-                return;
-            }
-
-            if (!confirm('상태를 변경하시겠습니까?')) return;
-
-            $.ajax({
-                type: 'POST',
-                url: `/product/status?productId=${productId}`,
-                data: {
-                    tradeStatus: tradeStatus
-                },
-                success: function () {
-                    alert('거래 상태가 변경되었습니다.');
-                    location.reload();
-                },
-                error: function () {
-                    alert('거래 상태 변경에 실패했습니다.');
-                }
-            });
-        });
-
         function moveProductImages(direction) {
             const imageArea = document.getElementById('productImageArea');
 
@@ -428,4 +371,5 @@
     </div>
 
 </body>
+
 </html>

@@ -2,6 +2,7 @@
     <link rel="stylesheet" th:href="@{/css/report-form.css}">
 
     <form class="report-form"
+          id="productReportForm"
           th:action="@{/report/product/{productId}(productId=${product.productId})}"
           method="POST">
 
@@ -43,4 +44,26 @@
 
         <button type="submit">신고접수</button>
     </form>
+
+    <script>
+        document.getElementById('productReportForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const form = event.currentTarget;
+
+            $.ajax({
+                type: 'POST',
+                url: form.action,
+                data: $(form).serialize(),
+                success: function() {
+                    alert('신고가 접수되었습니다.');
+                    closeProductReport();
+                    form.reset();
+                },
+                error: function() {
+                    alert('이미 신고한 상품입니다.');
+                }
+            });
+        });
+    </script>
 </th:block>

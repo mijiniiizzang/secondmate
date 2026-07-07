@@ -22,6 +22,11 @@
                th:classappend="${menu == 'reports'} ? 'active'">
                 신고관리
             </a>
+
+            <a th:href="@{/admin/inquiries}"
+               th:classappend="${menu == 'inquiries'} ? 'active'">
+                문의관리
+            </a>
         </nav>
     </aside>
 </th:block>
