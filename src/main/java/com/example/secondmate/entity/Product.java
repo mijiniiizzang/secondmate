@@ -52,7 +52,7 @@ public class Product {
     @Enumerated(EnumType.STRING)
     @Column(nullable=false)
     private ProductCategory category;
-    @Column(nullable=false)
+    @Column(nullable=false, columnDefinition="TEXT")
     private String content;
 
     // 지역 설정

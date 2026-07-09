@@ -26,6 +26,7 @@ public class SecurityConfig {
                 "/report/**",
                 "/mypage/**",
                 "/chat/**",
+                "/review/**",
                 "/ws/**"
             ).authenticated()
             .anyRequest().permitAll()

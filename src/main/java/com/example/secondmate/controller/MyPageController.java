@@ -28,6 +28,7 @@ import com.example.secondmate.entity.Inquiry;
 import com.example.secondmate.entity.Report;
 import com.example.secondmate.security.AccountDetails;
 import com.example.secondmate.service.InquiryService;
+import com.example.secondmate.service.NotificationService;
 import com.example.secondmate.service.ProductService;
 import com.example.secondmate.service.UserService;
 import com.example.secondmate.service.WishlistService;
@@ -43,12 +44,19 @@ public class MyPageController {
     private final ProductService productService;
     private final WishlistService wishlistService;
     private final InquiryService inquiryService;
+    private final NotificationService notificationService;
 
     // 마이페이지 기본 화면
-    @GetMapping
+    @GetMapping({"", "/home"})
     public String mypage(@AuthenticationPrincipal AccountDetails accountDetails, Model model) {
-        model.addAttribute("user", userService.getUser(accountDetails.getUserId()));
-        model.addAttribute("myInquiryCount", inquiryService.getMyInquiryCount(accountDetails.getUserId()));
+        Long userId = accountDetails.getUserId();
+
+        model.addAttribute("user", userService.getUser(userId));
+        model.addAttribute("myProductCount", productService.getMyProductCount(userId));
+        model.addAttribute("myWishlistCount", wishlistService.getMyWishlistCount(userId));
+        model.addAttribute("myUnreadNotificationCount", notificationService.getMyUnreadNotificationCount(userId));
+        model.addAttribute("myInquiryCount", inquiryService.getMyInquiryCount(userId));
+        model.addAttribute("menu", "home");
 
         return "user/mypage/mypage";
     }
@@ -109,6 +117,7 @@ public class MyPageController {
         Page<ProductDTO> products = productService.getMyProducts(accountDetails.getUserId(), pageable);
 
         model.addAttribute("products", products);
+        model.addAttribute("menu", "products");
 
         return "user/mypage/products";
     }
@@ -123,6 +132,8 @@ public class MyPageController {
 
         model.addAttribute("wishlists", wishlists);
         model.addAttribute("selectedCategories", categories);
+        model.addAttribute("menu", "wishlists");
+
         return "user/mypage/wishlists";
     }
 

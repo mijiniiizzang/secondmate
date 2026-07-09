@@ -19,32 +19,43 @@
                 <div>
                     <p class="user-home-label">USER DASHBOARD</p>
                     <h1>나의 마이페이지</h1>
-                    <h3>안녕하세요, <span th:text="${user.nickname}">닉네임</span>님!</h3>
+                    <h3>
+                        안녕하세요,
+                        <span th:text="${user.nickname}">닉네임</span>님!
+                    </h3>
                     <p>나의 정보와 활동 내역을 확인하세요.</p>
                 </div>
             </div>
 
             <section class="user-summary-section">
+
+                <div class="user-summary-card user-mate-score-card">
+                    <p>메이트지수</p>
+                    <strong th:text="${user.mateScore}">70</strong>점
+                    <span>거래 후기를 바탕으로 반영돼요</span>
+                </div>
+
                 <div class="user-summary-card">
                     <p>내가 올린 상품</p>
-                    <strong id="myProductCount">0</strong>개
+                    <strong th:text="${myProductCount}">0</strong>개
                 </div>
 
                 <div class="user-summary-card">
                     <p>찜한 상품</p>
-                    <strong id="myWishlistCount">0</strong>개
+                    <strong th:text="${myWishlistCount}">0</strong>개
                 </div>
 
                 <div class="user-summary-card">
                     <p>안 읽은 알림</p>
-                    <strong id="myUnreadNotificationCount">0</strong>건
+                    <strong th:text="${myUnreadNotificationCount}">0</strong>건
                 </div>
 
                 <a th:href="@{/mypage/inquiries}" class="user-summary-card user-inquiry-summary-card">
                     <p>문의 내역</p>
-                    <strong th:text="${myInquiryCount}"></strong>건
+                    <strong th:text="${myInquiryCount}">0</strong>건
                     <span>문의 내역 보기 →</span>
                 </a>
+
             </section>
         </section>
     </main>

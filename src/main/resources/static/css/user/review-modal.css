@@ -1,0 +1,230 @@
+.review-modal-wrapper {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    padding: 20px;
+
+    background: rgba(0, 0, 0, 0.45);
+}
+
+.review-modal-wrapper[hidden] {
+    display: none;
+}
+
+.review-modal-form {
+    position: relative;
+
+    width: 100%;
+    max-width: 460px;
+    padding: 34px 30px 30px;
+
+    border-radius: 22px;
+    background: #ffffff;
+    box-sizing: border-box;
+
+    box-shadow: 0 14px 40px rgba(0, 0, 0, 0.16);
+}
+
+.review-modal-close {
+    position: absolute;
+    top: 14px;
+    right: 18px;
+
+    border: 0;
+    background: none;
+
+    color: #555555;
+    font-size: 28px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.review-modal-close:hover {
+    color: #222222;
+}
+
+.review-modal-form h2 {
+    margin: 0;
+
+    color: #222222;
+    font-size: 22px;
+    font-weight: 800;
+    text-align: center;
+}
+
+.review-modal-desc {
+    margin: 8px 0 24px;
+
+    color: #68736b;
+    font-size: 14px;
+    text-align: center;
+}
+
+#reviewTargetNickname {
+    color: #2f7d4a;
+    font-weight: 800;
+}
+
+.review-emoji-list {
+    display: flex;
+    gap: 10px;
+
+    margin-bottom: 20px;
+}
+
+.review-emoji-item {
+    flex: 1;
+}
+
+.review-emoji-item input {
+    display: none;
+}
+
+.review-emoji-item span {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    min-height: 92px;
+
+    border: 1px solid #dddddd;
+    border-radius: 18px;
+
+    color: #555555;
+    font-size: 14px;
+    cursor: pointer;
+    box-sizing: border-box;
+
+    transition: 0.15s;
+}
+
+.review-emoji-item span:hover {
+    border-color: #b8d6c2;
+    background: #f7fbf8;
+}
+
+.review-emoji-item strong {
+    font-size: 30px;
+    line-height: 1;
+}
+
+.review-emoji-item input:checked + span {
+    border-color: #2f7d4a;
+    background: #eaf4ee;
+    color: #2f7d4a;
+    font-weight: 800;
+}
+
+.review-modal-form textarea {
+    width: 100%;
+    min-height: 120px;
+    padding: 14px;
+
+    border: 1px solid #dddddd;
+    border-radius: 14px;
+    outline: none;
+
+    resize: none;
+    box-sizing: border-box;
+
+    color: #333333;
+    font-size: 14px;
+    font-family: inherit;
+    line-height: 1.5;
+}
+
+.review-modal-form textarea:focus {
+    border-color: #2f7d4a;
+}
+
+.review-submit-btn {
+    width: 100%;
+    margin-top: 18px;
+    padding: 14px;
+
+    border: 0;
+    border-radius: 14px;
+
+    background: #2f7d4a;
+    color: #ffffff;
+
+    font-size: 15px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.review-submit-btn:hover {
+    background: #25663c;
+}
+
+.review-guide-box {
+    margin: 14px 18px 0;
+    padding: 18px;
+
+    border: 1px solid #dbe7df;
+    border-radius: 16px;
+
+    background: #f4faf6;
+    text-align: center;
+}
+
+.review-guide-title {
+    margin: 0 0 6px;
+
+    color: #222222;
+    font-size: 17px;
+    font-weight: 800;
+}
+
+.review-guide-text {
+    margin: 0 0 14px;
+
+    color: #68736b;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.review-open-btn,
+.trade-review-btn {
+    padding: 9px 15px;
+
+    border: 0;
+    border-radius: 999px;
+
+    background: #2f7d4a;
+    color: #ffffff;
+
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.review-open-btn:hover,
+.trade-review-btn:hover {
+    background: #25663c;
+}
+
+.trade-review-done {
+    display: inline-block;
+
+    padding: 6px 10px;
+
+    border-radius: 999px;
+    background: #eef6f1;
+
+    color: #2f7d4a;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.trade-review-none {
+    color: #aaaaaa;
+    font-size: 13px;
+}

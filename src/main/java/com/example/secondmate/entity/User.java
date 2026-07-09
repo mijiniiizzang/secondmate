@@ -59,4 +59,9 @@ public class User {
     @Column(nullable=false)
     private int suspensionCount = 0;
     private LocalDateTime suspendedUntil;
+
+    // 거래 완료 후
+    @Builder.Default
+    @Column(nullable=false)
+    private Integer mateScore = 70;
 }

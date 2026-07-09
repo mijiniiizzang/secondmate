@@ -16,6 +16,7 @@ import com.example.secondmate.dto.ChatMessageDTO;
 import com.example.secondmate.dto.ChatRoomDTO;
 import com.example.secondmate.security.AccountDetails;
 import com.example.secondmate.service.ChatService;
+import com.example.secondmate.service.ReviewService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -25,6 +26,7 @@ import lombok.RequiredArgsConstructor;
 public class ChatController {
     
     private final ChatService chatService;
+    private final ReviewService reviewService;
 
     // 채팅방 생성
     @PostMapping("/room")
@@ -59,12 +61,17 @@ public class ChatController {
             return "redirect:/auth/login?redirectUrl=/chat/room/" + roomId;
         }
 
-        ChatRoomDTO room = chatService.getRoom(roomId, accountDetails.getUserId());
+        Long loginUserId = accountDetails.getUserId();
+
+        ChatRoomDTO room = chatService.getRoom(roomId, loginUserId);
 
         List<ChatMessageDTO> messages = chatService.getMessages(roomId, accountDetails.getUserId());
 
+        boolean canWriteReview = reviewService.canWriteReview(roomId, loginUserId);
+
         model.addAttribute("room", room);
         model.addAttribute("messages", messages);
+        model.addAttribute("canWriteReview", canWriteReview);
 
         return "chat/room";
     }

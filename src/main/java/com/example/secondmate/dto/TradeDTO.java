@@ -34,6 +34,12 @@ public class TradeDTO {
     private LocalDateTime tradeDate;
     private LocalDateTime completedAt;
 
+    private Long chatRoomId;
+    private Long revieweeId;
+    private String revieweeNickname;
+    private boolean canWriteReview;
+    private boolean reviewWritten;
+
     public static TradeDTO fromEntity(Trade trade) {
         return TradeDTO.builder()
                 .tradeId(trade.getTradeId())
@@ -52,6 +58,12 @@ public class TradeDTO {
 
                 .tradeDate(trade.getTradeDate())
                 .completedAt(trade.getCompletedAt())
+
+                .chatRoomId(null)
+                .revieweeId(null)
+                .revieweeNickname(null)
+                .canWriteReview(false)
+                .reviewWritten(false)
                 .build();
     }
 }

@@ -185,3 +185,22 @@
         padding: 24px;
     }
 }
+
+.user-mate-score-card {
+    border-color: #cfe5d6;
+    background: linear-gradient(135deg, #eaf4ee, #ffffff);
+}
+
+.user-mate-score-card strong {
+    color: #2f7d4a;
+}
+
+.user-mate-score-card span {
+    display: block;
+
+    margin-top: 8px;
+
+    color: #68736b;
+    font-size: 13px;
+    font-weight: 500;
+}

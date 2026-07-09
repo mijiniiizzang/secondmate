@@ -127,4 +127,9 @@ public class WishlistService {
                 .build();
     }
 
+    // 특정 사용자의 찜 갯수
+    public long getMyWishlistCount(Long userId) {
+        return wishlistRepository.countByUser_UserId(userId);
+    }
+
 }

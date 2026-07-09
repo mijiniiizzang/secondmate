@@ -34,6 +34,19 @@
             <span id="chatOpponentNickname"></span>
         </p>
 
+        <div id="reviewGuideBox" class="review-guide-box" hidden>
+            <p class="review-guide-title">이번 거래는 어떠셨나요?</p>
+            <p class="review-guide-text">
+                거래 후기를 남기면 상대방의 메이트지수에 반영돼요.
+            </p>
+
+            <button type="button"
+                    class="review-open-btn"
+                    onclick="openReviewModal(selectedRoomId, selectedOpponentUserId, selectedOpponentNickname)">
+                후기 남기기
+            </button>
+        </div>
+
         <div id="chatMessageList"></div>
 
         <div>
@@ -52,19 +65,21 @@
 
             Promise.all([
                 fetch("/chat/api/rooms/" + roomId),
-                fetch("/chat/api/rooms/" + roomId + "/messages")
+                fetch("/chat/api/rooms/" + roomId + "/messages"),
+                fetch("/review/api/can-write?roomId=" + roomId)
             ])
                 .then(responses => {
-                    if (!responses[0].ok || !responses[1].ok) {
+                    if (!responses[0].ok || !responses[1].ok || !responses[2].ok) {
                         throw new Error("채팅방 조회 실패");
                     }
 
                     return Promise.all([
                         responses[0].json(),
-                        responses[1].json()
+                        responses[1].json(),
+                        responses[2].json()
                     ]);
                 })
-                .then(([room, messages]) => {
+                .then(([room, messages, canWriteReview]) => {
                     document.getElementById("chatListView").hidden = true;
                     document.getElementById("chatRoomView").hidden = false;
 
@@ -85,6 +100,9 @@
 
                     document.getElementById("chatContent").disabled =
                         room.roomStatus === "FINISHED";
+
+                    document.getElementById("reviewGuideBox").hidden =
+                        !canWriteReview;
 
                     renderChatMessages(messages);
 
@@ -247,24 +265,30 @@
                 return;
             }
 
-            fetch (
+            fetch(
                 "/chat/api/rooms/" + selectedRoomId + "/trade-status?tradeStatusId=" + tradeStatusId,
                 {
                     method: "POST"
                 }
             )
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error("거래 상태 변경 실패");
-                }
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("거래 상태 변경 실패");
+                    }
 
-                alert("거래 상태가 변경되었습니다.");
+                    alert("거래 상태가 변경되었습니다.");
+                    openChatRoom(selectedRoomId);
+                })
+                .catch(() => {
+                    alert("거래 상태 변경에 실패했습니다.");
+                    openChatRoom(selectedRoomId);
+                });
+        }
+
+        function afterReviewSubmit() {
+            if (selectedRoomId !== null) {
                 openChatRoom(selectedRoomId);
-            })
-            .catch(() => {
-                alert("거래 상태 변경에 실패했습니다.");
-                openChatRoom(selectedRoomId);
-            });
+            }
         }
 
         document.getElementById("chatContent")

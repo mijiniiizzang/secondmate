@@ -20,6 +20,7 @@ public class ProductDTO {
     private String title;
     private String name;
     private String writer;
+    private Integer writerMateScore;
     private Long price;
     private ProductCategory category;
     private String content;

@@ -1,0 +1,129 @@
+<th:block th:fragment="reviewListModal">
+
+    <div id="reviewListModal" class="review-list-modal-wrapper" hidden>
+        <div class="review-list-modal">
+
+            <button type="button"
+                    class="review-list-modal-close"
+                    onclick="closeReviewListModal()">
+                ×
+            </button>
+
+            <div class="review-list-modal-title">
+                <h2 id="reviewListModalTitle">거래 후기</h2>
+                <p id="reviewListModalDesc">거래 후기를 확인할 수 있어요.</p>
+            </div>
+
+            <section id="receivedReviewBox" class="review-list-box" hidden>
+
+                <article class="review-list-card" th:each="review : ${receivedReviews}">
+                    <div class="review-list-card-header">
+                        <div>
+                            <p class="review-list-product-title" th:text="${review.productTitle}">
+                                상품 제목
+                            </p>
+
+                            <p class="review-list-user-text">
+                                작성자
+                                <strong th:text="${review.reviewerNickname}">닉네임</strong>
+                            </p>
+                        </div>
+
+                        <span class="review-list-type"
+                              th:classappend="${review.reviewType.name() == 'GOOD'} ? ' good' : (${review.reviewType.name() == 'BAD'} ? ' bad' : ' normal')"
+                              th:text="${review.reviewType.name() == 'GOOD'} ? '좋았어요' : (${review.reviewType.name() == 'BAD'} ? '아쉬웠어요' : '보통이에요')">
+                            좋았어요
+                        </span>
+                    </div>
+
+                    <p class="review-list-content"
+                       th:text="${review.content != null and !#strings.isEmpty(review.content) ? review.content : '작성된 내용이 없습니다.'}">
+                        후기 내용
+                    </p>
+
+                    <p class="review-list-date"
+                       th:text="${#temporals.format(review.regDate, 'yyyy.MM.dd')}">
+                        2026.07.09
+                    </p>
+                </article>
+
+                <div class="review-list-empty" th:if="${receivedReviews.isEmpty()}">
+                    받은 거래 후기가 없습니다.
+                </div>
+
+            </section>
+
+            <section id="writtenReviewBox" class="review-list-box" hidden>
+
+                <article class="review-list-card" th:each="review : ${writtenReviews}">
+                    <div class="review-list-card-header">
+                        <div>
+                            <p class="review-list-product-title" th:text="${review.productTitle}">
+                                상품 제목
+                            </p>
+
+                            <p class="review-list-user-text">
+                                받은 사람
+                                <strong th:text="${review.revieweeNickname}">닉네임</strong>
+                            </p>
+                        </div>
+
+                        <span class="review-list-type"
+                              th:classappend="${review.reviewType.name() == 'GOOD'} ? ' good' : (${review.reviewType.name() == 'BAD'} ? ' bad' : ' normal')"
+                              th:text="${review.reviewType.name() == 'GOOD'} ? '좋았어요' : (${review.reviewType.name() == 'BAD'} ? '아쉬웠어요' : '보통이에요')">
+                            좋았어요
+                        </span>
+                    </div>
+
+                    <p class="review-list-content"
+                       th:text="${review.content != null and !#strings.isEmpty(review.content) ? review.content : '작성된 내용이 없습니다.'}">
+                        후기 내용
+                    </p>
+
+                    <p class="review-list-date"
+                       th:text="${#temporals.format(review.regDate, 'yyyy.MM.dd')}">
+                        2026.07.09
+                    </p>
+                </article>
+
+                <div class="review-list-empty" th:if="${writtenReviews.isEmpty()}">
+                    작성한 거래 후기가 없습니다.
+                </div>
+
+            </section>
+
+        </div>
+    </div>
+
+    <script>
+        function openReviewListModal(type) {
+            const modal = document.getElementById("reviewListModal");
+            const title = document.getElementById("reviewListModalTitle");
+            const desc = document.getElementById("reviewListModalDesc");
+            const receivedBox = document.getElementById("receivedReviewBox");
+            const writtenBox = document.getElementById("writtenReviewBox");
+
+            receivedBox.hidden = true;
+            writtenBox.hidden = true;
+
+            if (type === "received") {
+                title.textContent = "받은 거래 후기";
+                desc.textContent = "거래 상대방이 나에게 남긴 후기를 확인할 수 있어요.";
+                receivedBox.hidden = false;
+            }
+
+            if (type === "written") {
+                title.textContent = "작성한 거래 후기";
+                desc.textContent = "내가 거래 상대방에게 남긴 후기를 확인할 수 있어요.";
+                writtenBox.hidden = false;
+            }
+
+            modal.hidden = false;
+        }
+
+        function closeReviewListModal() {
+            document.getElementById("reviewListModal").hidden = true;
+        }
+    </script>
+
+</th:block>

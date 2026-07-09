@@ -168,6 +168,7 @@ public class ProductService {
                          .title(product.getTitle())
                          .name(product.getName())
                          .writer(product.getUser().getNickname())
+                         .writerMateScore(product.getUser().getMateScore())
                          .price(product.getPrice())
                          .category(product.getCategory())
                          .content(product.getContent())
@@ -196,5 +197,10 @@ public class ProductService {
         Page<Product> products = productRepository.findByUser_UserId(userId, pageable);
 
         return products.map(this::toDTO);
+    }
+
+    // 내가 올린 상품 갯수
+    public long getMyProductCount(Long userId) {
+        return productRepository.countByUser_UserId(userId);
     }
 }

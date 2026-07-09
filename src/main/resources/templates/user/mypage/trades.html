@@ -1,8 +1,11 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <link rel="stylesheet" th:href="@{/css/user/mypage-sidebar.css}">
     <link rel="stylesheet" th:href="@{/css/user/trades.css}">
+    <link rel="stylesheet" th:href="@{/css/user/review-list-modal.css}">
+    <link rel="stylesheet" th:href="@{/css/user/review-modal.css}">
     <th:block th:replace="~{common/head :: commonHead}"></th:block>
     <title>내 거래내역</title>
 </head>
@@ -20,7 +23,17 @@
             <div class="trades-title">
                 <p class="trades-label">MY TRADES</p>
                 <h1>내 거래내역</h1>
-                <p>구매하거나 판매한 상품을 확인할 수 있어요.</p>
+                <p>구매하거나 판매한 상품과 거래 후기를 확인할 수 있어요.</p>
+            </div>
+
+            <div class="trade-review-list-button-row">
+                <button type="button" class="trade-review-list-button" onclick="openReviewListModal('received')">
+                    받은 후기 보기
+                </button>
+
+                <button type="button" class="trade-review-list-button" onclick="openReviewListModal('written')">
+                    작성한 후기 보기
+                </button>
             </div>
 
             <section class="trades-section">
@@ -35,6 +48,7 @@
                             <th>상품 제목</th>
                             <th>상품명</th>
                             <th>구매날짜</th>
+                            <th>후기</th>
                         </tr>
                     </thead>
 
@@ -42,7 +56,7 @@
                         <tr th:each="trade : ${purchaseTrades}">
                             <td>
                                 <a th:href="@{/product/detail(productId=${trade.productId})}"
-                                   th:text="${trade.productTitle}">
+                                    th:text="${trade.productTitle}">
                                     상품 제목
                                 </a>
                             </td>
@@ -55,6 +69,24 @@
                                 ? #temporals.format(trade.completedAt, 'yyyy.MM.dd')
                                 : '-'}">
                                 2026.07.07
+                            </td>
+
+                            <td>
+                                <button type="button" class="trade-review-btn" th:if="${trade.canWriteReview}"
+                                    th:data-chat-room-id="${trade.chatRoomId}" th:data-reviewee-id="${trade.revieweeId}"
+                                    th:data-reviewee-nickname="${trade.revieweeNickname}">
+                                    후기 쓰기
+                                </button>
+
+                                <span class="trade-review-done"
+                                    th:if="${!trade.canWriteReview and trade.reviewWritten}">
+                                    작성완료
+                                </span>
+
+                                <span class="trade-review-none"
+                                    th:if="${!trade.canWriteReview and !trade.reviewWritten}">
+                                    -
+                                </span>
                             </td>
                         </tr>
                     </tbody>
@@ -78,6 +110,7 @@
                             <th>상품명</th>
                             <th>거래상태</th>
                             <th>거래날짜</th>
+                            <th>후기</th>
                         </tr>
                     </thead>
 
@@ -85,7 +118,7 @@
                         <tr th:each="trade : ${salesTrades}">
                             <td>
                                 <a th:href="@{/product/detail(productId=${trade.productId})}"
-                                   th:text="${trade.productTitle}">
+                                    th:text="${trade.productTitle}">
                                     상품 제목
                                 </a>
                             </td>
@@ -109,6 +142,24 @@
                                 : #temporals.format(trade.tradeDate, 'yyyy.MM.dd')}">
                                 2026.07.07
                             </td>
+
+                            <td>
+                                <button type="button" class="trade-review-btn" th:if="${trade.canWriteReview}"
+                                    th:data-chat-room-id="${trade.chatRoomId}" th:data-reviewee-id="${trade.revieweeId}"
+                                    th:data-reviewee-nickname="${trade.revieweeNickname}">
+                                    후기 쓰기
+                                </button>
+
+                                <span class="trade-review-done"
+                                    th:if="${!trade.canWriteReview and trade.reviewWritten}">
+                                    작성완료
+                                </span>
+
+                                <span class="trade-review-none"
+                                    th:if="${!trade.canWriteReview and !trade.reviewWritten}">
+                                    -
+                                </span>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
@@ -123,5 +174,34 @@
 
     <div th:replace="~{common/footer :: footer}"></div>
 
+    <div th:replace="~{user/mypage/review-list-modal :: reviewListModal}"></div>
+
+    <script>
+        document.querySelectorAll(".trade-review-btn").forEach(button => {
+            button.addEventListener("click", function () {
+                const chatRoomId = this.dataset.chatRoomId;
+                const revieweeId = this.dataset.revieweeId;
+                const revieweeNickname = this.dataset.revieweeNickname;
+
+                document.getElementById("reviewChatRoomId").value = chatRoomId;
+                document.getElementById("reviewRevieweeId").value = revieweeId;
+                document.getElementById("reviewTargetNickname").textContent = revieweeNickname;
+
+                const checkedInput = document.querySelector("#reviewForm input[name='reviewType'][value='GOOD']");
+                if (checkedInput) {
+                    checkedInput.checked = true;
+                }
+
+                const content = document.querySelector("#reviewForm textarea[name='content']");
+                if (content) {
+                    content.value = "";
+                }
+
+                document.getElementById("reviewModal").hidden = false;
+            });
+        });
+    </script>
+
 </body>
+
 </html>

@@ -60,4 +60,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     );
 
     long countByRegDateBetween(LocalDateTime startDate, LocalDateTime endDate);
+
+    // 내가 올린 상품 개수 검색
+    long countByUser_UserId(Long userId);
 }

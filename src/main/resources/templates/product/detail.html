@@ -64,7 +64,13 @@
 
                         <div class="product-info-row">
                             <dt>작성자</dt>
-                            <dd th:text="${product.writer}"></dd>
+                            <dd class="product-writer-info">
+                                <span th:text="${product.writer}"></span>
+
+                                <span class="writer-mate-score">
+                                    메이트지수 <strong th:text="${product.writerMateScore}">70</strong>
+                                </span>
+                            </dd>
                         </div>
 
                         <div class="product-info-row">

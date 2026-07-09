@@ -139,6 +139,33 @@
     font-weight: 500;
 }
 
+.product-detail-page .product-writer-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.product-detail-page .writer-mate-score {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+
+    padding: 4px 8px;
+
+    border-radius: 999px;
+    background: #eaf4ee;
+
+    color: #2f7d4a;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.product-detail-page .writer-mate-score strong {
+    font-size: 12px;
+    font-weight: 800;
+}
+
 .product-detail-page .product-status {
     display: inline-flex;
     align-items: center;
@@ -327,6 +354,10 @@
 
     .product-detail-page .product-empty-image {
         min-height: 300px;
+    }
+
+    .product-detail-page .product-info-row {
+        grid-template-columns: 90px 1fr;
     }
 
     .product-detail-page .product-content {

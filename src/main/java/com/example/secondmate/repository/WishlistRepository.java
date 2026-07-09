@@ -24,4 +24,7 @@ public interface WishlistRepository extends JpaRepository<Wishlist, Long> {
 
     // 특정 상품의 전체 찜 수
     long countByProduct_ProductId(Long productId);
+
+    // 특정 사용자의 전체 찜 수
+    long countByUser_UserId(Long userId);
 }

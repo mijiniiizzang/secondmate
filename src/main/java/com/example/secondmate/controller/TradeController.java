@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.example.secondmate.dto.TradeDTO;
 import com.example.secondmate.security.AccountDetails;
+import com.example.secondmate.service.ReviewService;
 import com.example.secondmate.service.TradeService;
 
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 public class TradeController {
 
     private final TradeService tradeService;
+    private final ReviewService reviewService;
 
     @GetMapping("/trades")
     public String trades(
@@ -36,6 +38,9 @@ public class TradeController {
 
         model.addAttribute("purchaseTrades", purchaseTrades);
         model.addAttribute("salesTrades", salesTrades);
+        model.addAttribute("receivedReviews", reviewService.getReceivedReviews(userId));
+        model.addAttribute("writtenReviews", reviewService.getWrittenReviews(userId));
+        model.addAttribute("menu", "trades");
 
         return "user/mypage/trades";
     }

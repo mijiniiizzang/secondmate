@@ -175,6 +175,11 @@ public class NotificationService {
         return notificationRepository.existsByUser_UserIdAndIsReadFalse(userId);
     }
 
+    // 안 읽은 알림 개수
+    public long getMyUnreadNotificationCount(Long userId) {
+        return notificationRepository.countByUser_UserIdAndIsReadFalse(userId);
+    }
+
     // 쪽지 삭제
     public void deleteNotification(Long notificationId, Long userId) {
         Notification notification = notificationRepository.findById(notificationId)

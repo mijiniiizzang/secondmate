@@ -167,3 +167,30 @@
         white-space: nowrap;
     }
 }
+
+.trade-review-list-button-row {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+
+    margin: 22px 0 0;
+}
+
+.trade-review-list-button {
+    padding: 11px 18px;
+
+    border: 1px solid #2f7d4a;
+    border-radius: 999px;
+
+    background: #ffffff;
+    color: #2f7d4a;
+
+    font-size: 14px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.trade-review-list-button:hover {
+    background: #2f7d4a;
+    color: #ffffff;
+}

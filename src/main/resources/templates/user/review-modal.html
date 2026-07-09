@@ -1,0 +1,113 @@
+<th:block th:fragment="reviewModal">
+
+    <div id="reviewModal" class="review-modal-wrapper" hidden>
+        <form id="reviewForm" class="review-modal-form">
+
+            <button type="button"
+                    class="review-modal-close"
+                    onclick="closeReviewModal()">
+                ×
+            </button>
+
+            <h2>거래 후기를 남겨주세요</h2>
+
+            <p class="review-modal-desc">
+                <span id="reviewTargetNickname"></span>님과의 거래는 어떠셨나요?
+            </p>
+
+            <input type="hidden" id="reviewChatRoomId" name="chatRoomId">
+            <input type="hidden" id="reviewRevieweeId" name="revieweeId">
+
+            <div class="review-emoji-list">
+
+                <label class="review-emoji-item">
+                    <input type="radio" name="reviewType" value="GOOD" checked>
+                    <span>
+                        <strong>😊</strong>
+                        좋았어요
+                    </span>
+                </label>
+
+                <label class="review-emoji-item">
+                    <input type="radio" name="reviewType" value="NORMAL">
+                    <span>
+                        <strong>😐</strong>
+                        보통이에요
+                    </span>
+                </label>
+
+                <label class="review-emoji-item">
+                    <input type="radio" name="reviewType" value="BAD">
+                    <span>
+                        <strong>😟</strong>
+                        아쉬웠어요
+                    </span>
+                </label>
+
+            </div>
+
+            <textarea name="content"
+                      maxlength="500"
+                      placeholder="거래하면서 좋았던 점이나 아쉬웠던 점을 적어주세요."></textarea>
+
+            <button type="submit" class="review-submit-btn">
+                후기 등록
+            </button>
+
+        </form>
+    </div>
+
+    <script>
+        function openReviewModal(chatRoomId, revieweeId, revieweeNickname) {
+            document.getElementById("reviewChatRoomId").value = chatRoomId;
+            document.getElementById("reviewRevieweeId").value = revieweeId;
+            document.getElementById("reviewTargetNickname").textContent = revieweeNickname;
+
+            const checkedInput = document.querySelector("#reviewForm input[name='reviewType'][value='GOOD']");
+            if (checkedInput) {
+                checkedInput.checked = true;
+            }
+
+            const content = document.querySelector("#reviewForm textarea[name='content']");
+            if (content) {
+                content.value = "";
+            }
+
+            document.getElementById("reviewModal").hidden = false;
+        }
+
+        function closeReviewModal() {
+            document.getElementById("reviewModal").hidden = true;
+        }
+
+        document.getElementById("reviewForm")
+            .addEventListener("submit", function (event) {
+                event.preventDefault();
+
+                const formData = new FormData(this);
+
+                fetch("/review/write", {
+                    method: "POST",
+                    body: formData
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error("리뷰 등록 실패");
+                        }
+
+                        alert("거래 후기가 등록되었습니다.");
+                        closeReviewModal();
+
+                        if (typeof afterReviewSubmit === "function") {
+                            afterReviewSubmit();
+                        } else {
+                            location.reload();
+                        }
+                    })
+                    .catch(() => {
+                        alert("리뷰 등록에 실패했습니다.");
+                    });
+            });
+    </script>
+
+</th:block>
