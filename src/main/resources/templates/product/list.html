@@ -9,24 +9,28 @@
 
 <body>
     <div th:replace="~{common/header :: header}"></div>
-    <h1>상품 리스트</h1>
+
+    <h1 th:text="${sort == 'likes'} ? '인기상품' : '상품 리스트'">상품 리스트</h1>
+
     <!-- 검색 -->
     <form th:action="@{/product/list}" method="GET">
+        <input type="hidden" name="sort" th:value="${sort}">
+
         <div id="searchProduct">
             <select id="category" name="category">
                 <option value="">전체 카테고리</option>
-                <option value="ELECTRONICS">전자제품</option>
-                <option value="FASHION">의류</option>
-                <option value="BEAUTY">미용/화장품</option>
-                <option value="BOOK">도서</option>
-                <option value="SPORTS">스포츠용품</option>
-                <option value="FURNITURE">가구</option>
-                <option value="HOBBY">취미</option>
-                <option value="FOOD">음식</option>
-                <option value="TICKET">티켓</option>
-                <option value="ETC">기타</option>
+                <option value="ELECTRONICS" th:selected="${category == 'ELECTRONICS'}">전자제품</option>
+                <option value="FASHION" th:selected="${category == 'FASHION'}">의류</option>
+                <option value="BEAUTY" th:selected="${category == 'BEAUTY'}">미용/화장품</option>
+                <option value="BOOK" th:selected="${category == 'BOOK'}">도서</option>
+                <option value="SPORTS" th:selected="${category == 'SPORTS'}">스포츠용품</option>
+                <option value="FURNITURE" th:selected="${category == 'FURNITURE'}">가구</option>
+                <option value="HOBBY" th:selected="${category == 'HOBBY'}">취미</option>
+                <option value="FOOD" th:selected="${category == 'FOOD'}">음식</option>
+                <option value="TICKET" th:selected="${category == 'TICKET'}">티켓</option>
+                <option value="ETC" th:selected="${category == 'ETC'}">기타</option>
             </select>
-            <input type="text" name="keyword" placeholder="찾고 싶은 상품을 검색하세요">
+            <input type="text" name="keyword" placeholder="찾고 싶은 상품을 검색하세요" th:value="${keyword}">
             <button type="submit">검색</button>
         </div>
     </form>
@@ -34,19 +38,28 @@
     <div class="product-content-wrap">
         <aside class="filter-sidebar">
             <h3>필터</h3>
+
             <form th:action="@{/product/list}" method="GET">
-                <!-- 검색 결과 -->
                 <input type="hidden" name="keyword" th:value="${keyword}">
                 <input type="hidden" name="category" th:value="${category}">
+                <input type="hidden" name="sort" th:value="${sort}">
 
                 <!-- 거래 가능 여부 -->
                 <label>
-                    <input type="checkbox" name="availableOnly" value="true" th:checked="${availableOnly}">거래 가능한 상품만 보기
+                    <input type="checkbox"
+                           name="availableOnly"
+                           value="true"
+                           th:checked="${availableOnly}">
+                    거래 가능한 상품만 보기
                 </label>
+
                 <!-- 위치 -->
-                <!-- 내 위치 반경 3km -->
                 <label>
-                    <input type="checkbox" id="nearbyOnly" name="nearbyOnly" value="true">
+                    <input type="checkbox"
+                           id="nearbyOnly"
+                           name="nearbyOnly"
+                           value="true"
+                           th:checked="${nearbyOnly}">
                     내 위치 반경 3km 이내
                 </label>
 
@@ -54,40 +67,101 @@
                 <p>거래 희망 지역</p>
                 <select id="city" name="city" onchange="changeGu()">
                     <option value="">시/도 선택</option>
-                    <option value="서울특별시">서울특별시</option>
-                    <option value="부산광역시">부산광역시</option>
-                    <option value="대구광역시">대구광역시</option>
-                    <option value="인천광역시">인천광역시</option>
-                    <option value="광주광역시">광주광역시</option>
-                    <option value="대전광역시">대전광역시</option>
-                    <option value="울산광역시">울산광역시</option>
-                    <option value="세종특별자치시">세종특별자치시</option>
-                    <option value="경기도">경기도</option>
-                    <option value="강원도">강원도</option>
-                    <option value="충청북도">충청북도</option>
-                    <option value="충청남도">충청남도</option>
-                    <option value="전라북도">전라북도</option>
-                    <option value="전라남도">전라남도</option>
-                    <option value="경상북도">경상북도</option>
-                    <option value="경상남도">경상남도</option>
-                    <option value="제주도">제주도</option>
+                    <option value="서울특별시" th:selected="${city == '서울특별시'}">서울특별시</option>
+                    <option value="부산광역시" th:selected="${city == '부산광역시'}">부산광역시</option>
+                    <option value="대구광역시" th:selected="${city == '대구광역시'}">대구광역시</option>
+                    <option value="인천광역시" th:selected="${city == '인천광역시'}">인천광역시</option>
+                    <option value="광주광역시" th:selected="${city == '광주광역시'}">광주광역시</option>
+                    <option value="대전광역시" th:selected="${city == '대전광역시'}">대전광역시</option>
+                    <option value="울산광역시" th:selected="${city == '울산광역시'}">울산광역시</option>
+                    <option value="세종특별자치시" th:selected="${city == '세종특별자치시'}">세종특별자치시</option>
+                    <option value="경기도" th:selected="${city == '경기도'}">경기도</option>
+                    <option value="강원도" th:selected="${city == '강원도'}">강원도</option>
+                    <option value="충청북도" th:selected="${city == '충청북도'}">충청북도</option>
+                    <option value="충청남도" th:selected="${city == '충청남도'}">충청남도</option>
+                    <option value="전라북도" th:selected="${city == '전라북도'}">전라북도</option>
+                    <option value="전라남도" th:selected="${city == '전라남도'}">전라남도</option>
+                    <option value="경상북도" th:selected="${city == '경상북도'}">경상북도</option>
+                    <option value="경상남도" th:selected="${city == '경상남도'}">경상남도</option>
+                    <option value="제주도" th:selected="${city == '제주도'}">제주도</option>
                 </select>
-                <select id="gu" name="gu">
+
+                <select id="gu" name="gu" th:attr="data-selected-gu=${gu}">
                     <option value="">구/군 선택</option>
                 </select>
 
                 <!-- 카테고리 -->
                 <p>카테고리</p>
-                <label><input type="checkbox" name="categories" value="ELECTRONICS"> 전자제품</label>
-                <label><input type="checkbox" name="categories" value="FASHION"> 의류</label>
-                <label><input type="checkbox" name="categories" value="BEAUTY"> 미용/화장품</label>
-                <label><input type="checkbox" name="categories" value="BOOK"> 도서</label>
-                <label><input type="checkbox" name="categories" value="SPORTS"> 스포츠용품</label>
-                <label><input type="checkbox" name="categories" value="FURNITURE"> 가구</label>
-                <label><input type="checkbox" name="categories" value="HOBBY"> 취미</label>
-                <label><input type="checkbox" name="categories" value="FOOD"> 음식</label>
-                <label><input type="checkbox" name="categories" value="TICKET"> 티켓</label>
-                <label><input type="checkbox" name="categories" value="ETC"> 기타</label>
+                <label>
+                    <input type="checkbox"
+                           name="categories"
+                           value="ELECTRONICS"
+                           th:checked="${categories != null and categories.contains(T(com.example.secondmate.common.ProductCategory).ELECTRONICS)}">
+                    전자제품
+                </label>
+                <label>
+                    <input type="checkbox"
+                           name="categories"
+                           value="FASHION"
+                           th:checked="${categories != null and categories.contains(T(com.example.secondmate.common.ProductCategory).FASHION)}">
+                    의류
+                </label>
+                <label>
+                    <input type="checkbox"
+                           name="categories"
+                           value="BEAUTY"
+                           th:checked="${categories != null and categories.contains(T(com.example.secondmate.common.ProductCategory).BEAUTY)}">
+                    미용/화장품
+                </label>
+                <label>
+                    <input type="checkbox"
+                           name="categories"
+                           value="BOOK"
+                           th:checked="${categories != null and categories.contains(T(com.example.secondmate.common.ProductCategory).BOOK)}">
+                    도서
+                </label>
+                <label>
+                    <input type="checkbox"
+                           name="categories"
+                           value="SPORTS"
+                           th:checked="${categories != null and categories.contains(T(com.example.secondmate.common.ProductCategory).SPORTS)}">
+                    스포츠용품
+                </label>
+                <label>
+                    <input type="checkbox"
+                           name="categories"
+                           value="FURNITURE"
+                           th:checked="${categories != null and categories.contains(T(com.example.secondmate.common.ProductCategory).FURNITURE)}">
+                    가구
+                </label>
+                <label>
+                    <input type="checkbox"
+                           name="categories"
+                           value="HOBBY"
+                           th:checked="${categories != null and categories.contains(T(com.example.secondmate.common.ProductCategory).HOBBY)}">
+                    취미
+                </label>
+                <label>
+                    <input type="checkbox"
+                           name="categories"
+                           value="FOOD"
+                           th:checked="${categories != null and categories.contains(T(com.example.secondmate.common.ProductCategory).FOOD)}">
+                    음식
+                </label>
+                <label>
+                    <input type="checkbox"
+                           name="categories"
+                           value="TICKET"
+                           th:checked="${categories != null and categories.contains(T(com.example.secondmate.common.ProductCategory).TICKET)}">
+                    티켓
+                </label>
+                <label>
+                    <input type="checkbox"
+                           name="categories"
+                           value="ETC"
+                           th:checked="${categories != null and categories.contains(T(com.example.secondmate.common.ProductCategory).ETC)}">
+                    기타
+                </label>
 
                 <!-- 가격 -->
                 <p>가격</p>
@@ -95,8 +169,18 @@
                 <button type="button" onclick="setMaxPrice(5000)">5,000원 이하</button>
                 <button type="button" onclick="setMaxPrice(10000)">10,000원 이하</button>
                 <button type="button" onclick="setMaxPrice(20000)">20,000원 이하</button>
-                <input type="number" id="minPrice" name="minPrice" value="0" placeholder="0">
-                <input type="number" id="maxPrice" name="maxPrice" placeholder="최대 가격">
+
+                <input type="number"
+                       id="minPrice"
+                       name="minPrice"
+                       th:value="${minPrice != null ? minPrice : 0}"
+                       placeholder="0">
+
+                <input type="number"
+                       id="maxPrice"
+                       name="maxPrice"
+                       th:value="${maxPrice}"
+                       placeholder="최대 가격">
 
                 <button type="submit">필터 적용</button>
             </form>
@@ -108,16 +192,21 @@
                 <div class="product-image-area">
                     <a th:href="@{/product/detail(productId=${product.productId})}">
                         <img th:if="${!#lists.isEmpty(product.imageList)}"
-                            th:src="@{'/upload/' + ${product.imageList.?[mainImage][0].imageChgName}}"
-                            th:alt="${product.title}" class="product-image">
+                             th:src="@{'/upload/' + ${product.imageList.?[mainImage][0].imageChgName}}"
+                             th:alt="${product.title}"
+                             class="product-image">
+
                         <div th:if="${#lists.isEmpty(product.imageList)}" class="product-image-placeholder">
                             상품 이미지 없음
                         </div>
                     </a>
 
-                    <button type="button" class="wish-btn" th:data-product-id="${product.productId}"
-                        th:data-logged-in="${#authorization.expression('isAuthenticated()')}"
-                        th:text="${product.isWished} ? '♥' : '♡'" onclick="toggleWishlist(this)">
+                    <button type="button"
+                            class="wish-btn"
+                            th:data-product-id="${product.productId}"
+                            th:data-logged-in="${#authorization.expression('isAuthenticated()')}"
+                            th:text="${product.isWished} ? '♥' : '♡'"
+                            onclick="toggleWishlist(this)">
                         ♡
                     </button>
                 </div>
@@ -142,9 +231,6 @@
             </p>
         </div>
     </div>
-
-
-
 
     <script>
         function setMaxPrice(price) {
@@ -257,6 +343,7 @@
         function changeGu() {
             const city = document.getElementById("city").value;
             const gu = document.getElementById("gu");
+            const selectedGu = gu.dataset.selectedGu;
 
             gu.innerHTML = '<option value="">구/군 선택</option>';
 
@@ -265,10 +352,19 @@
                     const option = document.createElement("option");
                     option.value = item;
                     option.textContent = item;
+
+                    if (selectedGu === item) {
+                        option.selected = true;
+                    }
+
                     gu.appendChild(option);
                 });
             }
         }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            changeGu();
+        });
 
         document.querySelectorAll(".reg-time").forEach(function (element) {
             const regDate = new Date(element.dataset.regDate);
@@ -297,7 +393,6 @@
             element.textContent = diffDays + "일 전";
         });
 
-        // 하트 클릭 시 찜 기능 연결
         function toggleWishlist(button) {
             const loggedIn = button.dataset.loggedIn === "true";
 
@@ -306,6 +401,7 @@
                 openLoginModal();
                 return;
             }
+
             const productId = button.dataset.productId;
 
             fetch("/wishlist/toggle/" + productId, {
@@ -315,6 +411,7 @@
                     if (!response.ok) {
                         throw new Error();
                     }
+
                     return response.json();
                 })
                 .then(result => {
@@ -322,7 +419,7 @@
                 })
                 .catch(() => {
                     alert("찜 처리에 실패했습니다.");
-                })
+                });
         }
     </script>
 </body>

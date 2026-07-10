@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <th:block th:fragment="header">
 
@@ -20,9 +19,7 @@
                 <div class="guest-menu" sec:authorize="isAnonymous()">
                     <a class="header-text-link" th:href="@{/user/register}">회원가입</a>
 
-                    <button type="button"
-                            class="header-login-btn"
-                            onclick="openLoginModal()">
+                    <button type="button" class="header-login-btn" onclick="openLoginModal()">
                         로그인
                     </button>
                 </div>
@@ -44,8 +41,7 @@
                     </a>
 
                     <a class="header-user-link" th:href="@{/mypage}">
-                        <span class="header-user-name"
-                              th:text="${#authentication.principal.nickname} + '님'">
+                        <span class="header-user-name" th:text="${#authentication.principal.nickname} + '님'">
                         </span>
                         <span>마이페이지</span>
                     </a>
@@ -63,8 +59,7 @@
                         관리자 페이지
                     </a>
 
-                    <span class="header-user-name"
-                          th:text="${#authentication.principal.nickname} + '님'">
+                    <span class="header-user-name" th:text="${#authentication.principal.nickname} + '님'">
                     </span>
 
                     <form th:action="@{/auth/logout}" method="POST">
@@ -82,9 +77,7 @@
     <div id="loginModal" class="login-modal">
         <div class="login-modal-box">
 
-            <button type="button"
-                    class="modal-close-btn"
-                    onclick="closeLoginModal()">
+            <button type="button" class="modal-close-btn" onclick="closeLoginModal()">
                 ×
             </button>
 
@@ -140,9 +133,26 @@
             document.getElementById("findPasswordView").classList.add("active");
         }
 
-        document.getElementById("loginModal").addEventListener("click", function(event) {
+        document.getElementById("loginModal").addEventListener("click", function (event) {
             if (event.target === this) {
                 closeLoginModal();
+            }
+        });
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const params = new URLSearchParams(window.location.search);
+
+            if (params.get("loginError") === "true") {
+                alert("아이디 또는 비밀번호가 일치하지 않습니다.");
+
+                if (typeof openLoginModal === "function") {
+                    openLoginModal();
+                }
+
+                params.delete("loginError");
+
+                const newUrl = window.location.pathname + (params.toString() ? "?" + params.toString() : "");
+                window.history.replaceState({}, "", newUrl);
             }
         });
 

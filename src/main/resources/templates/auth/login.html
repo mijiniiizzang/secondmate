@@ -4,8 +4,9 @@
         <h2>로그인</h2>
     </div>
 
-    <form th:action="@{/auth/login}" method="POST">
+    <form th:action="@{/auth/login}" method="POST" id="loginForm">
         <input type="hidden" id="redirectUrl" name="redirectUrl">
+
         <div class="login-input-group">
             <label for="loginUsername">아이디</label>
             <input type="text" id="loginUsername" name="username" required>
@@ -37,5 +38,45 @@
         아직 회원이 아니신가요?
         <a th:href="@{/user/register}">회원가입</a>
     </p>
+
+    <script>
+        function setLoginRedirectUrl() {
+            const redirectUrlInput = document.getElementById("redirectUrl");
+
+            if (!redirectUrlInput) {
+                return;
+            }
+
+            redirectUrlInput.value = window.location.pathname + window.location.search;
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            setLoginRedirectUrl();
+
+            const loginForm = document.getElementById("loginForm");
+
+            if (loginForm) {
+                loginForm.addEventListener("submit", function () {
+                    setLoginRedirectUrl();
+                });
+            }
+
+            const params = new URLSearchParams(window.location.search);
+
+            if (params.get("error") === "true" || params.get("loginError") === "true") {
+                alert("아이디 또는 비밀번호가 일치하지 않습니다.");
+
+                if (typeof openLoginModal === "function") {
+                    openLoginModal();
+                }
+
+                params.delete("error");
+                params.delete("loginError");
+
+                const newUrl = window.location.pathname + (params.toString() ? "?" + params.toString() : "");
+                window.history.replaceState({}, "", newUrl);
+            }
+        });
+    </script>
 
 </th:block>

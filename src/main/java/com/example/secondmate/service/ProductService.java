@@ -87,6 +87,12 @@ public class ProductService {
         return products.map(this::toDTO);
     }
 
+    // 찜 개수 많은 순으로 상품 조회
+    public Page<ProductDTO> getLikesOrder(Pageable pageable) {
+        return productRepository.findLikesOrder(pageable)
+                                .map(this::toDTO);
+    }
+
     // 상품 상세 조회
     public ProductDTO getProductById(Long productId) {
         Product product = productRepository.findById(productId)

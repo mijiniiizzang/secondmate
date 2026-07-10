@@ -13,62 +13,82 @@ import lombok.RequiredArgsConstructor;
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig {
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())
-        .authorizeHttpRequests(auth -> auth
-            .requestMatchers("/admin/**").hasRole("ADMIN")
-            .requestMatchers(
-                "/product/edit",
-                "/product/delete",
-                "/wishlist/**",
-                "/api/comments",
-                "/report/**",
-                "/mypage/**",
-                "/chat/**",
-                "/review/**",
-                "/ws/**"
-            ).authenticated()
-            .anyRequest().permitAll()
-        )
-        
-        .formLogin(form -> form.loginPage("/auth/login")
-                               .loginProcessingUrl("/auth/login")
-                               .successHandler((request, response, authentication) -> {
-                                    String redirectUrl = request.getParameter("redirectUrl");
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers(
+                                "/product/edit",
+                                "/product/delete",
+                                "/wishlist/**",
+                                "/api/comments",
+                                "/report/**",
+                                "/mypage/**",
+                                "/chat/**",
+                                "/review/**",
+                                "/ws/**")
+                        .authenticated()
+                        .anyRequest().permitAll())
 
-                                    // 현재 사이트 내부 주소일 때만 이동
-                                    if (redirectUrl != null 
-                                        && !redirectUrl.isBlank()
-                                        && redirectUrl.startsWith("/")
-                                        && !redirectUrl.startsWith("//")) {
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.sendRedirect("/home");
+                        }))
 
-                                        response.sendRedirect(redirectUrl);
-                                        return;
-                                    }
-                                    response.sendRedirect("/home");
-                               })
-                               .failureHandler((request, response, exception) -> {
-                                if (exception instanceof DisabledException) {
-                                    String[] suspendedInfo = exception.getMessage().split("\\|");
+                .formLogin(form -> form.loginPage("/auth/login")
+                        .loginProcessingUrl("/auth/login")
+                        .successHandler((request, response, authentication) -> {
+                            String redirectUrl = request.getParameter("redirectUrl");
 
-                                    String count = suspendedInfo[0];
-                                    String until = suspendedInfo[1];
-                                    response.sendRedirect("/auth/login?suspended=true" + "&count=" + count + "&until=" + until);
+                            if (redirectUrl != null
+                                    && !redirectUrl.isBlank()
+                                    && redirectUrl.startsWith("/")
+                                    && !redirectUrl.startsWith("//")) {
+
+                                response.sendRedirect(redirectUrl);
+                                return;
+                            }
+
+                            response.sendRedirect("/home");
+                        })
+                        .failureHandler((request, response, exception) -> {
+                            String redirectUrl = request.getParameter("redirectUrl");
+
+                            if (exception instanceof DisabledException) {
+                                String count = request.getParameter("count");
+                                String until = request.getParameter("until");
+
+                                response.sendRedirect("/auth/login?suspended=true&count=" + count + "&until=" + until);
+                                return;
+                            }
+
+                            if (redirectUrl != null
+                                    && !redirectUrl.isBlank()
+                                    && redirectUrl.startsWith("/")
+                                    && !redirectUrl.startsWith("//")) {
+
+                                if (redirectUrl.contains("?")) {
+                                    response.sendRedirect(redirectUrl + "&loginError=true");
                                 } else {
-                                    response.sendRedirect("/auth/login?error=true");
+                                    response.sendRedirect(redirectUrl + "?loginError=true");
                                 }
-                               })
-                               .permitAll()
-        )
-        .logout(logout -> logout.logoutUrl("/auth/logout")
-                                .logoutSuccessUrl("/home")
-                                .permitAll()
-        );
+
+                                return;
+                            }
+
+                            response.sendRedirect("/home?loginError=true");
+                        })
+                        .permitAll())
+
+                .logout(logout -> logout.logoutUrl("/auth/logout")
+                        .logoutSuccessUrl("/home")
+                        .permitAll());
 
         return http.build();
     }
-    // 비밀번호 암호화 객체 관리
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();

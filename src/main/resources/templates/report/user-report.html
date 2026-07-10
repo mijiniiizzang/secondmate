@@ -2,10 +2,16 @@
 
     <link rel="stylesheet" th:href="@{/css/report-form.css}">
 
-    <div id="userReportModal" class="report-modal-wrapper" hidden>
+    <div id="userReportModal" class="report-modal-wrapper">
         <form class="report-form"
               id="userReportForm"
               method="POST">
+
+            <button type="button"
+                    class="report-modal-close"
+                    onclick="closeUserReportModal()">
+                x
+            </button>
 
             <h2>사용자 신고</h2>
 
@@ -20,7 +26,7 @@
                 <span id="reportedUserNickname"></span>
             </p>
 
-            <p>신고 유형 :</p>
+            <p>신고 유형 : </p>
 
             <select name="reportType" required>
                 <option value="">신고 유형을 선택해주세요</option>
@@ -30,7 +36,7 @@
                 <option value="OTHER">기타</option>
             </select>
 
-            <p>신고 내용 :</p>
+            <p>신고 내용 : </p>
 
             <textarea name="reason"
                       rows="5"
@@ -40,45 +46,55 @@
 
             <button type="submit">신고접수</button>
 
-            <button type="button" onclick="closeUserReportModal()">
-                취소
-            </button>
         </form>
     </div>
 
     <script>
         function openUserReportModal(reportedUserId, reportedUserNickname) {
+            if (!reportedUserId) {
+                alert("신고 대상을 불러오지 못했습니다.");
+                return;
+            }
+
             document.getElementById("userReportForm").action =
                 "/report/api/user/" + reportedUserId;
 
             document.getElementById("reportedUserNickname").textContent =
                 reportedUserNickname;
 
-            document.getElementById("userReportModal").hidden = false;
+            document.getElementById("userReportModal").style.display = "flex";
         }
 
         function closeUserReportModal() {
-            document.getElementById("userReportModal").hidden = true;
+            document.getElementById("userReportModal").style.display = "none";
         }
 
-        document.getElementById('userReportForm').addEventListener('submit', function(event) {
+        document.getElementById("userReportForm").addEventListener("submit", function(event) {
             event.preventDefault();
 
             const form = event.currentTarget;
+            const formData = new FormData(form);
+            const params = new URLSearchParams(formData);
 
-            $.ajax({
-                type: 'POST',
-                url: form.action,
-                data: $(form).serialize(),
-                success: function() {
-                    alert('신고가 접수되었습니다.');
+            fetch(form.action, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: params
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("사용자 신고 실패");
+                    }
+
+                    alert("신고가 접수되었습니다.");
                     closeUserReportModal();
                     form.reset();
-                },
-                error: function() {
-                    alert('이미 신고된 사용자입니다.');
-                }
-            });
+                })
+                .catch(() => {
+                    alert("이미 신고된 사용자입니다.");
+                });
         });
     </script>
 

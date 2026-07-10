@@ -2,6 +2,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    <script>
+        (function () {
+            const navigationEntries = performance.getEntriesByType("navigation");
+            const navigationType = navigationEntries.length > 0
+                ? navigationEntries[0].type
+                : "";
+
+            const isReload =
+                navigationType === "reload" ||
+                performance.navigation.type === 1;
+
+            if (isReload && window.location.pathname !== "/home") {
+                window.location.replace("/home");
+            }
+        })();
+    </script>
+
     <link rel="stylesheet" th:href="@{/css/common.css}">
     <link rel="stylesheet" th:href="@{/css/auth.css}">
     <link rel="stylesheet" th:href="@{/css/home.css}">

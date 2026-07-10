@@ -63,4 +63,16 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     // 내가 올린 상품 개수 검색
     long countByUser_UserId(Long userId);
+
+    // 찜 개수 많은 순으로 불러오기
+    @Query("""
+            SELECT p
+            FROM Product p
+            LEFT JOIN Wishlist w on w.product = p 
+            WHERE p.hidden = false
+            GROUP BY p
+            ORDER BY COUNT(w) DESC, p.regDate DESC
+    """)
+    Page<Product> findLikesOrder(Pageable pageable);
+
 }

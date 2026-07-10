@@ -1,5 +1,7 @@
 package com.example.secondmate.service;
 
+import java.util.UUID;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,7 +24,6 @@ public class UserService {
 
     // 관리자 계정 생성
     public void createAdmin() {
-        // admin 계정이 존재하는 경우
         if (userRepository.findByUsername("admin").isPresent()) {
             return;
         }
@@ -40,6 +41,7 @@ public class UserService {
                 .role(UserRole.ROLE_ADMIN)
                 .status(UserStatus.ACTIVE)
                 .build();
+
         userRepository.save(admin);
     }
 
@@ -58,7 +60,9 @@ public class UserService {
                 .role(UserRole.ROLE_USER)
                 .status(UserStatus.ACTIVE)
                 .build();
+
         userRepository.save(user);
+
         return 1;
     }
 
@@ -93,6 +97,7 @@ public class UserService {
     public String findUsername(String name, String phone, String email) {
         User user = userRepository.findByNameAndPhoneAndEmail(name, phone, email)
                 .orElseThrow(() -> new IllegalArgumentException("입력한 정보와 일치하지 않음"));
+
         return user.getUsername();
     }
 
@@ -118,6 +123,7 @@ public class UserService {
     public int updateUser(Long userId, UserUpdateDTO userUpdateDTO) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자"));
+
         user.setName(userUpdateDTO.getName());
         user.setNickname(userUpdateDTO.getNickname());
         user.setPhone(userUpdateDTO.getPhone());
@@ -127,6 +133,7 @@ public class UserService {
         user.setLongitude(userUpdateDTO.getLongitude());
 
         userRepository.save(user);
+
         return 1;
     }
 
@@ -135,14 +142,13 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자"));
 
-        // 기존 비밀번호 확인
         if (!passwordEncoder.matches(updatePasswordDTO.getOldPassword(), user.getPassword())) {
             throw new IllegalArgumentException("현재 비밀번호가 일치하지 않습니다.");
         }
 
-        // 새 비밀번호 변경
         user.setPassword(passwordEncoder.encode(updatePasswordDTO.getNewPassword()));
         userRepository.save(user);
+
         return 1;
     }
 
@@ -156,6 +162,7 @@ public class UserService {
     }
 
     // 회원 탈퇴
+    @Transactional
     public void deleteUser(Long userId, String password) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자"));
@@ -163,6 +170,20 @@ public class UserService {
         if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new IllegalArgumentException("현재 비밀번호가 일치하지 않음");
         }
-        userRepository.delete(user);
+
+        String uniqueValue = userId + "_" + UUID.randomUUID().toString().substring(0, 8);
+
+        user.setUsername("deleted_" + uniqueValue);
+        user.setPassword(passwordEncoder.encode(UUID.randomUUID().toString()));
+        user.setName("탈퇴한 사용자");
+        user.setNickname("탈퇴한 사용자_" + uniqueValue);
+        user.setPhone("000-0000-0000_" + uniqueValue);
+        user.setEmail("deleted_" + uniqueValue + "@deleted.local");
+        user.setAddress("-");
+        user.setLatitude(0.0);
+        user.setLongitude(0.0);
+        user.setStatus(UserStatus.SUSPENDED);
+
+        userRepository.save(user);
     }
 }

@@ -1,6 +1,7 @@
 package com.example.secondmate.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -24,7 +25,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @RequestMapping("/chat")
 public class ChatController {
-    
+
     private final ChatService chatService;
     private final ReviewService reviewService;
 
@@ -37,7 +38,21 @@ public class ChatController {
 
         Long roomId = chatService.createOrGetRoom(productId, accountDetails.getUserId());
 
-        return "redirect:/chat/room/" + roomId; 
+        return "redirect:/chat/room/" + roomId;
+    }
+
+    // 채팅방 생성 - 모달용 JSON API
+    @PostMapping("/api/room")
+    @ResponseBody
+    public Map<String, Long> createRoomApi(@RequestParam Long productId,
+            @AuthenticationPrincipal AccountDetails accountDetails) {
+        if (accountDetails == null) {
+            throw new IllegalArgumentException("로그인이 필요합니다.");
+        }
+
+        Long roomId = chatService.createOrGetRoom(productId, accountDetails.getUserId());
+
+        return Map.of("roomId", roomId);
     }
 
     // 채팅방 목록 가져오기
@@ -56,7 +71,8 @@ public class ChatController {
 
     // 특정 채팅방 가져오기
     @GetMapping("/room/{roomId}")
-    public String chatRoom(@PathVariable Long roomId, Model model, @AuthenticationPrincipal AccountDetails accountDetails) {
+    public String chatRoom(@PathVariable Long roomId, Model model,
+            @AuthenticationPrincipal AccountDetails accountDetails) {
         if (accountDetails == null) {
             return "redirect:/auth/login?redirectUrl=/chat/room/" + roomId;
         }
@@ -78,7 +94,8 @@ public class ChatController {
 
     // 채팅 보내기
     @PostMapping("/room/{roomId}/message")
-    public String sendMessage(@PathVariable Long roomId, @RequestParam String content, @AuthenticationPrincipal AccountDetails accountDetails) {
+    public String sendMessage(@PathVariable Long roomId, @RequestParam String content,
+            @AuthenticationPrincipal AccountDetails accountDetails) {
         if (accountDetails == null) {
             return "redirect:/auth/login?redirectUrl=/chat/room/" + roomId;
         }
@@ -105,7 +122,8 @@ public class ChatController {
     // 헤더 채팅 패널 - 선택한 채팅방 이전 메세지 조회
     @GetMapping("/api/rooms/{roomId}/messages")
     @ResponseBody
-    public List<ChatMessageDTO> getChatMessages(@PathVariable Long roomId, @AuthenticationPrincipal AccountDetails accountDetails) {
+    public List<ChatMessageDTO> getChatMessages(@PathVariable Long roomId,
+            @AuthenticationPrincipal AccountDetails accountDetails) {
         return chatService.getMessages(roomId, accountDetails.getUserId());
     }
 
@@ -126,7 +144,8 @@ public class ChatController {
     // 거래 상태 변경
     @PostMapping("/api/rooms/{roomId}/trade-status")
     @ResponseBody
-    public void changeTradeStatus(@PathVariable Long roomId, @RequestParam int tradeStatusId, @AuthenticationPrincipal AccountDetails accountDetails) {
+    public void changeTradeStatus(@PathVariable Long roomId, @RequestParam int tradeStatusId,
+            @AuthenticationPrincipal AccountDetails accountDetails) {
         chatService.changeTradeStatus(roomId, accountDetails.getUserId(), tradeStatusId);
     }
 }

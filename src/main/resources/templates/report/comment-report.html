@@ -1,8 +1,8 @@
 <th:block th:fragment="commentReport">
     <link rel="stylesheet" th:href="@{/css/report-form.css}">
-    <button type="button" class="report-modal-close" onclick="closeCommentReport()">x</button>
     <!-- 댓글 신고 -->
     <form class="report-form" id="commentReportForm" method="POST">
+        <button type="button" class="report-modal-close" onclick="closeCommentReport()">x</button>
         <h2>댓글 신고</h2>
         <p>댓글 작성자 : <span id="reportCommentWriter"></span></p>
         <p>댓글 내용 : <span id="reportCommentContent"></span></p>

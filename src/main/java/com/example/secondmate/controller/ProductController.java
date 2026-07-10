@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -58,15 +59,15 @@ public class ProductController {
             @RequestParam(required = false) Long maxPrice,
             @RequestParam(required = false) String city,
             @RequestParam(required = false) String gu,
+            @RequestParam(required = false) String sort,
             @PageableDefault(size = 20, sort = "productId", direction = Sort.Direction.DESC) Pageable pageable,
             Model model,
             @AuthenticationPrincipal AccountDetails accountDetails) {
-        // 홈에서 카테고리 하나만 선택한 경우
+
         if (category != null && (categories == null || categories.isEmpty())) {
             categories = List.of(category);
         }
 
-        // 빈 문자열은 검색 조건에서 제외
         if (keyword != null && keyword.isBlank()) {
             keyword = null;
         }
@@ -79,22 +80,30 @@ public class ProductController {
             gu = null;
         }
 
-        // 거래 가능 체크 시 판매중 상품만 조회
         TradeStatus tradeStatus = Boolean.TRUE.equals(availableOnly)
                 ? TradeStatus.ON_SALE
                 : null;
 
-        Page<ProductDTO> products = productService.search(
-                keyword,
-                categories,
-                city,
-                gu,
-                tradeStatus,
-                minPrice,
-                maxPrice,
-                pageable);
+        Page<ProductDTO> products;
 
-        // 로그인한 사람만 찜 여부 조회
+        if ("likes".equals(sort)) {
+            Pageable likesPageable = PageRequest.of(
+                    pageable.getPageNumber(),
+                    pageable.getPageSize());
+
+            products = productService.getLikesOrder(likesPageable);
+        } else {
+            products = productService.search(
+                    keyword,
+                    categories,
+                    city,
+                    gu,
+                    tradeStatus,
+                    minPrice,
+                    maxPrice,
+                    pageable);
+        }
+
         if (accountDetails != null) {
             for (ProductDTO product : products.getContent()) {
                 boolean isWished = wishlistService.isWished(
@@ -114,6 +123,7 @@ public class ProductController {
         model.addAttribute("maxPrice", maxPrice);
         model.addAttribute("city", city);
         model.addAttribute("gu", gu);
+        model.addAttribute("sort", sort);
 
         model.addAttribute(
                 "selectedCategories",
@@ -188,10 +198,8 @@ public class ProductController {
         boolean isWished = false;
         boolean isOwner = false;
 
-        // 로그인한 경우에만 "내가 찜 했는지" 확인 + 글 작성자만 수정/삭제 가능
         if (accountDetails != null) {
             isWished = wishlistService.isWished(accountDetails.getUserId(), productId);
-
             isOwner = productService.isProductOwner(productId, accountDetails.getUserId());
         }
 
@@ -270,7 +278,6 @@ public class ProductController {
             @RequestParam TradeStatus tradeStatus,
             @AuthenticationPrincipal AccountDetails accountDetails) {
 
-        // 작성자 본인인지 확인
         if (!productService.isProductOwner(productId, accountDetails.getUserId())) {
             return 0;
         }

@@ -114,11 +114,13 @@
                             신고
                         </button>
 
-                        <form th:action="@{/chat/room}" method="POST" sec:authorize="isAuthenticated()"
-                            th:if="${!isOwner}">
-                            <input type="hidden" name="productId" th:value="${product.productId}">
-                            <button type="submit" class="product-chat-button">채팅하기</button>
-                        </form>
+                        <button type="button"
+                                th:data-product-id="${product.productId}"
+                                th:data-logged-in="${#authorization.expression('isAuthenticated()')}"
+                                onclick="startChatFromProductDetail(this)">
+                            채팅하기
+                        </button>
+
                         <a class="product-list-button" th:href="@{/product/list}">
                             목록
                         </a>
@@ -186,6 +188,46 @@
     <div th:replace="~{common/footer :: footer}"></div>
 
     <script th:inline="javascript">
+        function setLoginRedirectToCurrentPage() {
+            const currentUrl = location.pathname + location.search;
+
+            const redirectInputs = document.querySelectorAll("input[name='redirectUrl']");
+
+            redirectInputs.forEach(function(input) {
+                input.value = currentUrl;
+            });
+        }
+
+        function startChatFromProductDetail(button) {
+            const loggedIn = button.dataset.loggedIn === "true";
+
+            if (!loggedIn) {
+                alert("로그인 후 이용할 수 있습니다.");
+                setLoginRedirectToCurrentPage();
+                openLoginModal();
+                return;
+            }
+
+            const productId = button.dataset.productId;
+
+            fetch("/chat/api/room?productId=" + productId, {
+                method: "POST"
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("채팅방 생성 실패");
+                }
+                return response.json();
+            })
+            .then(room => {
+                openChatPanel();
+                openChatRoom(room.roomId);
+            })
+            .catch(() => {
+                alert("채팅방 생성에 실패했습니다.");
+            });
+        }
+
         const currentUser =
             /*[[${#authorization.expression('isAuthenticated()') ? #authentication.principal.nickname : ''}]]*/'';
 
@@ -318,6 +360,7 @@
 
             if (!loggedIn) {
                 alert('로그인 후 이용할 수 있습니다.');
+                setLoginRedirectToCurrentPage();
                 openLoginModal();
                 return;
             }
