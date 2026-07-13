@@ -383,6 +383,71 @@
             marker.setMap(map);
         }
 
+        function normalizeCityName(city) {
+            const cityNameMap = {
+                "강원특별자치도": "강원도",
+                "전북특별자치도": "전라북도",
+                "제주특별자치도": "제주도"
+            };
+
+            return cityNameMap[city] || city;
+        }
+
+        function findMatchingGu(city, region2DepthName) {
+            if (city === "세종특별자치시") {
+                return "세종특별자치시";
+            }
+
+            if (!areaData[city] || !region2DepthName) {
+                return "";
+            }
+
+            return areaData[city].find(function (gu) {
+                return region2DepthName === gu
+                    || region2DepthName.startsWith(gu + " ")
+                    || region2DepthName.includes(gu);
+            }) || "";
+        }
+
+        function updateRegionSelectByPosition(latlng) {
+            const lat = latlng.getLat();
+            const lng = latlng.getLng();
+
+            geocoder.coord2RegionCode(lng, lat, function (result, status) {
+                if (status !== kakao.maps.services.Status.OK || result.length === 0) {
+                    alert("선택한 위치의 행정구역을 찾지 못했습니다.");
+                    return;
+                }
+
+                const region = result.find(function (item) {
+                    return item.region_type === "H";
+                }) || result[0];
+
+                const city = normalizeCityName(region.region_1depth_name);
+                const gu = findMatchingGu(city, region.region_2depth_name);
+
+                if (!areaData[city]) {
+                    alert("선택한 위치의 시/도 정보를 목록에서 찾지 못했습니다.");
+                    return;
+                }
+
+                const citySelect = document.getElementById("city");
+                const guSelect = document.getElementById("gu");
+
+                citySelect.value = city;
+                changeGu();
+
+                if (gu) {
+                    guSelect.value = gu;
+                }
+
+                document.getElementById("address").value =
+                    city === "세종특별자치시"
+                        ? city
+                        : city + " " + gu;
+            });
+        }
+
         kakao.maps.event.addListener(map, "click", function (mouseEvent) {
             if (!isEditing) {
                 return;
@@ -402,6 +467,8 @@
             });
 
             marker.setMap(map);
+
+            updateRegionSelectByPosition(latlng);
         });
     </script>
 </body>
